@@ -1,0 +1,36 @@
+{
+  "type": "module",
+  "name": "DictatorBot",
+  "version": "1.0.0",
+  "exports": "./index.js",
+  "license": "MIT",
+  "packageManager": "yarn@3.1.1",
+  "scripts": {
+    "build": "yarn tsc --build"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^0.11.0",
+    "@discordjs/rest": "^0.2.0-canary.0",
+    "axios": "^0.24.0",
+    "bufferutil": "^4.0.6",
+    "canvas": "^2.8.0",
+    "discord-api-types": "^0.26.1",
+    "discord.js": "^13.5.1",
+    "erlpack": "^0.1.4",
+    "got": "^12.0.1",
+    "js-yaml": "^4.1.0",
+    "pg": "^8.7.1",
+    "puppeteer": "^13.0.1",
+    "puppeteer-extra": "^3.2.3",
+    "puppeteer-extra-plugin-stealth": "^2.9.0",
+    "utf-8-validate": "^5.0.8",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5",
+    "@types/mysql": "^2.15.20",
+    "@types/pg": "^8.6.3",
+    "eslint": "^8.6.0",
+    "typescript": "^4.5.4"
+  }
+}
