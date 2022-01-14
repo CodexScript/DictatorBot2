@@ -1,64 +1,54 @@
-import { Client, Collection, Intents } from 'discord.js';
-import { config } from './util/ConfigManager.js';
-import * as fs from 'fs/promises';
-import * as fsSync from 'fs';
-import { SocialCreditManager } from './util/SocialCreditManager.js';
-
-export let commands = new Collection<string, any>();
+import * as SocialCreditManager from './util/SocialCreditManager.js';
+import { Bot } from './models/Bot.js';
+import { registerCommands } from './util/CommandUtils.js';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 (async () => {
-    
-    const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 
-    await SocialCreditManager.establishConnection(config.socialCreditDatabase);
 
-    const commandCategories = (fsSync.readdirSync('./commands')).filter(file => {
-        return fsSync.statSync(`./commands/${file}`).isDirectory();
-    });
+	const client = new Bot();
 
-    for (const category of commandCategories) {
-        console.log("Loading commands from category: " + category);
-        const categoryCommands = (await fs.readdir(`./commands/${category}`)).filter(file => file.endsWith('.js'));
-        for (const file of categoryCommands) {
-            const command = await import(`./commands/${category}/${file}`);
-            console.log("Adding command: " + command.data.name);
-            commands.set(command.data.name, command);
-        }
-    }
+	await SocialCreditManager.establishConnection(client.config.socialCreditDatabase);
 
-    client.once('ready', () => {
-        console.log(`${client.user?.username} is now providing they/their services to the CCP.`);
-    });
+	client.music.on('connect', () => {
+		console.log('Connected to lavalink.');
+	});
 
-    client.on('interactionCreate', async interaction => {
-        if (!interaction.isCommand()) {
-            return;
-        }
+	client.once('ready', async () => {
+		const __filename = fileURLToPath(import.meta.url);
+		await registerCommands(client, join(dirname(__filename), 'commands'));
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		await client.music.connect(client.user!.id);
+		console.log(`${client.user?.username} is now providing they/their services to the CCP.`);
+	});
 
-        const command = commands.get(interaction.commandName);
+	client.on('interactionCreate', async interaction => {
+		if (!interaction.isCommand()) {
+			return;
+		}
 
-        if (!command) {
-            console.log("Command not found: " + interaction.commandName);
-            return;
-        }
+		const command = client.commands.get(interaction.commandName);
 
-        await command.execute(interaction);
-        // try {
-        //     await command.execute(interaction);
-        // }
-        // catch (error: any) {
-        //     console.error(error);
-        //     if (interaction.replied) {
-        //         await interaction.editReply({content: 'There was an error while executing this command! Please show this to the bot owner:\n```' + error.stack + '\n```'});
-        //     }
-        //     else {
-        //         await interaction.reply({ content: 'There was an error while executing this command! Please show this to the bot owner:\n```' + error.stack + '\n```', ephemeral: true });
-        //     }
-        // }
-    });
+		if (!command) {
+			console.log('Command not found: ' + interaction.commandName);
+			return;
+		}
 
-    client.login(config.botToken);
+		await command.execute(interaction);
+		// try {
+		//     await command.execute(interaction);
+		// }
+		// catch (error: any) {
+		//     console.error(error);
+		//     if (interaction.replied) {
+		//         await interaction.editReply({content: 'There was an error while executing this command! Please show this to the bot owner:\n```' + error.stack + '\n```'});
+		//     }
+		//     else {
+		//         await interaction.reply({ content: 'There was an error while executing this command! Please show this to the bot owner:\n```' + error.stack + '\n```', ephemeral: true });
+		//     }
+		// }
+	});
 
-    
-
+	await client.login(client.config.botToken);
 })();
