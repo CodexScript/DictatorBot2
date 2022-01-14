@@ -4,9 +4,11 @@ import { Config } from './config/Config.js';
 import { SlashCommand } from './SlashCommand.js';
 import yaml from 'js-yaml';
 import * as fs from 'fs';
+import { TrackScheduler } from '../util/music/TrackScheduler.js';
 
 export class Bot extends Client {
 	readonly music: Node;
+	readonly musicManagers = new Collection<Snowflake, TrackScheduler>();
 	readonly config: Config;
 	readonly commands: Collection<Snowflake, SlashCommand> = new Collection();
 
@@ -35,6 +37,7 @@ declare module 'discord.js' {
 	// eslint-disable-next-line no-shadow
 	interface Client {
 		readonly music: Node;
+		readonly musicManagers: Collection<Snowflake, TrackScheduler>;
 		readonly config: Config;
 	}
 }
