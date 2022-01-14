@@ -12,9 +12,11 @@ export interface Config {
     },
     socialCreditPhrases: Map<string, number>
     socialCreditRegex: Map<string, number>
-    invalidCommandPenalty: number 
-    lavalinkIP: string
-    lavalinkPort: number
-    lavalinkPassword: string
+    invalidCommandPenalty: number
+    lavalink: {
+        ip: string,
+        port: number,
+        password: string
+    },
     tiktok: TiktokConfig
 }

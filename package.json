@@ -6,7 +6,9 @@
   "license": "MIT",
   "packageManager": "yarn@3.1.1",
   "scripts": {
-    "build": "yarn tsc --build"
+    "build": "yarn tsc --build",
+    "dev": "node --loader ts-node/esm src/index.ts | pino-pretty -i pid,hostname -t yyyy-mm-dd HH:MM:ss",
+    "lint-fix": "eslint . --ext .ts --fix"
   },
   "dependencies": {
     "@discordjs/builders": "^0.11.0",
@@ -19,7 +21,9 @@
     "erlpack": "^0.1.4",
     "got": "^12.0.1",
     "js-yaml": "^4.1.0",
+    "lavaclient": "beta",
     "pg": "^8.7.1",
+    "pino": "next",
     "puppeteer": "^13.0.1",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-stealth": "^2.9.0",
@@ -30,7 +34,11 @@
     "@types/js-yaml": "^4.0.5",
     "@types/mysql": "^2.15.20",
     "@types/pg": "^8.6.3",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
     "eslint": "^8.6.0",
+    "pino-pretty": "^7.3.0",
+    "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   }
 }
