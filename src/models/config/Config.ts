@@ -2,7 +2,6 @@ import { TiktokConfig } from './TiktokConfig.js';
 
 export interface Config {
     botToken: string
-    clientID: string
     ownerID: string
     socialCreditDatabase: {
         host: string,

@@ -4,7 +4,7 @@ import { TextChannel } from 'discord.js';
 import { Player } from 'lavaclient';
 
 export class TrackScheduler {
-	private player: Player;
+	readonly player: Player;
 	private channel: TextChannel;
 	private queue: Track[];
 	private loop = false;
@@ -26,6 +26,8 @@ export class TrackScheduler {
 				await this.playTrack(this.queue.shift()!);
 			}
 			else {
+				console.log(`Destroying TrackScheduler for guild ${this.channel.guildId}, goodbye cruel world`);
+				this.player.disconnect();
 				await this.player.destroy();
 				this.channel.client.musicManagers.delete(this.channel.guildId);
 			}
@@ -34,6 +36,14 @@ export class TrackScheduler {
 
 	get length(): number {
 		return this.queue.length;
+	}
+
+	getTrack(): Track | undefined {
+		return this.currentTrack;
+	}
+
+	getQueue() {
+		return this.queue;
 	}
 
 	async setVolume(volume: number) {
@@ -45,7 +55,7 @@ export class TrackScheduler {
 	}
 
 	async queueTrack(track: Track): Promise<boolean> {
-		if (this.queue.length === 0) {
+		if (this.currentTrack === undefined) {
 			this.currentTrack = track;
 			await this.playTrack(track);
 			return true;
@@ -62,6 +72,17 @@ export class TrackScheduler {
 
 	async resume() {
 		await this.player.resume();
+	}
+
+	clear() {
+		this.queue = [];
+	}
+
+	async skip(clear = false) {
+		if (clear) {
+			this.clear();
+		}
+		await this.player.stop();
 	}
 
 	private async playTrack(track: Track) {

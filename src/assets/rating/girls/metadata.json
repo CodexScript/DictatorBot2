@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Dixie D'Amelio",
+    "files": [
+      "dixie/dixie.jpg",
+      "dixie/dixie3.jpg",
+      "dixie/dixie2.png"
+    ],
+    "baseRating": 9
+  },
+  {
+    "name": "Alinity",
+    "files": [
+      "alinity/1.jpg",
+      "alinity/2.jpg",
+      "alinity/3.jpg"
+    ],
+    "baseRating": 8
+  },
+  {
+    "name": "HeyImBee",
+    "files": [
+      "bee/1.jpg",
+      "bee/2.jpg",
+      "bee/3.jpg"
+    ],
+    "baseRating": 9.2
+  },
+  {
+    "name": "Billie Eilish",
+    "files": [
+      "billie/VegNews.BillieEilish5.jpg",
+      "billie/Billie-Eilish-hot-side-pics.jpg",
+      "billie/original_2x_upconv.png"
+    ],
+    "baseRating": 9.7
+  },
+  {
+    "name": "Pokimane",
+    "files": [
+      "pokimane/2.jpg",
+      "pokimane/1.png",
+      "pokimane/3.jpg"
+    ],
+    "baseRating": 5
+  },
+  {
+    "name": "Emiru",
+    "files": [
+      "emiru/1.jpeg",
+      "emiru/2.jpg",
+      "emiru/3.jpg"
+    ],
+    "baseRating": 8.7
+  },
+  {
+    "name": "Bella Poarch",
+    "files": [
+      "bellapoarch/1.jpg",
+      "bellapoarch/2.jpg",
+      "bellapoarch/3.jpg"
+    ],
+    "baseRating": 8.1
+  },
+  {
+    "name": "Corinna Kopf",
+    "files": [
+      "corinna/1.jpg",
+      "corinna/2.jpg",
+      "corinna/3.jpg"
+    ],
+    "baseRating": 8.9
+  }
+]
