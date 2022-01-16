@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
-	GuildMember,
+	GuildMember, Message,
 	MessageActionRow,
 	MessageButton,
 	MessageComponentInteraction,
 	MessageSelectMenu,
 	MessageSelectOptionData,
+	Permissions,
 	TextBasedChannel,
 } from 'discord.js';
 import { BasedometerManager } from './BasedometerManager.js';
@@ -16,7 +17,7 @@ export class BasedometerInstance {
 	lastInteraction: Date;
 	channel: TextBasedChannel;
 	visible: boolean;
-	lastMessageLink: string | undefined;
+	currentSlide: Message | undefined;
 	manager: BasedometerManager;
 	member: GuildMember;
 	category: BasedometerCategory | undefined;
@@ -77,11 +78,16 @@ export class BasedometerInstance {
 	}
 
 	async nextEntry() {
+		this.lastInteraction = new Date();
 		if (this.currentEntry === undefined || this.category === undefined) {
 			return;
 		}
+
 		this.currentEntry++;
 
+		if (this.currentSlide !== undefined) {
+			await this.currentSlide.edit({ components: [] });
+		}
 
 		const entry = this.category.entries[this.currentEntry];
 
@@ -107,6 +113,9 @@ export class BasedometerInstance {
 			files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`],
 			components: [slideshowRow],
 		});
+
+		this.currentSlide = categoryMsg;
+
 		const slideshowCollector = categoryMsg.createMessageComponentCollector({
 			componentType: 'BUTTON',
 			time: 120000,
@@ -114,6 +123,7 @@ export class BasedometerInstance {
 		slideshowCollector.on('collect', async i => {
 			if (i.user.id === this.member.user.id) {
 				if (i.customId === 'basedometerPrevImage') {
+					this.lastInteraction = new Date();
 					filesIndex--;
 					if (filesIndex < 0) {
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -121,6 +131,7 @@ export class BasedometerInstance {
 					}
 				}
 				else if (i.customId === 'basedometerNextImage') {
+					this.lastInteraction = new Date();
 					filesIndex++;
 					if (filesIndex >= entry.files.length) {
 						filesIndex = 0;
@@ -135,7 +146,7 @@ export class BasedometerInstance {
 			}
 			else {
 				await i.reply({
-					content: 'Only the person who initiated the basedometer quiz may use these buttons.',
+					content: 'Only the person who initiated this basedometer quiz may use these buttons.',
 					ephemeral: true,
 				});
 			}
@@ -144,11 +155,57 @@ export class BasedometerInstance {
 
 	async finishQuiz() {
 		const average = this.userDiffs.reduce((a, b) => a + b) / this.userDiffs.length;
-		await this.channel.send({ content: `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***` });
 
-		// TODO: Check for permissions to see if we can actually do this
+		const components: Array<MessageActionRow> = [];
+
+		let doneString = `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***`;
+
 		if (this.channel.isThread()) {
-			await this.channel.delete();
+			doneString += '\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
+			components.push(new MessageActionRow()
+				.addComponents(
+					new MessageButton()
+						.setCustomId('basedometerKeepThread')
+						.setStyle(MessageButtonStyles.SUCCESS)
+						.setLabel('Keep this thread'),
+				),
+			);
 		}
+
+		const done = await this.channel.send({ content: doneString, components: components });
+
+		const keepCollector = done.createMessageComponentCollector({
+			componentType: 'BUTTON',
+			time: 15000 * 60,
+		});
+
+		const threadDelete = setTimeout(async () => {
+			if (this.channel.isThread()) {
+				if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+					await this.channel.delete();
+				}
+				else {
+					await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
+					await done.edit({ components: [] });
+				}
+			}
+		}, 15000 * 60);
+
+		keepCollector.on('collect', async keepInteraction => {
+			if (keepInteraction.customId === 'basedometerKeepThread') {
+				if (keepInteraction.user.id === this.member.user.id || keepInteraction.user.id === keepInteraction.client.config.ownerID || (keepInteraction.member instanceof GuildMember && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
+					await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
+					clearTimeout(threadDelete);
+				}
+				else {
+					await keepInteraction.reply({
+						content: 'You do not have permission to use this button.',
+						ephemeral: true,
+					});
+				}
+			}
+		});
+
+		this.manager.instances.delete(this.member.user.id);
 	}
 }
