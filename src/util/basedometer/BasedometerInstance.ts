@@ -39,7 +39,7 @@ export class BasedometerInstance {
 		for (const [, category] of this.manager.categories.entries()) {
 			selectOptions.push({
 				label: category.displayName,
-				description: 'A category',
+				description: category.desc,
 				value: category.directoryName,
 			});
 		}
@@ -79,6 +79,7 @@ export class BasedometerInstance {
 	}
 
 	async nextEntry() {
+		const helpString = 'Use `/basedometer rate` in order to rate this entry on a scale from 0-10.';
 		this.lastInteraction = new Date();
 		if (this.currentEntry === undefined || this.category === undefined) {
 			return;
@@ -110,7 +111,7 @@ export class BasedometerInstance {
 			);
 		let filesIndex = 0;
 		const categoryMsg = await this.channel.send({
-			content: `${filesIndex + 1} / ${entry.files.length}`,
+			content: `${helpString}\n${filesIndex + 1} / ${entry.files.length}`,
 			files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`],
 			components: [slideshowRow],
 		});
@@ -143,7 +144,7 @@ export class BasedometerInstance {
 				await i.update({ files: [], components: [slideshowRow] });
 
 				// Edit immediately after to restore files, because updating with a new file appends it instead of replacing it for some reason
-				await categoryMsg.edit({ content: `${filesIndex + 1} / ${entry.files.length}`, files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`], components: [slideshowRow] });
+				await categoryMsg.edit({ content: `${helpString}\n${filesIndex + 1} / ${entry.files.length}`, files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`], components: [slideshowRow] });
 			}
 			else {
 				await i.reply({
@@ -154,21 +155,28 @@ export class BasedometerInstance {
 		});
 	}
 
-	async finishQuiz() {
+	async finishQuiz(immediateDelete = false) {
 		if (this.finished) {
 			return;
 		}
 
 		this.finished = true;
-		const average = this.userDiffs.reduce((a, b) => a + b) / this.userDiffs.length;
+		let average: number | undefined;
+
+		if (this.userDiffs.length > 0) {
+			average = this.userDiffs.reduce((a, b) => a + b) / this.userDiffs.length;
+		}
 
 		const components: Array<MessageActionRow> = [];
 
 		let doneString = `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***`;
 
-		let threadDelete: NodeJS.Timeout | undefined;
-
 		if (this.channel.isThread() && this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+			if (immediateDelete) {
+				await this.deleteThread();
+				return;
+			}
+
 			doneString += '\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
 			components.push(new MessageActionRow()
 				.addComponents(
@@ -179,42 +187,47 @@ export class BasedometerInstance {
 				),
 			);
 
-			threadDelete = setTimeout(async () => {
-				if (this.channel.isThread()) {
-					if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
-						await this.channel.delete();
-					}
-					else {
-						await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
-						await done.edit({ components: [] });
-					}
-				}
+			const threadDelete = setTimeout(async () => {
+				await this.deleteThread(done);
 			}, 15000 * 60);
-		}
 
-		const done = await this.channel.send({ content: doneString, components: components });
+			const done = await this.channel.send({ content: doneString, components: components });
 
-		const keepCollector = done.createMessageComponentCollector({
-			componentType: 'BUTTON',
-			time: 15000 * 60,
-		});
+			const keepCollector = done.createMessageComponentCollector({
+				componentType: 'BUTTON',
+				time: 15000 * 60,
+			});
 
-		keepCollector.on('collect', async keepInteraction => {
-			if (keepInteraction.customId === 'basedometerKeepThread') {
-				if (keepInteraction.user.id === this.member.user.id || keepInteraction.user.id === keepInteraction.client.config.ownerID || (keepInteraction.member instanceof GuildMember && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
-					await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
-					if (threadDelete) {
+			keepCollector.on('collect', async keepInteraction => {
+				if (keepInteraction.customId === 'basedometerKeepThread') {
+					if (keepInteraction.user.id === this.member.user.id || keepInteraction.user.id === keepInteraction.client.config.ownerID || (keepInteraction.member instanceof GuildMember && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
+						await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
 						clearTimeout(threadDelete);
 					}
+					else {
+						await keepInteraction.reply({
+							content: 'You do not have permission to use this button.',
+							ephemeral: true,
+						});
+					}
 				}
-				else {
-					await keepInteraction.reply({
-						content: 'You do not have permission to use this button.',
-						ephemeral: true,
-					});
+			});
+		}
+
+		this.manager.instances.delete(this.member.user.id);
+	}
+
+	private async deleteThread(done?: Message) {
+		if (this.channel.isThread()) {
+			if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+				await this.channel.delete();
+			}
+			else {
+				await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
+				if (done) {
+					await done.edit({ components: [] });
 				}
 			}
-		});
-		this.manager.instances.delete(this.member.user.id);
+		}
 	}
 }

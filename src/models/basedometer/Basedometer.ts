@@ -1,6 +1,7 @@
 export type BasedometerCategory = {
 	directoryName: string;
 	displayName: string;
+	desc: string;
 	tolerance: number;
 	entries: Array<BasedometerEntry>;
 }

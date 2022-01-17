@@ -12,10 +12,10 @@ export class BasedometerManager {
 			const now = new Date();
 			for (const [, instance] of this.instances) {
 				if (now.getTime() - instance.lastInteraction.getTime() > 15000 * 60) {
-					await instance.finishQuiz();
+					await instance.finishQuiz(true);
 				}
 			}
-		}, 15000 * 60);
+		}, 5000 * 60);
 	}
 
 	async populateCategories() {
