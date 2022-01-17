@@ -9,7 +9,9 @@ import { MessageButtonStyles } from 'discord.js/typings/enums';
 import { BasedometerInstance } from '../../util/basedometer/BasedometerInstance.js';
 import { BasedometerManager } from '../../util/basedometer/BasedometerManager.js';
 
-async function createNewQuiz(manager: BasedometerManager, interaction: Interaction, useThread: boolean, visible: boolean): Promise<BasedometerInstance | null> {
+const manager = new BasedometerManager();
+
+async function createNewQuiz(interaction: Interaction, useThread: boolean, visible: boolean): Promise<BasedometerInstance | null> {
 	if (interaction.channel === null || !(interaction.channel instanceof TextChannel) || !(interaction.member instanceof GuildMember)) {
 		return null;
 	}
@@ -75,11 +77,11 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
 		await interaction.deferReply({ ephemeral: true });
 
-		if (interaction.client.basedometerManager.categories.size === 0) {
-			await interaction.client.basedometerManager.populateCategories();
+		if (manager.categories.size === 0) {
+			await manager.populateCategories();
 		}
 
-		const existingInstance = interaction.client.basedometerManager.instances.get(interaction.user.id);
+		const existingInstance = manager.instances.get(interaction.user.id);
 
 		if (existingInstance !== undefined) {
 			const confirmRow = new MessageActionRow()
@@ -89,14 +91,6 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 						.setLabel('Yes')
 						.setStyle(MessageButtonStyles.DANGER),
 				);
-			if (existingInstance.lastMessageLink !== undefined) {
-				confirmRow.addComponents(
-					new MessageButton()
-						.setURL(existingInstance.lastMessageLink)
-						.setLabel('View previous quiz')
-						.setStyle(MessageButtonStyles.LINK),
-				);
-			}
 			let instanceLocation: string;
 
 			if (interaction.channel instanceof TextChannel) {
@@ -121,9 +115,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 			collector.on('collect', async () => {
 				collector.stop();
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				const instance = await createNewQuiz(interaction.client.basedometerManager, interaction, useThread!, visible!);
+				const instance = await createNewQuiz(interaction, useThread!, visible!);
 				if (instance !== null) {
-					interaction.client.basedometerManager.instances.set(interaction.user.id, instance);
+					manager.instances.set(interaction.user.id, instance);
 					await interaction.editReply({ content: 'New quiz started.', components: [] });
 					await instance.startQuiz();
 				}
@@ -134,9 +128,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 		}
 		else {
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const instance = await createNewQuiz(interaction.client.basedometerManager, interaction, useThread!, visible!);
+			const instance = await createNewQuiz(interaction, useThread!, visible!);
 			if (instance !== null) {
-				interaction.client.basedometerManager.instances.set(interaction.user.id, instance);
+				manager.instances.set(interaction.user.id, instance);
 				await interaction.editReply({ content: 'New quiz started.' });
 				await instance.startQuiz();
 			}
@@ -152,7 +146,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 			return;
 		}
 
-		const instance = interaction.client.basedometerManager.instances.get(interaction.user.id);
+		const instance = manager.instances.get(interaction.user.id);
 		if (instance === undefined) {
 			await interaction.reply({ content: 'You must have an active quiz in order to use that command.', ephemeral: true });
 			return;

@@ -106,4 +106,3 @@ dist
 .yarn/
 config.yml
 .idea/
-/src/assets/rating/
