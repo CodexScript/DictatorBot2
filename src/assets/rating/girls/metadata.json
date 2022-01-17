@@ -20,9 +20,9 @@
   {
     "name": "Billie Eilish",
     "files": [
-      "billie/VegNews.BillieEilish5.jpg",
-      "billie/Billie-Eilish-hot-side-pics.jpg",
-      "billie/original_2x_upconv.png"
+      "billie/1.jpg",
+      "billie/2.jpg",
+      "billie/3.jpg"
     ],
     "baseRating": 9.8
   },
@@ -51,16 +51,16 @@
       "emiru/2.jpg",
       "emiru/3.jpg"
     ],
-    "baseRating": 8.8
+    "baseRating": 8.4
   },
   {
-    "name": "Jutsa Minx",
+    "name": "Justa Minx",
     "files": [
       "minx/1.jpg",
       "minx/2.jpg",
       "minx/3.jpg"
     ],
-    "baseRating": 8.4
+    "baseRating": 8.8
   },
   {
     "name": "Corinna Kopf",

@@ -5,9 +5,9 @@ import {
 	MessageButton,
 	MessageComponentInteraction, TextBasedChannel, TextChannel,
 } from 'discord.js';
-import { MessageButtonStyles } from 'discord.js/typings/enums';
 import { BasedometerInstance } from '../../util/basedometer/BasedometerInstance.js';
 import { BasedometerManager } from '../../util/basedometer/BasedometerManager.js';
+import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 const manager = new BasedometerManager();
 
@@ -22,7 +22,7 @@ async function createNewQuiz(interaction: Interaction, useThread: boolean, visib
 		quizChannel = await interaction.channel.threads.create({
 			name: `basedometer-${interaction.user.username.toLowerCase()}-${interaction.id}`,
 			autoArchiveDuration: 60,
-			reason: 'Basedometer quiz',
+			reason: 'Basedometer test',
 		});
 	}
 
@@ -34,7 +34,7 @@ export const data = new SlashCommandBuilder()
 	.setDescription('Sends a series of pictures in order to establish someone\'s 1-10 rating scale.')
 	.addSubcommand(subcommand =>
 		subcommand.setName('start')
-			.setDescription('Start a new quiz.')
+			.setDescription('Start a new test.')
 			.addBooleanOption(option =>
 				option.setName('use_thread')
 					.setDescription('Create a separate thread to reduce spam')
@@ -105,7 +105,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
 			await interaction.followUp({
 				// content: `You already have an active basedometer quiz in ${instanceLocation}! Starting a new one would destroy the old one. Are you sure?`,
-				content: `You already have an active basedometer quiz in ${instanceLocation}!`,
+				content: `You already have an active basedometer test in ${instanceLocation}!`,
 			});
 
 			return;
@@ -133,11 +133,11 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 			const instance = await createNewQuiz(interaction, useThread!, visible!);
 			if (instance !== null) {
 				manager.instances.set(interaction.user.id, instance);
-				await interaction.editReply({ content: 'New quiz started.' });
+				await interaction.editReply({ content: 'New test started.' });
 				await instance.startQuiz();
 			}
 			else {
-				await interaction.editReply({ content: 'Cannot start a quiz in this channel.' });
+				await interaction.editReply({ content: 'Cannot start a test in this channel.' });
 			}
 		}
 	}
@@ -149,18 +149,21 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 		}
 
 		if (rating < 0 || rating > 10) {
-			await interaction.reply({ content: 'Rating must be between 0 and 10.', ephemeral: true });
+			await interaction.reply({ content: 'Rating must be between 0 and 10. -10 social credit.', ephemeral: true });
+			await addSocialCredit(interaction.user.id, -10);
 			return;
 		}
 
 		const instance = manager.instances.get(interaction.user.id);
 		if (instance === undefined) {
-			await interaction.reply({ content: 'You must have an active quiz in order to use that command.', ephemeral: true });
+			await interaction.reply({ content: 'You must have an active test in order to use that command. -10 social credit.', ephemeral: true });
+			await addSocialCredit(interaction.user.id, -10);
 			return;
 		}
 
 		if (interaction.channel !== instance.channel) {
-			await interaction.reply({ content: 'This is the wrong channel.', ephemeral: true });
+			await interaction.reply({ content: 'This is the wrong channel. -10 social credit.', ephemeral: true });
+			await addSocialCredit(interaction.user.id, -10);
 			return;
 		}
 
