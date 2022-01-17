@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('speed')
@@ -44,4 +45,5 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 	await scheduler.player.setFilters();
 
 	await interaction.reply({ content: `Set speed to **${newSpeed}%**` });
+	await addSocialCredit(interaction.user.id, 1);
 }

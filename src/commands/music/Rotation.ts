@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('rotation')
@@ -39,4 +40,5 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 	await scheduler.player.setFilters();
 
 	await interaction.reply({ content: `Set rotation speed to **${newSpeed}Hz**` });
+	await addSocialCredit(interaction.user.id, 1);
 }

@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
 import got from 'got';
 import canvas from 'canvas';
+import * as SocialCreditManager from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('soygrimes')
@@ -54,4 +55,5 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 	ctx.save();
 
 	await interaction.followUp({ files: [soyCanvas.toBuffer()] });
+	await SocialCreditManager.addSocialCredit(interaction.user.id, 10);
 }

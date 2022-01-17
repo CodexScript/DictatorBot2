@@ -12,6 +12,7 @@ import {
 import { BasedometerManager } from './BasedometerManager.js';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 import { BasedometerCategory } from '../../models/basedometer/Basedometer.js';
+import { addSocialCredit } from '../SocialCreditManager.js';
 
 export class BasedometerInstance {
 	lastInteraction: Date;
@@ -148,9 +149,10 @@ export class BasedometerInstance {
 			}
 			else {
 				await i.reply({
-					content: 'Only the person who initiated this basedometer quiz may use these buttons.',
+					content: 'Only the person who initiated this basedometer quiz may use these buttons. -10 social credit.',
 					ephemeral: true,
 				});
+				await addSocialCredit(i.user.id, -10);
 			}
 		});
 	}
@@ -213,6 +215,8 @@ export class BasedometerInstance {
 				}
 			});
 		}
+
+		await addSocialCredit(this.member.user.id, 25);
 
 		this.manager.instances.delete(this.member.user.id);
 	}
