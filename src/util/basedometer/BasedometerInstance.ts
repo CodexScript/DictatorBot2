@@ -65,6 +65,10 @@ export class BasedometerInstance {
 			const category = this.manager.categories.get(categoryName);
 			if (category === undefined) {
 				await selectMessage.edit({ content: 'This category is not set up properly. Please contact the bot owner.', components: [] });
+				this.manager.instances.delete(this.member.user.id);
+				setTimeout(async () => {
+					await this.deleteThread();
+				}, 1000 * 60);
 				return;
 			}
 			await selectMessage.edit({ content: `${category.displayName} selected.`, components: [] });
@@ -94,6 +98,8 @@ export class BasedometerInstance {
 
 		const entry = this.category.entries[this.currentEntry];
 
+		// If the currentEntry variable is >= to the length of the entries array, then we will get undefined
+		// This means we have gone through all the entries that we have and can finish
 		if (entry === undefined) {
 			await this.finishQuiz();
 			return;
@@ -124,9 +130,9 @@ export class BasedometerInstance {
 			time: 15000 * 60,
 		});
 		slideshowCollector.on('collect', async i => {
+			this.lastInteraction = new Date();
 			if (i.user.id === this.member.user.id) {
 				if (i.customId === 'basedometerPrevImage') {
-					this.lastInteraction = new Date();
 					filesIndex--;
 					if (filesIndex < 0) {
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -134,7 +140,6 @@ export class BasedometerInstance {
 					}
 				}
 				else if (i.customId === 'basedometerNextImage') {
-					this.lastInteraction = new Date();
 					filesIndex++;
 					if (filesIndex >= entry.files.length) {
 						filesIndex = 0;
@@ -149,7 +154,7 @@ export class BasedometerInstance {
 			}
 			else {
 				await i.reply({
-					content: 'Only the person who initiated this basedometer quiz may use these buttons. -10 social credit.',
+					content: 'Only the person who initiated this basedometer test may use these buttons. -10 social credit.',
 					ephemeral: true,
 				});
 				await addSocialCredit(i.user.id, -10);
@@ -203,8 +208,8 @@ export class BasedometerInstance {
 			keepCollector.on('collect', async keepInteraction => {
 				if (keepInteraction.customId === 'basedometerKeepThread') {
 					if (keepInteraction.user.id === this.member.user.id || keepInteraction.user.id === keepInteraction.client.config.ownerID || (keepInteraction.member instanceof GuildMember && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
-						await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
 						clearTimeout(threadDelete);
+						await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
 					}
 					else {
 						await keepInteraction.reply({
@@ -216,7 +221,10 @@ export class BasedometerInstance {
 			});
 		}
 
-		await addSocialCredit(this.member.user.id, 25);
+		// Reward social credit only if user does quiz all the way through
+		if (!immediateDelete) {
+			await addSocialCredit(this.member.user.id, 25);
+		}
 
 		this.manager.instances.delete(this.member.user.id);
 	}
@@ -227,6 +235,7 @@ export class BasedometerInstance {
 				await this.channel.delete();
 			}
 			else {
+				// Permissions could theoretically change in the 15 minutes that we wait before calling this function
 				await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
 				if (done) {
 					await done.edit({ components: [] });
