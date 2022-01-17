@@ -178,6 +178,19 @@ export class BasedometerInstance {
 
 		let doneString = `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***`;
 
+		// Reward social credit only if user does quiz all the way through
+		if (!immediateDelete && average && this.category) {
+			const tolerance = this.category.tolerance;
+			if (average > tolerance) {
+				doneString += '\nThis is an act of treason against the CCP. -25 social credit.';
+				await addSocialCredit(this.member.user.id, -25);
+			}
+			else {
+				doneString += '\nThe CCP admires your national pride. +25 social credit.';
+				await addSocialCredit(this.member.user.id, 25);
+			}
+		}
+
 		if (this.channel.isThread() && this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
 			if (immediateDelete) {
 				await this.deleteThread();
@@ -219,11 +232,6 @@ export class BasedometerInstance {
 					}
 				}
 			});
-		}
-
-		// Reward social credit only if user does quiz all the way through
-		if (!immediateDelete) {
-			await addSocialCredit(this.member.user.id, 25);
 		}
 
 		this.manager.instances.delete(this.member.user.id);
