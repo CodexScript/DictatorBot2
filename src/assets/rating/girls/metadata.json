@@ -6,16 +6,7 @@
       "dixie/dixie3.jpg",
       "dixie/dixie2.png"
     ],
-    "baseRating": 9
-  },
-  {
-    "name": "Alinity",
-    "files": [
-      "alinity/1.jpg",
-      "alinity/2.jpg",
-      "alinity/3.jpg"
-    ],
-    "baseRating": 8
+    "baseRating": 9.1
   },
   {
     "name": "HeyImBee",
@@ -24,7 +15,7 @@
       "bee/2.png",
       "bee/3.png"
     ],
-    "baseRating": 9.3
+    "baseRating": 9.4
   },
   {
     "name": "Billie Eilish",
@@ -33,7 +24,16 @@
       "billie/Billie-Eilish-hot-side-pics.jpg",
       "billie/original_2x_upconv.png"
     ],
-    "baseRating": 9.7
+    "baseRating": 9.8
+  },
+  {
+    "name": "Addison Rae",
+    "files": [
+      "rae/1.jpg",
+      "rae/2.jpg",
+      "rae/3.jpg"
+    ],
+    "baseRating": 9
   },
   {
     "name": "Pokimane",
@@ -51,16 +51,16 @@
       "emiru/2.jpg",
       "emiru/3.jpg"
     ],
-    "baseRating": 8.7
+    "baseRating": 8.8
   },
   {
-    "name": "Bella Poarch",
+    "name": "Jutsa Minx",
     "files": [
-      "bellapoarch/1.jpg",
-      "bellapoarch/2.jpg",
-      "bellapoarch/3.jpg"
+      "minx/1.jpg",
+      "minx/2.jpg",
+      "minx/3.jpg"
     ],
-    "baseRating": 8.1
+    "baseRating": 8.4
   },
   {
     "name": "Corinna Kopf",
@@ -69,6 +69,6 @@
       "corinna/2.jpg",
       "corinna/3.jpg"
     ],
-    "baseRating": 8.9
+    "baseRating": 9
   }
 ]
