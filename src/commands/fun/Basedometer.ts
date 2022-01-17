@@ -20,7 +20,7 @@ async function createNewQuiz(interaction: Interaction, useThread: boolean, visib
 
 	if (useThread) {
 		quizChannel = await interaction.channel.threads.create({
-			name: `basedometer-${interaction.user.username}-${interaction.id}`,
+			name: `basedometer-${interaction.user.username.toLowerCase()}-${interaction.id}`,
 			autoArchiveDuration: 60,
 			reason: 'Basedometer quiz',
 		});
@@ -84,13 +84,13 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 		const existingInstance = manager.instances.get(interaction.user.id);
 
 		if (existingInstance !== undefined) {
-			const confirmRow = new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('destroyOldBasedometer')
-						.setLabel('Yes')
-						.setStyle(MessageButtonStyles.DANGER),
-				);
+			// const confirmRow = new MessageActionRow()
+			// 	.addComponents(
+			// 		new MessageButton()
+			// 			.setCustomId('destroyOldBasedometer')
+			// 			.setLabel('Yes')
+			// 			.setStyle(MessageButtonStyles.DANGER),
+			// 	);
 			let instanceLocation: string;
 
 			if (interaction.channel instanceof TextChannel) {
@@ -104,27 +104,29 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 			}
 
 			await interaction.followUp({
-				content: `You already have an active basedometer quiz in ${instanceLocation}! Starting a new one would destroy the old one. Are you sure?`,
-				components: [confirmRow],
+				// content: `You already have an active basedometer quiz in ${instanceLocation}! Starting a new one would destroy the old one. Are you sure?`,
+				content: `You already have an active basedometer quiz in ${instanceLocation}!`,
 			});
 
-			// Wait for user to respond to confirmation
-			const filter = (i: MessageComponentInteraction) => i.customId === 'destroyOldBasedometer' && i.user === interaction.user;
+			return;
 
-			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
-			collector.on('collect', async () => {
-				collector.stop();
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				const instance = await createNewQuiz(interaction, useThread!, visible!);
-				if (instance !== null) {
-					manager.instances.set(interaction.user.id, instance);
-					await interaction.editReply({ content: 'New quiz started.', components: [] });
-					await instance.startQuiz();
-				}
-				else {
-					await interaction.editReply({ content: 'Cannot start a quiz in this channel.', components: [] });
-				}
-			});
+			// // Wait for user to respond to confirmation
+			// const filter = (i: MessageComponentInteraction) => i.customId === 'destroyOldBasedometer' && i.user === interaction.user;
+			//
+			// const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
+			// collector.on('collect', async () => {
+			// 	collector.stop();
+			// 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			// 	const instance = await createNewQuiz(interaction, useThread!, visible!);
+			// 	if (instance !== null) {
+			// 		manager.instances.set(interaction.user.id, instance);
+			// 		await interaction.editReply({ content: 'New quiz started.', components: [] });
+			// 		await instance.startQuiz();
+			// 	}
+			// 	else {
+			// 		await interaction.editReply({ content: 'Cannot start a quiz in this channel.', components: [] });
+			// 	}
+			// });
 		}
 		else {
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -146,9 +148,19 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 			return;
 		}
 
+		if (rating < 0 || rating > 10) {
+			await interaction.reply({ content: 'Rating must be between 0 and 10.', ephemeral: true });
+			return;
+		}
+
 		const instance = manager.instances.get(interaction.user.id);
 		if (instance === undefined) {
 			await interaction.reply({ content: 'You must have an active quiz in order to use that command.', ephemeral: true });
+			return;
+		}
+
+		if (interaction.channel !== instance.channel) {
+			await interaction.reply({ content: 'This is the wrong channel.', ephemeral: true });
 			return;
 		}
 
@@ -171,13 +183,4 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 		instance.userDiffs.push(diff);
 		await instance.nextEntry();
 	}
-
-	// const row = new MessageActionRow()
-	// 	.addComponents(
-	// 		new MessageSelectMenu()
-	// 			.setCustomId('basedometerSelect')
-	// 			.setPlaceholder('Nothing selected'),
-	// 	);
-
-
 }

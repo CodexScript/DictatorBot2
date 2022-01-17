@@ -45,4 +45,5 @@ export async function registerCommands(client: Bot, dir: string, sync = false, g
 			console.log('No application found, skipping hard command registration.');
 		}
 	}
+	console.log();
 }
