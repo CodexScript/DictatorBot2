@@ -5,14 +5,12 @@ import { SlashCommand } from './SlashCommand.js';
 import yaml from 'js-yaml';
 import * as fs from 'fs';
 import { TrackScheduler } from '../util/music/TrackScheduler.js';
-import { BasedometerManager } from '../util/basedometer/BasedometerManager.js';
 
 export class Bot extends Client {
 	readonly music: Node;
 	readonly musicManagers = new Collection<Snowflake, TrackScheduler>();
 	readonly config: Config;
 	readonly commands: Collection<Snowflake, SlashCommand> = new Collection();
-	readonly basedometerManager = new BasedometerManager();
 
 	constructor() {
 		super({
@@ -41,6 +39,5 @@ declare module 'discord.js' {
 		readonly music: Node;
 		readonly musicManagers: Collection<Snowflake, TrackScheduler>;
 		readonly config: Config;
-		readonly basedometerManager: BasedometerManager;
 	}
 }

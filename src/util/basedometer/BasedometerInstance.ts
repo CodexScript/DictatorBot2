@@ -23,6 +23,7 @@ export class BasedometerInstance {
 	category: BasedometerCategory | undefined;
 	currentEntry: number | undefined;
 	userDiffs: Array<number> = [];
+	finished = false;
 
 	constructor(manager: BasedometerManager, member: GuildMember, channel: TextBasedChannel, visible: boolean) {
 		this.lastInteraction = new Date();
@@ -154,13 +155,20 @@ export class BasedometerInstance {
 	}
 
 	async finishQuiz() {
+		if (this.finished) {
+			return;
+		}
+
+		this.finished = true;
 		const average = this.userDiffs.reduce((a, b) => a + b) / this.userDiffs.length;
 
 		const components: Array<MessageActionRow> = [];
 
 		let doneString = `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***`;
 
-		if (this.channel.isThread()) {
+		let threadDelete: NodeJS.Timeout | undefined;
+
+		if (this.channel.isThread() && this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
 			doneString += '\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
 			components.push(new MessageActionRow()
 				.addComponents(
@@ -170,6 +178,18 @@ export class BasedometerInstance {
 						.setLabel('Keep this thread'),
 				),
 			);
+
+			threadDelete = setTimeout(async () => {
+				if (this.channel.isThread()) {
+					if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+						await this.channel.delete();
+					}
+					else {
+						await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
+						await done.edit({ components: [] });
+					}
+				}
+			}, 15000 * 60);
 		}
 
 		const done = await this.channel.send({ content: doneString, components: components });
@@ -179,23 +199,13 @@ export class BasedometerInstance {
 			time: 15000 * 60,
 		});
 
-		const threadDelete = setTimeout(async () => {
-			if (this.channel.isThread()) {
-				if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
-					await this.channel.delete();
-				}
-				else {
-					await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
-					await done.edit({ components: [] });
-				}
-			}
-		}, 15000 * 60);
-
 		keepCollector.on('collect', async keepInteraction => {
 			if (keepInteraction.customId === 'basedometerKeepThread') {
 				if (keepInteraction.user.id === this.member.user.id || keepInteraction.user.id === keepInteraction.client.config.ownerID || (keepInteraction.member instanceof GuildMember && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
 					await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
-					clearTimeout(threadDelete);
+					if (threadDelete) {
+						clearTimeout(threadDelete);
+					}
 				}
 				else {
 					await keepInteraction.reply({
@@ -205,7 +215,6 @@ export class BasedometerInstance {
 				}
 			}
 		});
-
 		this.manager.instances.delete(this.member.user.id);
 	}
 }
