@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { TrackScheduler } from '../../util/music/TrackScheduler.js';
 import { LoadTracksResponse } from '@lavaclient/types';
+import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('play')
@@ -72,4 +73,6 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 	else {
 		await interaction.followUp({ content: `Queued: **${res.tracks[0].info.title}**` });
 	}
+
+	await addSocialCredit(interaction.user.id, 1);
 }

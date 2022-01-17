@@ -17,7 +17,7 @@ import { fileURLToPath } from 'url';
 
 	client.once('ready', async () => {
 		const __filename = fileURLToPath(import.meta.url);
-		await registerCommands(client, join(dirname(__filename), 'commands'), process.argv.includes('--force-sync'), '272896244412579841');
+		await registerCommands(client, join(dirname(__filename), 'commands'), process.argv.includes('--force-sync'));
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		await client.music.connect(client.user!.id);
 		console.log(`${client.user?.username} is now providing they/their services to the CCP.`);
