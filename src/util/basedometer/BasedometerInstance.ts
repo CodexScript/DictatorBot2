@@ -121,7 +121,7 @@ export class BasedometerInstance {
 
 		const slideshowCollector = categoryMsg.createMessageComponentCollector({
 			componentType: 'BUTTON',
-			time: 120000,
+			time: 15000 * 60,
 		});
 		slideshowCollector.on('collect', async i => {
 			if (i.user.id === this.member.user.id) {
