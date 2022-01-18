@@ -14,12 +14,10 @@ export class TiktokManager {
 		this.config = config;
 	}
 
-	async populateFavs(event: CommandInteraction, bus: EventEmitter) {
-		if (this.isFetching || event.channel === null) {
+	async populateFavs(bus: EventEmitter) {
+		if (this.isFetching) {
 			return false;
 		}
-
-		const waitMessage = await event.channel.send('Populating TikTok favorites list. This may take awhile...');
 
 		this.lastFetch = new Date();
 		this.isFetching = true;
@@ -43,7 +41,7 @@ export class TiktokManager {
 			const favs = response as TiktokFavsResponse;
 
 			for (const vid of favs.aweme_list) {
-				if (vid.video && (vid.can_play === undefined || vid.can_play) && this.isValidVideo(vid)) {
+				if (vid.video && (vid.can_play === undefined || vid.can_play) && vid.video.play_addr?.url_list !== undefined && this.isValidVideo(vid)) {
 					this.videos.push(vid.video);
 				}
 			}
@@ -59,7 +57,6 @@ export class TiktokManager {
 		}
 		this.isFetching = false;
 		bus.emit('unlocked');
-		await waitMessage.delete();
 	}
 
 	isValidVideo(video: TiktokVideoListing): boolean {

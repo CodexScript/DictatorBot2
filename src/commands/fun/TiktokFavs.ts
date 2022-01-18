@@ -19,6 +19,11 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: CommandInteraction): Promise<void> {
 	const index = interaction.options.getInteger('index');
 
+	if (interaction.channel === null) {
+		await interaction.reply({ content: 'You can\'t use that command here', ephemeral: true });
+		return;
+	}
+
 	await interaction.deferReply();
 
 	if (!manager) {
@@ -26,24 +31,41 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 	}
 
 	if (manager.videos.length === 0 || new Date().getTime() - manager.lastFetch.getTime() > 21600000) {
-		await manager.populateFavs(interaction, bus);
+		const waitMessage = await interaction.channel.send('Populating TikTok favorites list. This may take awhile...');
+		await manager.populateFavs(bus);
+		await waitMessage.delete();
 	}
 
 	if (manager.isFetching) {
+		const waitMessage = await interaction.channel.send('Populating TikTok favorites list. This may take awhile...');
 		await new Promise(resolve => bus.once('unlocked', resolve));
+		await waitMessage.delete();
 	}
 
-	let url = undefined;
+	let fav = undefined;
 
-	while (url === undefined) {
-		const fav = manager.videos[Math.floor(Math.random() * manager.videos.length)];
-		console.log(manager.videos.length);
-		if (fav.play_addr && fav.play_addr.url_list) {
-			url = fav.play_addr.url_list[fav.play_addr.url_list.length - 1];
+	if (index === null) {
+		while (fav === undefined) {
+			const tempFav = manager.videos[Math.floor(Math.random() * manager.videos.length)];
+			if (tempFav.play_addr && tempFav.play_addr.url_list) {
+				fav = tempFav;
+			}
 		}
 	}
+	else if (index < 0) {
+		fav = manager.videos[manager.videos.length + index];
+	}
+	else {
+		fav = manager.videos[index];
+	}
 
-	const buffer = await got.get(url).buffer();
+	if (fav === undefined) {
+		await interaction.followUp({ content: 'Invalid index.' });
+		return;
+	}
+
+
+	const buffer = await got.get(fav.play_addr!.url_list[fav.play_addr!.url_list.length - 1]).buffer();
 
 	await interaction.followUp({ files: [{ name: 'tiktok.mp4', attachment: buffer }] });
 
