@@ -197,7 +197,7 @@ export class BasedometerInstance {
 				return;
 			}
 
-			doneString += '\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
+			doneString += '\n\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
 			components.push(new MessageActionRow()
 				.addComponents(
 					new MessageButton()
