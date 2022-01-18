@@ -5,7 +5,6 @@ import * as fs from 'fs/promises';
 import got from 'got';
 import pg from 'pg';
 
-
 let CLIENT: pg.Client;
 
 export async function establishConnection(options: {host: string, port: number, user: string, password: string}) {
