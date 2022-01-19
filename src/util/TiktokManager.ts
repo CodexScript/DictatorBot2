@@ -21,6 +21,7 @@ export class TiktokManager {
 
 		this.lastFetch = new Date();
 		this.isFetching = true;
+		this.videos = [];
 
 		let cursor = 0;
 		let hasMore = true;
