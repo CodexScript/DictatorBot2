@@ -14,10 +14,15 @@ export const data = new SlashCommandBuilder()
 	.addIntegerOption(option =>
 		option.setName('index')
 			.setDescription('Array index.')
+			.setRequired(false))
+	.addBooleanOption(option =>
+		option.setName('force-update')
+			.setDescription('Force the list of favorites to update. Only President Xi may use')
 			.setRequired(false));
 
 export async function execute(interaction: CommandInteraction): Promise<void> {
 	const index = interaction.options.getInteger('index');
+	let force = interaction.options.getBoolean('force-update');
 
 	if (interaction.channel === null) {
 		await interaction.reply({ content: 'You can\'t use that command here', ephemeral: true });
@@ -26,11 +31,15 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
 	await interaction.deferReply();
 
+	if (interaction.user.id !== interaction.client.config.ownerID) {
+		force = false;
+	}
+
 	if (!manager) {
 		manager = new TiktokManager(interaction.client.config.tiktok);
 	}
 
-	if (manager.videos.length === 0 || new Date().getTime() - manager.lastFetch.getTime() > 21600000) {
+	if (force || manager.videos.length === 0 || new Date().getTime() - manager.lastFetch.getTime() > 21600000) {
 		const waitMessage = await interaction.channel.send('Populating TikTok favorites list. This may take awhile...');
 		await manager.populateFavs(bus);
 		await waitMessage.delete();
