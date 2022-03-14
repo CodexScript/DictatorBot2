@@ -1,9 +1,9 @@
-import { Bot } from '../models/Bot';
-import * as fs from 'fs/promises';
-import * as fsSync from 'fs';
-import { Routes } from 'discord-api-types/v9';
 import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
 import { ApplicationCommand } from 'discord.js';
+import * as fsSync from 'fs';
+import * as fs from 'fs/promises';
+import { Bot } from '../models/Bot';
 
 export async function registerCommands(client: Bot, dir: string, sync = false, remove = false, guildId?: string): Promise<void> {
 	const commandCategories = (await (fs.readdir(dir))).filter(file => {
@@ -58,4 +58,18 @@ export async function registerCommands(client: Bot, dir: string, sync = false, r
 		}
 	}
 	console.log();
+}
+
+export async function registerEvents(client: Bot, dir: string): Promise<void> {
+	const events = (await fs.readdir(dir)).filter(file => file.endsWith('.js'));
+	for (const file of events) {
+		const event = await import(`file:///${dir}/${file}`);
+		console.log('Registering event: ' + event.name);
+		if (event.once) {
+			client.once(event.name, async (...args) => await event.execute(...args));
+		}
+		else {
+			client.on(event.name, async (...args) => await event.execute(...args));
+		}
+	}
 }

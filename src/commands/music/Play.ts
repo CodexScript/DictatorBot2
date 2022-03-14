@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { LoadTracksResponse } from '@lavaclient/types';
 import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { TrackScheduler } from '../../util/music/TrackScheduler.js';
-import { LoadTracksResponse } from '@lavaclient/types';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
@@ -48,6 +48,21 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 		await interaction.reply({ content: 'Could not find any tracks.' });
 		return;
 	}
+
+	for (const blacklist of interaction.client.config.lavalink.linkBlacklist) {
+		if (res.tracks[0].info.uri === blacklist) {
+			await interaction.reply({ content: 'That link is blacklisted.' });
+			return;
+		}
+	}
+
+	for (const blacklist of interaction.client.config.lavalink.titleBlacklist) {
+		if (res.tracks[0].info.title.toLowerCase().includes(blacklist.toLowerCase())) {
+			await interaction.reply({ content: 'That track is blacklisted.' });
+			return;
+		}
+	}
+
 
 	let scheduler = interaction.client.musicManagers.get(interaction.guildId);
 

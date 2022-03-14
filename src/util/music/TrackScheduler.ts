@@ -27,9 +27,9 @@ export class TrackScheduler {
 			}
 			else {
 				console.log(`Destroying TrackScheduler for guild ${this.channel.guildId}, goodbye cruel world`);
+				this.channel.client.musicManagers.delete(this.channel.guildId);
 				this.player.disconnect();
 				await this.player.destroy();
-				this.channel.client.musicManagers.delete(this.channel.guildId);
 			}
 		});
 	}

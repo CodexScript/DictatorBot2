@@ -106,3 +106,5 @@ dist
 .yarn/
 config.yml
 .idea/
+.vscode/
+src/assets/solve/
