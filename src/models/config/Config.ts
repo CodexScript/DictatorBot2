@@ -16,6 +16,12 @@ export interface Config {
         ip: string,
         port: number,
         password: string
+        linkBlacklist: string[]
+        titleBlacklist: string[]
     },
+    spotify: {
+        token: string,
+        secret: string
+    }
     tiktok: TiktokConfig
 }

@@ -1,8 +1,8 @@
-import * as SocialCreditManager from './util/SocialCreditManager.js';
-import { Bot } from './models/Bot.js';
-import { registerCommands } from './util/CommandUtils.js';
-import { join, dirname } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { Bot } from './models/Bot.js';
+import { registerCommands, registerEvents } from './util/CommandUtils.js';
+import * as SocialCreditManager from './util/SocialCreditManager.js';
 
 (async () => {
 
@@ -18,6 +18,7 @@ import { fileURLToPath } from 'url';
 	client.once('ready', async () => {
 		const __filename = fileURLToPath(import.meta.url);
 		await registerCommands(client, join(dirname(__filename), 'commands'), process.argv.includes('--force-sync'), process.argv.includes('--remove'));
+		await registerEvents(client, join(dirname(__filename), 'events'));
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		await client.music.connect(client.user!.id);
 		console.log(`${client.user?.username} is now providing they/their services to the CCP.`);
