@@ -46,7 +46,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
     ctx.drawImage(base, 0, 0);
   } else {
-    const fontSize = 75 - Math.floor(text.length / 10);
+    const fontSize = Math.max(75 - Math.floor(text.length / 10), 6);
 
     ctx.fillStyle = '#ffffff';
     ctx.rect(265, 225, 969, 770);

@@ -49,7 +49,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
     ctx.drawImage(hands, 0, 0);
   } else {
-    const fontSize = 50 - Math.floor(text.length / 10);
+    const fontSize = 50 - Math.max(Math.floor(text.length / 10), 6);
     ctx.drawImage(base, 0, 0);
     ctx.font = `${fontSize}px sans-serif`;
 

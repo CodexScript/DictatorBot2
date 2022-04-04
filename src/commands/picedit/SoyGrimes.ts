@@ -21,6 +21,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   }
 
   try {
+    // eslint-disable-next-line no-new
     new URL(url);
   } catch {
     await interaction.reply({ content: 'Invalid URL.', ephemeral: true });
