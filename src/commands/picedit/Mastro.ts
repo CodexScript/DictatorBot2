@@ -27,7 +27,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   const mastroCanvas = canvas.createCanvas(base.width, base.height);
   const ctx = mastroCanvas.getContext('2d');
 
-  const fontSize = 50 - Math.floor(text.length / 10);
+  const fontSize = Math.max(50 - Math.floor(text.length / 10), 6);
 
   ctx.drawImage(base, 0, 0);
   ctx.font = `${fontSize}px sans-serif`;
