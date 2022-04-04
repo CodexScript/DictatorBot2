@@ -21,6 +21,9 @@ async function setProfilePicture(client: Bot) {
   } else if (now.getMonth() === 3 && now.getDate() === 1) {
     // April Fools
     newPfp = './assets/pfp/carti.png';
+  } else if (now.getMonth() === 3 && now.getDate() === 20) {
+    // 420
+    newPfp = './assets/pfp/uzi-smacked.jpg';
   } else if (now.getMonth() === 2 && now.getDate() === 13) {
     // Daylight savings begins
     newPfp = './assets/pfp/uzi-tart.png';
