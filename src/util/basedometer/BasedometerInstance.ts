@@ -1,254 +1,270 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
-	GuildMember, Message,
-	MessageActionRow,
-	MessageButton,
-	MessageComponentInteraction,
-	MessageSelectMenu,
-	MessageSelectOptionData,
-	Permissions,
-	TextBasedChannel,
+  GuildMember, Message,
+  MessageActionRow,
+  MessageButton,
+  MessageComponentInteraction,
+  MessageSelectMenu,
+  MessageSelectOptionData,
+  Permissions,
+  TextBasedChannel
 } from 'discord.js';
-import { BasedometerManager } from './BasedometerManager.js';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 import { BasedometerCategory } from '../../models/basedometer/Basedometer.js';
 import { addSocialCredit } from '../SocialCreditManager.js';
+import BasedometerManager from './BasedometerManager.js';
 
-export class BasedometerInstance {
-	lastInteraction: Date;
-	channel: TextBasedChannel;
-	visible: boolean;
-	currentSlide: Message | undefined;
-	manager: BasedometerManager;
-	member: GuildMember;
-	category: BasedometerCategory | undefined;
-	currentEntry: number | undefined;
-	userDiffs: Array<number> = [];
-	finished = false;
+export default class BasedometerInstance {
+  lastInteraction: Date;
 
-	constructor(manager: BasedometerManager, member: GuildMember, channel: TextBasedChannel, visible: boolean) {
-		this.lastInteraction = new Date();
-		this.channel = channel;
-		this.visible = visible;
-		this.manager = manager;
-		this.member = member;
-	}
+  channel: TextBasedChannel;
 
-	async startQuiz() {
-		const selectOptions: Array<MessageSelectOptionData> = [];
+  visible: boolean;
 
-		for (const [, category] of this.manager.categories.entries()) {
-			selectOptions.push({
-				label: category.displayName,
-				description: category.desc,
-				value: category.directoryName,
-			});
-		}
+  currentSlide: Message | undefined;
 
-		const selectRow = new MessageActionRow()
-			.addComponents(
-				new MessageSelectMenu()
-					.setCustomId('basedometerCategorySelector')
-					.setPlaceholder('No category selected')
-					.addOptions(selectOptions)
-					.setMaxValues(1)
-					.setMinValues(1),
-			);
+  manager: BasedometerManager;
 
-		const selectMessage = await this.channel.send({ content: 'Welcome to the Basedometer test © 2020 Aidan Walden (idea, code) & Payton Odierno (name). Please note that decimal places ARE allowed.\nPlease select a category.', components: [selectRow] });
+  member: GuildMember;
 
-		const filter = (i: MessageComponentInteraction) => i.customId === 'basedometerCategorySelector' && i.user.id === this.member.user.id;
+  category: BasedometerCategory | undefined;
 
-		try {
-			const selectInteraction = await selectMessage.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 60000 });
-			const categoryName = selectInteraction.values[0];
-			const category = this.manager.categories.get(categoryName);
-			if (category === undefined) {
-				await selectMessage.edit({ content: 'This category is not set up properly. Please contact the bot owner.', components: [] });
-				this.manager.instances.delete(this.member.user.id);
-				setTimeout(async () => {
-					await this.deleteThread();
-				}, 1000 * 60);
-				return;
-			}
-			await selectMessage.edit({ content: `${category.displayName} selected.`, components: [] });
-			this.category = category;
-			// for (const entry of category.entries) {
-			this.currentEntry = -1;
-			await this.nextEntry();
-		}
-		catch (e) {
-			console.log(e);
-			await selectMessage.edit({ content: 'Category not selected in time.', components: [] });
-		}
-	}
+  currentEntry: number | undefined;
 
-	async nextEntry() {
-		const helpString = 'Use `/basedometer rate` in order to rate this entry on a scale from 0-10.';
-		this.lastInteraction = new Date();
-		if (this.currentEntry === undefined || this.category === undefined) {
-			return;
-		}
+  userDiffs: Array<number> = [];
 
-		this.currentEntry++;
+  finished = false;
 
-		if (this.currentSlide !== undefined) {
-			await this.currentSlide.edit({ components: [] });
-		}
+  constructor(
+    manager: BasedometerManager,
+    member: GuildMember,
+    channel: TextBasedChannel,
+    visible: boolean
+  ) {
+    this.lastInteraction = new Date();
+    this.channel = channel;
+    this.visible = visible;
+    this.manager = manager;
+    this.member = member;
+  }
 
-		const entry = this.category.entries[this.currentEntry];
+  async startQuiz() {
+    const selectOptions: Array<MessageSelectOptionData> = [];
 
-		// If the currentEntry variable is >= to the length of the entries array, then we will get undefined
-		// This means we have gone through all the entries that we have and can finish
-		if (entry === undefined) {
-			await this.finishQuiz();
-			return;
-		}
+    for (const [, category] of this.manager.categories.entries()) {
+      selectOptions.push({
+        label: category.displayName,
+        description: category.desc,
+        value: category.directoryName,
+      });
+    }
 
-		const slideshowRow = new MessageActionRow()
-			.addComponents(
-				new MessageButton()
-					.setCustomId('basedometerPrevImage')
-					.setStyle(MessageButtonStyles.PRIMARY)
-					.setLabel('⬅️'),
-				new MessageButton()
-					.setCustomId('basedometerNextImage')
-					.setStyle(MessageButtonStyles.PRIMARY)
-					.setLabel('➡️'),
-			);
-		let filesIndex = 0;
-		const categoryMsg = await this.channel.send({
-			content: `${helpString}\n${filesIndex + 1} / ${entry.files.length}`,
-			files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`],
-			components: [slideshowRow],
-		});
+    const selectRow = new MessageActionRow()
+      .addComponents(
+        new MessageSelectMenu()
+          .setCustomId('basedometerCategorySelector')
+          .setPlaceholder('No category selected')
+          .addOptions(selectOptions)
+          .setMaxValues(1)
+          .setMinValues(1),
+      );
 
-		this.currentSlide = categoryMsg;
+    const selectMessage = await this.channel.send({ content: 'Welcome to the Basedometer test © 2020 Aidan Walden (idea, code) & Payton Odierno (name). Please note that decimal places ARE allowed.\nPlease select a category.', components: [selectRow] });
 
-		const slideshowCollector = categoryMsg.createMessageComponentCollector({
-			componentType: 'BUTTON',
-			time: 15000 * 60,
-		});
-		slideshowCollector.on('collect', async i => {
-			this.lastInteraction = new Date();
-			if (i.user.id === this.member.user.id) {
-				if (i.customId === 'basedometerPrevImage') {
-					filesIndex--;
-					if (filesIndex < 0) {
-						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-						filesIndex = entry.files.length - 1;
-					}
-				}
-				else if (i.customId === 'basedometerNextImage') {
-					filesIndex++;
-					if (filesIndex >= entry.files.length) {
-						filesIndex = 0;
-					}
-				}
+    const filter = (i: MessageComponentInteraction) => i.customId === 'basedometerCategorySelector' && i.user.id === this.member.user.id;
 
-				// Update so that Discord doesn't freak out about request not being acknowledged
-				await i.update({ files: [], components: [slideshowRow] });
+    try {
+      const selectInteraction = await selectMessage.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 60000 });
+      const categoryName = selectInteraction.values[0];
+      const category = this.manager.categories.get(categoryName);
+      if (category === undefined) {
+        await selectMessage.edit({ content: 'This category is not set up properly. Please contact the bot owner.', components: [] });
+        this.manager.instances.delete(this.member.user.id);
+        setTimeout(async () => {
+          await this.deleteThread();
+        }, 1000 * 60);
+        return;
+      }
+      await selectMessage.edit({ content: `${category.displayName} selected.`, components: [] });
+      this.category = category;
+      // for (const entry of category.entries) {
+      this.currentEntry = -1;
+      await this.nextEntry();
+    } catch (e) {
+      console.log(e);
+      await selectMessage.edit({ content: 'Category not selected in time.', components: [] });
+    }
+  }
 
-				// Edit immediately after to restore files, because updating with a new file appends it instead of replacing it for some reason
-				await categoryMsg.edit({ content: `${helpString}\n${filesIndex + 1} / ${entry.files.length}`, files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`], components: [slideshowRow] });
-			}
-			else {
-				await i.reply({
-					content: 'Only the person who initiated this basedometer test may use these buttons. -10 social credit.',
-					ephemeral: true,
-				});
-				await addSocialCredit(i.user.id, -10);
-			}
-		});
-	}
+  async nextEntry() {
+    const helpString = 'Use `/basedometer rate` in order to rate this entry on a scale from 0-10.';
+    this.lastInteraction = new Date();
+    if (this.currentEntry === undefined || this.category === undefined) {
+      return;
+    }
 
-	async finishQuiz(immediateDelete = false) {
-		if (this.finished) {
-			return;
-		}
+    this.currentEntry += 1;
 
-		this.finished = true;
-		let average: number | undefined;
+    if (this.currentSlide !== undefined) {
+      await this.currentSlide.edit({ components: [] });
+    }
 
-		if (this.userDiffs.length > 0) {
-			average = this.userDiffs.reduce((a, b) => a + b) / this.userDiffs.length;
-		}
+    const entry = this.category.entries[this.currentEntry];
 
-		const components: Array<MessageActionRow> = [];
+    // If the currentEntry variable is >= to the length of the entries array, then we will get
+    // undefined
+    // This means we have gone through all the entries that we have and can finish
+    if (entry === undefined) {
+      await this.finishQuiz();
+      return;
+    }
 
-		let doneString = `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***`;
+    const slideshowRow = new MessageActionRow()
+      .addComponents(
+        new MessageButton()
+          .setCustomId('basedometerPrevImage')
+          .setStyle(MessageButtonStyles.PRIMARY)
+          .setLabel('⬅️'),
+        new MessageButton()
+          .setCustomId('basedometerNextImage')
+          .setStyle(MessageButtonStyles.PRIMARY)
+          .setLabel('➡️'),
+      );
+    let filesIndex = 0;
+    const categoryMsg = await this.channel.send({
+      content: `${helpString}\n${filesIndex + 1} / ${entry.files.length}`,
+      files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`],
+      components: [slideshowRow],
+    });
 
-		// Reward social credit only if user does quiz all the way through
-		if (!immediateDelete && average && this.category) {
-			const tolerance = this.category.tolerance;
-			if (average > tolerance) {
-				doneString += '\nThis is an act of treason against the CCP. -25 social credit.';
-				await addSocialCredit(this.member.user.id, -25);
-			}
-			else {
-				doneString += '\nThe CCP admires your national pride. +25 social credit.';
-				await addSocialCredit(this.member.user.id, 25);
-			}
-		}
+    this.currentSlide = categoryMsg;
 
-		if (this.channel.isThread() && this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
-			if (immediateDelete) {
-				await this.deleteThread();
-				return;
-			}
+    const slideshowCollector = categoryMsg.createMessageComponentCollector({
+      componentType: 'BUTTON',
+      time: 15000 * 60,
+    });
+    slideshowCollector.on('collect', async (i) => {
+      this.lastInteraction = new Date();
+      if (i.user.id === this.member.user.id) {
+        if (i.customId === 'basedometerPrevImage') {
+          filesIndex--;
+          if (filesIndex < 0) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            filesIndex = entry.files.length - 1;
+          }
+        } else if (i.customId === 'basedometerNextImage') {
+          filesIndex++;
+          if (filesIndex >= entry.files.length) {
+            filesIndex = 0;
+          }
+        }
 
-			doneString += '\n\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
-			components.push(new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('basedometerKeepThread')
-						.setStyle(MessageButtonStyles.SUCCESS)
-						.setLabel('Keep this thread'),
-				),
-			);
+        // Update so that Discord doesn't freak out about request not being acknowledged
+        await i.update({ files: [], components: [slideshowRow] });
 
-			const threadDelete = setTimeout(async () => {
-				await this.deleteThread(done);
-			}, 15000 * 60);
+        // Edit immediately after to restore files, because updating with a new file appends it instead of replacing it for some reason
+        await categoryMsg.edit({ content: `${helpString}\n${filesIndex + 1} / ${entry.files.length}`, files: [`./assets/rating/${this.category!.directoryName}/media/${entry.files[filesIndex]}`], components: [slideshowRow] });
+      } else {
+        await i.reply({
+          content: 'Only the person who initiated this basedometer test may use these buttons. -10 social credit.',
+          ephemeral: true,
+        });
+        await addSocialCredit(i.client.redisClient, i.user.id, -10);
+      }
+    });
+  }
 
-			const done = await this.channel.send({ content: doneString, components: components });
+  async finishQuiz(immediateDelete = false) {
+    if (this.finished) {
+      return;
+    }
 
-			const keepCollector = done.createMessageComponentCollector({
-				componentType: 'BUTTON',
-				time: 15000 * 60,
-			});
+    this.finished = true;
+    let average: number | undefined;
 
-			keepCollector.on('collect', async keepInteraction => {
-				if (keepInteraction.customId === 'basedometerKeepThread') {
-					if (keepInteraction.user.id === this.member.user.id || keepInteraction.user.id === keepInteraction.client.config.ownerID || (keepInteraction.member instanceof GuildMember && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
-						clearTimeout(threadDelete);
-						await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
-					}
-					else {
-						await keepInteraction.reply({
-							content: 'You do not have permission to use this button.',
-							ephemeral: true,
-						});
-					}
-				}
-			});
-		}
+    if (this.userDiffs.length > 0) {
+      average = this.userDiffs.reduce((a, b) => a + b) / this.userDiffs.length;
+    }
 
-		this.manager.instances.delete(this.member.user.id);
-	}
+    const components: Array<MessageActionRow> = [];
 
-	private async deleteThread(done?: Message) {
-		if (this.channel.isThread()) {
-			if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
-				await this.channel.delete();
-			}
-			else {
-				// Permissions could theoretically change in the 15 minutes that we wait before calling this function
-				await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
-				if (done) {
-					await done.edit({ components: [] });
-				}
-			}
-		}
-	}
+    let doneString = `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***`;
+
+    // Reward social credit only if user does quiz all the way through
+    if (!immediateDelete && average && this.category) {
+      const { tolerance } = this.category;
+      if (average > tolerance) {
+        doneString += '\nThis is an act of treason against the CCP. -25 social credit.';
+        await addSocialCredit(
+          this.channel.client.redisClient,
+          this.member.user.id,
+          -25
+        );
+      } else {
+        doneString += '\nThe CCP admires your national pride. +25 social credit.';
+        await addSocialCredit(this.channel.client.redisClient, this.member.user.id, 25);
+      }
+    }
+
+    if (this.channel.isThread()
+     && this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+      if (immediateDelete) {
+        await this.deleteThread();
+        return;
+      }
+
+      doneString += '\n\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
+      components.push(new MessageActionRow()
+        .addComponents(
+          new MessageButton()
+            .setCustomId('basedometerKeepThread')
+            .setStyle(MessageButtonStyles.SUCCESS)
+            .setLabel('Keep this thread'),
+        ));
+
+      const done = await this.channel.send({ content: doneString, components });
+
+      const threadDelete = setTimeout(async () => {
+        await this.deleteThread(done);
+      }, 15000 * 60);
+
+      const keepCollector = done.createMessageComponentCollector({
+        componentType: 'BUTTON',
+        time: 15000 * 60,
+      });
+
+      keepCollector.on('collect', async (keepInteraction) => {
+        if (keepInteraction.customId === 'basedometerKeepThread') {
+          if (keepInteraction.user.id === this.member.user.id
+            || keepInteraction.user.id === keepInteraction.client.config.ownerID
+            || (keepInteraction.member instanceof GuildMember
+              && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
+            clearTimeout(threadDelete);
+            await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
+          } else {
+            await keepInteraction.reply({
+              content: 'You do not have permission to use this button.',
+              ephemeral: true,
+            });
+          }
+        }
+      });
+    }
+
+    this.manager.instances.delete(this.member.user.id);
+  }
+
+  private async deleteThread(done?: Message) {
+    if (this.channel.isThread()) {
+      if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+        await this.channel.delete();
+      } else {
+        // Permissions could theoretically change in the 15 minutes that we wait before calling this function
+        await this.channel.send({ content: 'I tried to delete this thread but I do not have the proper permissions.' });
+        if (done) {
+          await done.edit({ components: [] });
+        }
+      }
+    }
+  }
 }

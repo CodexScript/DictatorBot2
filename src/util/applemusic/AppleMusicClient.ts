@@ -1,25 +1,55 @@
-import jwt from 'jsonwebtoken';
+import got from 'got';
+import { AppleMusicAccessToken, signToken } from './AppleMusicAccessToken';
 
 export default class AppleMusicClient {
-	keyId: string;
-	teamId: string;
-	secret: string;
-	constructor(keyId: string, teamId: string, secret: string) {
-		this.keyId = keyId;
-		this.teamId = teamId;
-		this.secret = secret;
-	}
+  accessToken: AppleMusicAccessToken;
 
-	public async getAccessToken(): Promise<string> {
-		const now = new Date();
-		const expiresAt = new Date(now.getTime() + 3600 * 1000);
+  constructor(keyId: string, teamId: string, secret: string) {
+    this.accessToken = new AppleMusicAccessToken(keyId, teamId, secret);
+  }
 
-		const payload = {
-			'iss': this.teamId,
-			'iat': now.getTime() / 1000,
-			'exp': expiresAt.getTime() / 1000,
-		};
+  public async getSongByISRC(isrc: string): Promise<unknown> {
+    if (this.shouldResignAccessToken()) {
+      this.accessToken = await signToken(this.accessToken);
+    }
 
-	 	return await jwt.sign(payload, this.secret, { algorithm: 'ES256', keyid: this.keyId, expiresIn: '1h' });
-	}
+    const response = await got.get(`https://api.music.apple.com/v1/catalog/us/songs?filter[isrc]=${isrc}`, {
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    }).json();
+
+    return response;
+  }
+
+  public async getAlbumByUPC(upc: string): Promise<unknown> {
+    if (this.shouldResignAccessToken()) {
+      this.accessToken = await signToken(this.accessToken);
+    }
+
+    const response = await got.get(`https://api.music.apple.com/v1/catalog/us/albums?filter[upc]=${upc}`, {
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    }).json();
+
+    return response;
+  }
+
+  private shouldResignAccessToken(): boolean {
+    if (this.accessToken.token === undefined || this.accessToken.exp === undefined
+      || this.accessToken.iat === undefined) {
+      return true;
+    }
+
+    const now = new Date();
+
+    if (this.accessToken.exp < now.getTime() / 1000) {
+      return true;
+    }
+
+    return false;
+  }
 }

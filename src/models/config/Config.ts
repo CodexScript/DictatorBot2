@@ -1,27 +1,27 @@
 import { TiktokConfig } from './TiktokConfig.js';
 
 export interface Config {
-    botToken: string
-    ownerID: string
-    socialCreditDatabase: {
-        host: string,
-        port: number,
-        user: string,
-        password: string
-    },
-    socialCreditPhrases: Map<string, number>
-    socialCreditRegex: Map<string, number>
-    invalidCommandPenalty: number
-    lavalink: {
-        ip: string,
-        port: number,
-        password: string
-        linkBlacklist: string[]
-        titleBlacklist: string[]
-    },
-    spotify: {
-        token: string,
-        secret: string
-    }
-    tiktok: TiktokConfig
+  botToken: string
+  ownerID: string
+  pfp: string | null
+  settingsDatabase: {
+    host: string,
+    port: number,
+    password: string
+  },
+  socialCreditPhrases: Map<string, number>
+  socialCreditRegex: Map<string, number>
+  invalidCommandPenalty: number
+  lavalink: {
+    ip: string,
+    port: number,
+    password: string
+    linkBlacklist: string[]
+    titleBlacklist: string[]
+  },
+  spotify: {
+    token: string,
+    secret: string
+  }
+  tiktok: TiktokConfig
 }

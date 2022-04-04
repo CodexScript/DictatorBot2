@@ -1,83 +1,84 @@
-import { TiktokConfig } from '../models/config/TiktokConfig.js';
-import { TiktokFavsResponse, TiktokVideo, TiktokVideoListing } from '../models/Tiktok';
 import { CommandInteraction } from 'discord.js';
 import got from 'got';
 import { EventEmitter } from 'events';
+import { TiktokFavsResponse, TiktokVideo, TiktokVideoListing } from '../models/Tiktok';
+import { TiktokConfig } from '../models/config/TiktokConfig.js';
 
 export class TiktokManager {
-	config: TiktokConfig;
-	lastFetch = new Date();
-	videos: Array<TiktokVideo> = [];
-	isFetching = false;
+  config: TiktokConfig;
 
-	constructor(config: TiktokConfig) {
-		this.config = config;
-	}
+  lastFetch = new Date();
 
-	async populateFavs(bus: EventEmitter) {
-		if (this.isFetching) {
-			return false;
-		}
+  videos: Array<TiktokVideo> = [];
 
-		this.lastFetch = new Date();
-		this.isFetching = true;
-		this.videos = [];
+  isFetching = false;
 
-		let cursor = 0;
-		let hasMore = true;
-		let iterated = 0;
+  constructor(config: TiktokConfig) {
+    this.config = config;
+  }
 
-		while (hasMore && iterated < 500) {
-			const url = `https://api19-normal-c-useast1a.tiktokv.com/aweme/v1/aweme/listcollection/?app_language=en&count=30&cursor=${cursor}&account_region=US`;
+  async populateFavs(bus: EventEmitter) {
+    if (this.isFetching) {
+      return false;
+    }
 
-			const response = await got.get(url, {
-				headers: {
-					'user-agent': 'TikTok 16.6.5 rv:166515 (iPhone; iOS 14.0; en_US) Cronet',
-					'x-khronos': this.config.xKhronos,
-					'x-gorgon': this.config.xGorgon,
-					'cookie': this.config.cookie,
-				},
-			}).json();
+    this.lastFetch = new Date();
+    this.isFetching = true;
+    this.videos = [];
 
-			const favs = response as TiktokFavsResponse;
+    let cursor = 0;
+    let hasMore = true;
+    let iterated = 0;
 
-			for (const vid of favs.aweme_list) {
-				if (vid.video && (vid.can_play === undefined || vid.can_play) && vid.video.play_addr?.url_list !== undefined && this.isValidVideo(vid)) {
-					this.videos.push(vid.video);
-				}
-			}
-			hasMore = favs.has_more === 1;
-			cursor = favs.cursor;
-			const diff = 500 - iterated;
-			if (diff < 30) {
-				iterated += diff;
-			}
-			else {
-				iterated += 30;
-			}
-		}
-		this.isFetching = false;
-		bus.emit('unlocked');
-	}
+    while (hasMore && iterated < 500) {
+      const url = `https://api19-normal-c-useast1a.tiktokv.com/aweme/v1/aweme/listcollection/?app_language=en&count=30&cursor=${cursor}&account_region=US`;
 
-	isValidVideo(video: TiktokVideoListing): boolean {
-		let hashtagsValid = true;
-		let soundValid = true;
-		let authorValid = true;
+      const response = await got.get(url, {
+        headers: {
+          'user-agent': 'TikTok 16.6.5 rv:166515 (iPhone; iOS 14.0; en_US) Cronet',
+          'x-khronos': this.config.xKhronos,
+          'x-gorgon': this.config.xGorgon,
+          cookie: this.config.cookie,
+        },
+      }).json();
 
-		if (this.config.badHashtags !== undefined && this.config.badHashtags.length > 0) {
-			hashtagsValid = !this.config.badHashtags.some(r => video.text_extra.filter(e => e.hashtag_name === r).length > 0);
-		}
+      const favs = response as TiktokFavsResponse;
 
-		if (video.music?.id && this.config.badSounds.includes(video.music.id)) {
-			soundValid = false;
-		}
+      for (const vid of favs.aweme_list) {
+        if (vid.video && (vid.can_play === undefined || vid.can_play) && vid.video.play_addr?.url_list !== undefined && this.isValidVideo(vid)) {
+          this.videos.push(vid.video);
+        }
+      }
+      hasMore = favs.has_more === 1;
+      cursor = favs.cursor;
+      const diff = 500 - iterated;
+      if (diff < 30) {
+        iterated += diff;
+      } else {
+        iterated += 30;
+      }
+    }
+    this.isFetching = false;
+    bus.emit('unlocked');
+  }
 
-		if (this.config.badAuthors !== undefined && this.config.badAuthors.length > 0) {
-			authorValid = (video.author?.unique_id !== undefined && !this.config.badAuthors.includes(video.author.unique_id));
-		}
+  isValidVideo(video: TiktokVideoListing): boolean {
+    let hashtagsValid = true;
+    let soundValid = true;
+    let authorValid = true;
 
-		return hashtagsValid && soundValid && authorValid;
-	}
+    if (this.config.badHashtags !== undefined && this.config.badHashtags.length > 0) {
+      hashtagsValid = !this.config.badHashtags.some((r) => video.text_extra.filter((e) => e.hashtag_name === r).length > 0);
+    }
 
+    if (video.music?.id && this.config.badSounds.includes(video.music.id)) {
+      soundValid = false;
+    }
+
+    if (this.config.badAuthors !== undefined && this.config.badAuthors.length > 0) {
+      authorValid = (video.author?.unique_id !== undefined && !this.config.badAuthors.includes(video.author.unique_id));
+    }
+
+    return hashtagsValid && soundValid && authorValid;
+  }
 }
