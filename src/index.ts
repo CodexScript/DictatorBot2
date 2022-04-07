@@ -18,18 +18,21 @@ async function setProfilePicture(client: Bot) {
   if (now.getMonth() === 11) {
     // December
     newPfp = './assets/pfp/uzi-christmas.jpg';
+  } else if (now.getMonth() === 6 || (now.getMonth() === 10 && now.getFullYear() % 4 === 0)) {
+    // November of election year or July
+    newPfp = './assets/pfp/uzi-president.jpg';
+  } else if (now.getMonth() === 9) {
+    // October
+    newPfp = './assets/pfp/uzi-halloween.png';
   } else if (now.getMonth() === 3 && now.getDate() === 1) {
     // April Fools
     newPfp = './assets/pfp/carti.png';
   } else if (now.getMonth() === 3 && now.getDate() === 20) {
     // 420
     newPfp = './assets/pfp/uzi-smacked.jpg';
-  } else if (now.getMonth() === 2 && now.getDate() === 13) {
+  } else if (now.getMonth() === 2 && now.getDate() >= 13) {
     // Daylight savings begins
     newPfp = './assets/pfp/uzi-tart.png';
-  } else if (now.getMonth() === 10 && now.getFullYear() % 4 === 0) {
-    // November of election year
-    newPfp = './assets/pfp/uzi-president.jpg';
   } else {
     newPfp = './assets/pfp/uzi-donda.jpg';
   }

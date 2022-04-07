@@ -22,6 +22,10 @@ export interface Config {
   spotify: {
     token: string,
     secret: string
+  },
+  imgur: {
+    clientId: string,
+    clientSecret: string,
   }
   tiktok: TiktokConfig
 }
