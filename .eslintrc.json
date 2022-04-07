@@ -20,6 +20,13 @@
         "no-console": "off",
         "@typescript-eslint/comma-dangle": "off",
         "no-restricted-syntax": "off",
-        "no-await-in-loop": "off"
+        "no-await-in-loop": "off",
+        "import/extensions": [
+            "error",
+            {
+                "js": "ignorePackages",
+                "json": "never"
+            }
+        ]
     }
 }
