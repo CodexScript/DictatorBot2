@@ -30,6 +30,11 @@ export default class Bot extends Client {
 
   constructor() {
     super({
+      ws: {
+        properties: {
+          $browser: 'Discord iOS'
+        }
+      },
       intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS],
     });
