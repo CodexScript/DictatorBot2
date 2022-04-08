@@ -1,4 +1,5 @@
 import { Interaction } from 'discord.js';
+import { ActivityTypes } from 'discord.js/typings/enums';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Bot from './models/Bot.js';
@@ -60,6 +61,8 @@ async function setProfilePicture(client: Bot) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await client.music.connect(client.user!.id);
     await setProfilePicture(client);
+
+    await client.user?.setActivity({ name: 'femboy moans 👨‍❤️‍💋‍👨', type: ActivityTypes.LISTENING });
 
     setInterval(async () => {
       await setProfilePicture(client);

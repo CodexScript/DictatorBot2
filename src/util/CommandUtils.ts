@@ -26,7 +26,7 @@ export async function registerCommands(
     }
   }
 
-  const rest = new REST({ version: '9' }).setToken(client.config.botToken);
+  const rest = new REST({ version: '10' }).setToken(client.config.botToken);
 
   if (remove) {
     // eslint-disable-next-line max-len
