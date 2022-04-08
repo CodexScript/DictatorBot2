@@ -7,9 +7,9 @@ export class ImgurClient {
 
   clientSecret: string;
 
-  constructor(config: { clientId: string, clientSecret: string }) {
-    this.clientId = config.clientId;
-    this.clientSecret = config.clientSecret;
+  constructor(clientId: string, clientSecret: string) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
   }
 
   async getAlbum(albumId: string): Promise<ImgurAlbum> {
