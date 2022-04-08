@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Node } from 'lavaclient';
 import redis from 'redis';
+import { ImgurClient } from '../util/imgur/ImgurClient.js';
 import { TrackScheduler } from '../util/music/TrackScheduler.js';
 import SpotifyClient from '../util/spotify/SpotifyClient.js';
 import { Config } from './config/Config.js';
@@ -22,6 +23,8 @@ export default class Bot extends Client {
   readonly spotify: SpotifyClient;
 
   readonly redisClient: redis.RedisClientType<any, Record<string, never>>;
+
+  readonly imgur: ImgurClient;
 
   redisConnected: boolean = false;
 
@@ -52,6 +55,8 @@ export default class Bot extends Client {
 
     this.spotify = new SpotifyClient(this.config.spotify.token, this.config.spotify.secret);
 
+    this.imgur = new ImgurClient(this.config.imgur.clientId, this.config.imgur.clientSecret);
+
     this.ws.on('VOICE_SERVER_UPDATE', (data) => this.music.handleVoiceUpdate(data));
     this.ws.on('VOICE_STATE_UPDATE', (data) => this.music.handleVoiceUpdate(data));
   }
@@ -75,6 +80,7 @@ declare module 'discord.js' {
     readonly spotify: SpotifyClient;
     readonly redisClient: redis.RedisClientType<any, Record<string, never>>;
     readonly redisConnected: boolean;
+    readonly imgur: ImgurClient;
     connectRedis(): Promise<void>;
   }
 }

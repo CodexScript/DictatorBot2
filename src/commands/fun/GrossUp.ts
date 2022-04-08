@@ -1,8 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
-import { ImgurClient } from '../../util/imgur/ImgurClient.js';
-
-let client: ImgurClient;
 
 // Album IDs, each represents an imgur url. eg. QtYaS = https://imgur.com/a/QtYaS
 const GROSS_UPS = [
@@ -18,17 +15,10 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: CommandInteraction): Promise<void> {
   await interaction.deferReply();
 
-  if (!client) {
-    client = new ImgurClient({
-      clientId: interaction.client.config.imgur.clientId,
-      clientSecret: interaction.client.config.imgur.clientSecret
-    });
-  }
-
   const season = Math.floor(Math.random() * 3) + 1;
   const grossUp = GROSS_UPS[season - 1][Math.floor(Math.random() * GROSS_UPS[season - 1].length)];
 
-  const album = await client.getAlbum(grossUp);
+  const album = await interaction.client.imgur.getAlbum(grossUp);
 
   const image = album.data.images[Math.floor(Math.random() * album.data.images.length)];
 
