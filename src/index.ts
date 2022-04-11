@@ -67,7 +67,7 @@ async function setProfilePicture(client: Bot) {
 
   client.once('ready', async () => {
     const filename = fileURLToPath(import.meta.url);
-    await registerCommands(client, path.join(path.dirname(filename), 'commands'), process.argv.includes('--force-sync'), process.argv.includes('--remove'));
+    await registerCommands(client, path.join(path.dirname(filename), 'commands'), client.config.adminGuildID, process.argv.includes('--force-sync'), process.argv.includes('--remove'));
     await registerEvents(client, path.join(path.dirname(filename), 'events'));
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await client.music.connect(client.user!.id);
@@ -77,7 +77,7 @@ async function setProfilePicture(client: Bot) {
 
     setInterval(async () => {
       await setProfilePicture(client);
-    }, 1800000);
+    }, 900000);
 
     console.log(`${client.user?.username} is now providing they/their services to the CCP.`);
   });
@@ -94,7 +94,7 @@ async function setProfilePicture(client: Bot) {
       return;
     }
 
-    await command.execute(interaction);
+    await command[1].execute(interaction);
     // try {
     //     await command.execute(interaction);
     // }

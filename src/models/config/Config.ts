@@ -3,7 +3,7 @@ import { TiktokConfig } from './TiktokConfig.js';
 export interface Config {
   botToken: string
   ownerID: string
-  pfp: string | null
+  adminGuildID: string
   settingsDatabase: {
     host: string,
     port: number,

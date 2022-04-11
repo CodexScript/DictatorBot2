@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/return-await */
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import { Routes } from 'discord-api-types/v10';
 import { ApplicationCommand } from 'discord.js';
+import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import * as fsSync from 'fs';
 import * as fs from 'fs/promises';
 import Bot from '../models/Bot';
+import CommandPutResponse from '../models/discord_api/CommandPutResponse';
 
 export async function registerCommands(
   client: Bot,
   dir: string,
+  adminGuildId: string,
   sync = false,
   remove = false,
   guildId?: string
@@ -22,7 +25,7 @@ export async function registerCommands(
     for (const file of categoryCommands) {
       const command = await import(`file:///${dir}/${category}/${file}`);
       console.log(`Adding command to client: ${command.data.name}`);
-      client.commands.set(command.data.name, command);
+      client.commands.set(command.data.name, [category, command]);
     }
   }
 
@@ -41,8 +44,13 @@ export async function registerCommands(
 
   if (sync) {
     const commands = [];
+    const adminCommands = [];
     for (const command of client.commands) {
-      commands.push(command[1].data.toJSON());
+      if (command[1][0] === 'admin') {
+        adminCommands.push(command[1][1].data.toJSON());
+      } else {
+        commands.push(command[1][1].data.toJSON());
+      }
     }
     if (client.application) {
       console.log('Pushing commands to application endpoint...');
@@ -57,10 +65,29 @@ export async function registerCommands(
           { body: commands },
         );
       }
+      const adminCommandsResponse = await rest.put(
+        Routes.applicationGuildCommands(client.application.id, adminGuildId),
+        { body: adminCommands },
+      ) as Array<CommandPutResponse>;
+      for (const commandResponse of adminCommandsResponse) {
+        const permissions = [
+          {
+            id: client.config.ownerID,
+            type: ApplicationCommandPermissionTypes.USER,
+            permission: true
+          }
+        ];
+        await client.application.commands.permissions.set({
+          command: commandResponse.id,
+          guild: adminGuildId,
+          permissions
+        });
+      }
     } else {
       console.log('No application found, skipping hard command registration.');
     }
   }
+
   console.log();
 }
 

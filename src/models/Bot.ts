@@ -18,7 +18,7 @@ export default class Bot extends Client {
 
   readonly config: Config;
 
-  readonly commands: Collection<Snowflake, SlashCommand> = new Collection();
+  readonly commands: Collection<Snowflake, [string, SlashCommand]> = new Collection();
 
   readonly spotify: SpotifyClient;
 
