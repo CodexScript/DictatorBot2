@@ -11,13 +11,14 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  const scheduler = interaction.client.musicManagers.get(interaction.guildId);
+  const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
-  if (!scheduler || scheduler.getTrack() === undefined) {
+  if (!scheduler || scheduler.trackData === undefined) {
     await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
     return;
   }
 
-  await interaction.reply({ content: `Skipped: **${scheduler.getTrack()?.info.title}**` });
-  await scheduler.skip();
+  await interaction.reply({ content: `Skipped: **${scheduler.trackData?.title}**` });
+  await scheduler.queue.skip();
+  await scheduler.queue.start();
 }

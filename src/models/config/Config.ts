@@ -12,6 +12,7 @@ export interface Config {
   socialCreditPhrases: Map<string, number>
   socialCreditRegex: Map<string, number>
   invalidCommandPenalty: number
+  openaiToken: string | null
   lavalink: {
     ip: string,
     port: number,

@@ -67,7 +67,7 @@ async function setProfilePicture(client: Bot) {
 
   client.once('ready', async () => {
     const filename = fileURLToPath(import.meta.url);
-    await registerCommands(client, path.join(path.dirname(filename), 'commands'), client.config.adminGuildID, process.argv.includes('--force-sync'), process.argv.includes('--remove'));
+    await registerCommands(client, path.join(path.dirname(filename), 'commands'), client.config.adminGuildID, process.argv.includes('--force-sync'), process.argv.includes('--remove'), '272896244412579841');
     await registerEvents(client, path.join(path.dirname(filename), 'events'));
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await client.music.connect(client.user!.id);
