@@ -31,7 +31,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   const temperature = interaction.options.getNumber('randomness') || 0.7;
 
   const response = await got.post(`https://api.openai.com/v1/engines/${model}/completions`, {
-    throwHttpErrors: true,
+    throwHttpErrors: false,
     responseType: 'json',
     headers: {
       Authorization: `Bearer ${interaction.client.config.openaiToken}`,
