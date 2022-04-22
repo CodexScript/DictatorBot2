@@ -17,11 +17,6 @@ export const data = new SlashCommandBuilder()
     .setDescription('The higher the number, the more random the sentence will be. 0-1. Default 0.7.')
     .setMinValue(0)
     .setMaxValue(1)
-    .setRequired(false))
-  .addIntegerOption((option) => option.setName('max_length')
-    .setDescription('The maximum length of the sentence. Default 256.')
-    .setMinValue(0)
-    .setMaxValue(2000)
     .setRequired(false));
 
 export async function execute(interaction: CommandInteraction): Promise<void> {
@@ -34,22 +29,33 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   const prompt = interaction.options.getString('prompt');
   const model = interaction.options.getString('model') || 'text-davinci-002';
   const temperature = interaction.options.getNumber('randomness') || 0.7;
-  const maxLength = interaction.options.getInteger('max_length') || 256;
 
   const response = await got.post(`https://api.openai.com/v1/engines/${model}/completions`, {
+    throwHttpErrors: true,
+    responseType: 'json',
     headers: {
       Authorization: `Bearer ${interaction.client.config.openaiToken}`,
     },
     json: {
       prompt,
       temperature,
-      max_length: maxLength,
+      n: 1,
+      top_p: 1,
+      stream: false,
+      logprobs: null
     }
-  }).json() as GPTResponse;
+  });
+
+  if (response.statusCode !== 200) {
+    await interaction.followUp({ content: `Something went wrong:\n${response.statusCode}: ${response.statusMessage}` });
+    return;
+  }
+
+  const respData = response.body as GPTResponse;
 
   const embed = new MessageEmbed()
     .setTitle('GPT-3 Response')
-    .setDescription(`**${prompt}** ${response.choices[0].text}`)
+    .setDescription(`**${prompt}** ${respData.choices[0].text}`)
     .setThumbnail('https://yt3.ggpht.com/a/AGF-l7_v51OdQMsXHr-f0canebdaj0d3NtQmM5nhJA=s900-c-k-c0xffffffff-no-rj-mo');
 
   await interaction.followUp({ embeds: [embed] });

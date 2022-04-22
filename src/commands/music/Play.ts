@@ -62,6 +62,16 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   const player = interaction.client.music.createPlayer(interaction.guildId);
 
+  player.on('trackEnd', async (track, reason) => {
+    if (reason === 'REPLACED') {
+      return;
+    }
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await player.disconnect();
+    await player.destroy();
+  });
+
   const channel = interaction.member.voice.channelId;
 
   if (!player.connected || player.channelId !== channel) {
