@@ -11,21 +11,21 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  const scheduler = interaction.client.musicManagers.get(interaction.guildId);
+  const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
-  if (!scheduler || scheduler.getTrack() === undefined) {
+  if (!scheduler || scheduler.trackData === undefined) {
     await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
     return;
   }
 
-  if (scheduler.length === 0) {
+  if (scheduler.queue.tracks.length === 0) {
     await interaction.reply({ content: 'There is nothing in the queue.', ephemeral: true });
     return;
   }
 
   let queueString = '';
-  scheduler.getQueue().forEach((track, index) => {
-    queueString += `${index + 1}. ${track.info.title}\n`;
+  scheduler.queue.tracks.forEach((track, index) => {
+    queueString += `${index + 1}. ${track.title}\n`;
   });
 
   await interaction.reply({ content: `\`\`\`\n${queueString}\n\`\`\``, ephemeral: true });

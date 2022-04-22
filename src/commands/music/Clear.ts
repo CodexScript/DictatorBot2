@@ -12,14 +12,14 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  const scheduler = interaction.client.musicManagers.get(interaction.guildId);
+  const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
-  if (!scheduler || scheduler.getTrack() === undefined) {
+  if (!scheduler || scheduler.trackData === undefined) {
     await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
     return;
   }
 
-  scheduler.clear();
+  scheduler.queue.clear();
 
   await interaction.reply({ content: 'Cleared the queue.' });
 }

@@ -16,9 +16,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  const scheduler = interaction.client.musicManagers.get(interaction.guildId);
+  const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
-  if (!scheduler || scheduler.getTrack() === undefined) {
+  if (!scheduler || scheduler.trackData === undefined) {
     await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
     return;
   }
@@ -35,12 +35,12 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  if (!scheduler.player.filters.timescale) {
-    scheduler.player.filters.timescale = { pitch: newPitch / 100, rate: 1, speed: 1 };
+  if (!scheduler.filters.timescale) {
+    scheduler.filters.timescale = { pitch: newPitch / 100, rate: 1, speed: 1 };
   } else {
-    scheduler.player.filters.timescale.pitch = newPitch / 100;
+    scheduler.filters.timescale.pitch = newPitch / 100;
   }
-  await scheduler.player.setFilters();
+  await scheduler.setFilters();
 
   await interaction.reply({ content: `Set pitch to **${newPitch}%**` });
   await addSocialCredit(

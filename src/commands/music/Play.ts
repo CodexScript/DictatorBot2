@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import '@lavaclient/queue/register.js';
 import { LoadTracksResponse } from '@lavaclient/types';
 import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { TrackScheduler } from '../../util/music/TrackScheduler.js';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
@@ -60,15 +60,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     }
   }
 
-  let scheduler = interaction.client.musicManagers.get(interaction.guildId);
-
-  if (!scheduler) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    scheduler = new TrackScheduler(node.createPlayer(interaction.guildId), interaction.channel!);
-    interaction.client.musicManagers.set(interaction.guildId, scheduler);
-  }
-
-  const { player } = scheduler;
+  const player = interaction.client.music.createPlayer(interaction.guildId);
 
   const channel = interaction.member.voice.channelId;
 
@@ -76,12 +68,16 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     player.connect(channel, { deafened: true });
   }
 
-  const playNow = await scheduler.queueTrack(res.tracks[0]);
+  player.queue.add(res.tracks[0]);
 
-  if (playNow) {
+  if (!player.playing) {
     await interaction.followUp({ content: `Now playing: **${res.tracks[0].info.title}**` });
   } else {
     await interaction.followUp({ content: `Queued: **${res.tracks[0].info.title}**` });
+  }
+
+  if (!player.playing) {
+    await player.queue.start();
   }
 
   await addSocialCredit(

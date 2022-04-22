@@ -11,14 +11,11 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  const scheduler = interaction.client.musicManagers.get(interaction.guildId);
+  const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
-  if (!scheduler || scheduler.getTrack() === undefined) {
-    await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
-    return;
-  }
-
-  await scheduler.skip(true);
+  await scheduler.stop();
+  await scheduler.disconnect();
+  await scheduler.destroy();
 
   await interaction.reply({ content: 'Stopped.' });
 }

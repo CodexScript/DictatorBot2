@@ -15,9 +15,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  const scheduler = interaction.client.musicManagers.get(interaction.guildId);
+  const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
-  if (!scheduler || scheduler.getTrack() === undefined) {
+  if (!scheduler || !scheduler.playing || scheduler.track === undefined) {
     await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
     return;
   }
@@ -34,7 +34,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     return;
   }
 
-  await scheduler.player.setVolume(newVol);
+  await scheduler.setVolume(newVol);
 
   await interaction.reply({ content: `Set volume to **${newVol}**` });
 }
