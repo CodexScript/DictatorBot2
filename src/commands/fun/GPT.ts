@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 import got from 'got';
 import GPTResponse from '../../models/GPTResponse';
 
@@ -42,7 +42,8 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
       n: 1,
       top_p: 1,
       stream: false,
-      logprobs: null
+      logprobs: 0,
+      max_tokens: 1024
     }
   });
 
@@ -53,10 +54,5 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   const respData = response.body as GPTResponse;
 
-  const embed = new MessageEmbed()
-    .setTitle('GPT-3 Response')
-    .setDescription(`**${prompt}** ${respData.choices[0].text}`)
-    .setThumbnail('https://yt3.ggpht.com/a/AGF-l7_v51OdQMsXHr-f0canebdaj0d3NtQmM5nhJA=s900-c-k-c0xffffffff-no-rj-mo');
-
-  await interaction.followUp({ embeds: [embed] });
+  await interaction.followUp({ content: `**${prompt}** ${respData.choices[0].text}` });
 }
