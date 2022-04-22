@@ -14,7 +14,7 @@ export const data = new SlashCommandBuilder()
     .addChoices([['davinci', 'text-davinci-002'], ['ada', 'text-ada-001'], ['babbage', 'text-babbage-001'], ['curie', 'text-curie-001']])
     .setRequired(false))
   .addNumberOption((option) => option.setName('randomness')
-    .setDescription('The higher the number, the more random the sentence will be. 0-1. Default 0.7.')
+    .setDescription('The higher the number, the more random the sentence will be. 0-1. Default 1.')
     .setMinValue(0)
     .setMaxValue(1)
     .setRequired(false));
@@ -28,7 +28,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   const prompt = interaction.options.getString('prompt');
   const model = interaction.options.getString('model') || 'text-davinci-002';
-  const temperature = interaction.options.getNumber('randomness') || 0.7;
+  const temperature = interaction.options.getNumber('randomness') || 1;
 
   const response = await got.post(`https://api.openai.com/v1/engines/${model}/completions`, {
     throwHttpErrors: false,
@@ -43,7 +43,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
       top_p: 1,
       stream: false,
       logprobs: 0,
-      max_tokens: 1024
+      max_tokens: 500
     }
   });
 
