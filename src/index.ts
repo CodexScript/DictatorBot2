@@ -79,6 +79,8 @@ async function setProfilePicture(client: Bot) {
       await setProfilePicture(client);
     }, 900000);
 
+    await (await client.guilds.fetch('575404293935595531')).members.fetch();
+
     console.log(`${client.user?.username} is now providing they/their services to the CCP.`);
   });
 
