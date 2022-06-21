@@ -1,4 +1,4 @@
-import { Interaction } from 'discord.js';
+import { Guild, Interaction } from 'discord.js';
 import { ActivityTypes } from 'discord.js/typings/enums';
 import path from 'path';
 import { fileURLToPath } from 'url';

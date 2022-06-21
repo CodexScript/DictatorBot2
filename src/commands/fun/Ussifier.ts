@@ -20,9 +20,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   lastExecuted = new Date();
 
-  const guilds = interaction.client.guilds.cache;
-
-  const alphaWorld = guilds.get('575404293935595531');
+  const alphaWorld = await interaction.client.guilds.fetch('575404293935595531');
 
   if (!alphaWorld) {
     await interaction.reply({ content: 'Fetching Alpha World server from cache failed. I\'m probably not in the server. If you are 100% positive that I am, try sending a message in the general channel, then try again.', ephemeral: true });
@@ -31,12 +29,14 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   await interaction.deferReply();
 
+  const bot = await alphaWorld.members.fetch(interaction.client.user!.id!);
+
   const members = await alphaWorld.members.list({ limit: 1000 });
 
   for (const memberArr of members) {
     const member = memberArr[1];
     console.log(member.user.username);
-    if (member.user.id !== interaction.client.user?.id && member.user.id !== alphaWorld.ownerId && (member.nickname === null || member.nickname.endsWith('ussy') === false)) {
+    if (member.user.id !== interaction.client.user?.id && bot.permissions.has('MANAGE_NICKNAMES') && bot.roles.highest.position > member.roles.highest.position && (member.nickname === null || member.nickname.endsWith('ussy') === false)) {
       await member.setNickname(`${member.nickname ? member.nickname : member.user.username}ussy`);
     }
   }
