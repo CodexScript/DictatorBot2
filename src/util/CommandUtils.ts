@@ -102,4 +102,5 @@ export async function registerEvents(client: Bot, dir: string): Promise<void> {
       client.on(event.name, async (...args) => await event.execute(...args));
     }
   }
+  console.log();
 }
