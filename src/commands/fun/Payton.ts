@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, GuildMember } from 'discord.js';
-import { playURL } from '../../util/PlayerUtils';
+import { playURL } from '../../util/PlayerUtils.js';
 
 const responses: Array<string> = ['I disagree', 'OK, here\'s the schpiel... *incoherent rambling*', 'Based', 'Nigger', 'Big dick style',
   'Zesty.', 'It\'s time for the twerkulator', 'Free Wi-Fi anywhere you go', 'Well no it\'s like the whole schpiel',
