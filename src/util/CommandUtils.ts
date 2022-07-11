@@ -65,24 +65,24 @@ export async function registerCommands(
           { body: commands },
         );
       }
-      const adminCommandsResponse = await rest.put(
-        Routes.applicationGuildCommands(client.application.id, adminGuildId),
-        { body: adminCommands },
-      ) as Array<CommandPutResponse>;
-      for (const commandResponse of adminCommandsResponse) {
-        const permissions = [
-          {
-            id: client.config.ownerID,
-            type: ApplicationCommandPermissionTypes.USER,
-            permission: true
-          }
-        ];
-        await client.application.commands.permissions.set({
-          command: commandResponse.id,
-          guild: adminGuildId,
-          permissions
-        });
-      }
+      // const adminCommandsResponse = await rest.put(
+      //   Routes.applicationGuildCommands(client.application.id, adminGuildId),
+      //   { body: adminCommands },
+      // ) as Array<CommandPutResponse>;
+      // for (const commandResponse of adminCommandsResponse) {
+      //   const permissions = [
+      //     {
+      //       id: client.config.ownerID,
+      //       type: ApplicationCommandPermissionTypes.USER,
+      //       permission: true
+      //     }
+      //   ];
+      //   await client.application.commands.permissions.set({
+      //     command: commandResponse.id,
+      //     guild: adminGuildId,
+      //     permissions
+      //   });
+      // }
     } else {
       console.log('No application found, skipping hard command registration.');
     }
