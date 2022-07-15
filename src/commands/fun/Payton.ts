@@ -6,7 +6,7 @@ const responses: Array<string> = ['I disagree', 'OK, here\'s the schpiel... *inc
   'Zesty.', 'It\'s time for the twerkulator', 'Free Wi-Fi anywhere you go', 'Well no it\'s like the whole schpiel',
   'Wait no but like unironically...', 'Kumalala', 'OK nerd', '*unprompted* CS:GO is the best shooter of all time',
   '*whines about back pain*', 'I feel no remorse watching an animal die at my hand',
-  'You can\'t understand art because you\'re not trained in it.'];
+  'You can\'t understand art because you\'re not trained in it.', 'Die'];
 
 
 export const data = new SlashCommandBuilder()
@@ -39,11 +39,14 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   const triggers: Array<Function> = [];
 
   if (interaction.member instanceof GuildMember) {
-    triggers.push(gameTrigger);
     if (interaction.member.presence?.activities?.length !== undefined && interaction.member.presence.activities.length > 0) {
       if (interaction.member.presence.activities[0].type === 'PLAYING') {
-        triggers.push(kumalaTrigger);
+        triggers.push(gameTrigger);
       }
+    }
+
+    if (interaction.member.voice.channel) {
+      triggers.push(kumalaTrigger);
     }
   }
 

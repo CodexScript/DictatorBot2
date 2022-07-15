@@ -2,69 +2,74 @@ import canvas from 'canvas';
 import { GuildMember, Message } from 'discord.js';
 import * as fs from 'fs/promises';
 import got from 'got';
-import redis from 'redis';
+import * as BetterSqlite3 from 'better-sqlite3';
 import SocialCreditTier from '../models/SocialCreditTier.js';
 
 canvas.registerFont('./assets/font/seven-monkey-fury-bb.regular.ttf', { family: 'Seven Monkey Fury BB' });
 
 export async function setSocialCredit(
-  client: redis.RedisClientType<any, Record<string, never>>,
+  client: BetterSqlite3.Database,
   userID: string,
   socialCredit: number
 ) {
-  await client.set(`social_credit:${userID}`, socialCredit);
+  // await client.set(`social_credit:${userID}`, socialCredit);
+  return;
 }
 
 export async function getSocialCredit(
-  client: redis.RedisClientType<any, Record<string, never>>,
+  client: BetterSqlite3.Database,
   userID: string
 ) {
-  const res = await client.get(`social_credit:${userID}`);
-  if (res === null) {
-    await setSocialCredit(client, userID, 1000);
-    return 1000;
-  }
-  return parseInt(res, 10);
+  // const res = await client.get(`social_credit:${userID}`);
+  // if (res === null) {
+  //   await setSocialCredit(client, userID, 1000);
+  //   return 1000;
+  // }
+  // return parseInt(res, 10);
+  return 1;
 }
 
 export async function addSocialCredit(
-  client: redis.RedisClientType<any, Record<string, never>>,
+  client: BetterSqlite3.Database,
   userID: string,
   socialCredit: number
 ) {
-  const currentSocialCredit = await getSocialCredit(client, userID);
-  await setSocialCredit(client, userID, currentSocialCredit + socialCredit);
+  // const currentSocialCredit = await getSocialCredit(client, userID);
+  // await setSocialCredit(client, userID, currentSocialCredit + socialCredit);
+  return;
 }
 
 export async function setSocialCreditFromMessage(
-  client: redis.RedisClientType<any, Record<string, never>>,
+  client: BetterSqlite3.Database,
   message: Message,
   reasons: Array<string>,
   socialCredit: number,
   reply = true
 ) {
-  const userID = message.author.id;
-  await setSocialCredit(client, userID, socialCredit);
-  if (reply) {
-    await message.reply(`Your new social credit: ${socialCredit}
-Reasons:\n>${reasons.join('\n>')}`);
-  }
+//   const userID = message.author.id;
+//   await setSocialCredit(client, userID, socialCredit);
+//   if (reply) {
+//     await message.reply(`Your new social credit: ${socialCredit}
+// Reasons:\n>${reasons.join('\n>')}`);
+//   }
+  return;
 }
 
 export async function addSocialCreditFromMessage(
-  client: redis.RedisClientType<any, Record<string, never>>,
+  client: BetterSqlite3.Database,
   message: Message,
   reasons: Array<string>,
   socialCredit: number,
   reply = true
 ) {
-  const userID = message.author.id;
-  const currentSocialCredit = await getSocialCredit(client, userID);
-  await setSocialCredit(client, userID, currentSocialCredit + socialCredit);
-  if (reply) {
-    await message.reply(`Your new social credit: ${currentSocialCredit + socialCredit}
-Reasons:\n>${reasons.join('\n>')}`);
-  }
+//   const userID = message.author.id;
+//   const currentSocialCredit = await getSocialCredit(client, userID);
+//   await setSocialCredit(client, userID, currentSocialCredit + socialCredit);
+//   if (reply) {
+//     await message.reply(`Your new social credit: ${currentSocialCredit + socialCredit}
+// Reasons:\n>${reasons.join('\n>')}`);
+//   }
+  return;
 }
 
 export function getSocialCreditTier(socialCredit: number): SocialCreditTier {
@@ -93,7 +98,7 @@ export function getSocialCreditTier(socialCredit: number): SocialCreditTier {
 }
 
 export async function createUserBanner(
-  client: redis.RedisClientType<any, Record<string, never>>,
+  client: BetterSqlite3.Database,
   member: GuildMember
 ): Promise<Buffer> {
   const socialCredit = await getSocialCredit(client, member.id);

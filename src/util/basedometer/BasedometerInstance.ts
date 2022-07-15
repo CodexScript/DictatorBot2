@@ -169,7 +169,7 @@ export default class BasedometerInstance {
           content: 'Only the person who initiated this basedometer test may use these buttons. -10 social credit.',
           ephemeral: true,
         });
-        await addSocialCredit(i.client.redisClient, i.user.id, -10);
+        await addSocialCredit(i.client.sql, i.user.id, -10);
       }
     });
   }
@@ -196,13 +196,13 @@ export default class BasedometerInstance {
       if (average > tolerance) {
         doneString += '\nThis is an act of treason against the CCP. -25 social credit.';
         await addSocialCredit(
-          this.channel.client.redisClient,
+          this.channel.client.sql,
           this.member.user.id,
           -25
         );
       } else {
         doneString += '\nThe CCP admires your national pride. +25 social credit.';
-        await addSocialCredit(this.channel.client.redisClient, this.member.user.id, 25);
+        await addSocialCredit(this.channel.client.sql, this.member.user.id, 25);
       }
     }
 
