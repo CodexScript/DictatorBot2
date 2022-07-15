@@ -5,22 +5,38 @@ import {
 import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Node } from 'lavaclient';
-import redis from 'redis';
 import { ImgurClient } from '../util/imgur/ImgurClient.js';
 import SpotifyClient from '../util/spotify/SpotifyClient.js';
 import { Config } from './config/Config.js';
 import { SlashCommand } from './SlashCommand.js';
+import Database from 'better-sqlite3';
+import * as BetterSqlite3 from 'better-sqlite3';
+import path from 'path';
 
 export default class Bot extends Client {
   readonly music: Node;
 
-  readonly config: Config;
+  private _config: Config;
+
+  public set config(config: Config) {
+    this._config = config;
+    const readyYaml = yaml.dump(config, { quotingType: '"'});
+    fs.writeFile('./config.yml', readyYaml, (err) => {
+      if (err) {
+        console.error(err);
+      }
+    });
+  }
+
+  public get config(): Config {
+    return this._config;
+  };
 
   readonly commands: Collection<Snowflake, [string, SlashCommand]> = new Collection();
 
   readonly spotify: SpotifyClient;
 
-  readonly redisClient: redis.RedisClientType<any, Record<string, never>>;
+  readonly sql: BetterSqlite3.Database;
 
   readonly imgur: ImgurClient;
 
@@ -37,15 +53,12 @@ export default class Bot extends Client {
         Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS],
     });
 
-    this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
+    this._config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
 
-    this.redisClient = redis.createClient({
-      socket: {
-        host: this.config.settingsDatabase.host,
-        port: this.config.settingsDatabase.port
-      },
-      password: this.config.settingsDatabase.password
-    });
+    console.log(path.resolve('./assets/memes.sqlite'));
+    this.sql = new Database('./assets/memes.sqlite');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS memes (name TEXT PRIMARY KEY, url TEXT NOT NULL)');
+    this.sql.exec('CREATE UNIQUE INDEX IF NOT EXISTS memes_name ON memes (name)');
 
     this.music = new Node({
       sendGatewayPayload: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
@@ -64,25 +77,15 @@ export default class Bot extends Client {
     this.ws.on('VOICE_STATE_UPDATE', (data) => this.music.handleVoiceUpdate(data));
   }
 
-  async connectRedis(): Promise<void> {
-    this.redisClient.on('connect', () => {
-      console.log('Redis connected!');
-      this.redisConnected = true;
-    });
-
-    await this.redisClient.connect();
-  }
 }
 
 declare module 'discord.js' {
   // eslint-disable-next-line no-shadow
   interface Client {
     readonly music: Node;
-    readonly config: Config;
+    config: Config;    
     readonly spotify: SpotifyClient;
-    readonly redisClient: redis.RedisClientType<any, Record<string, never>>;
-    readonly redisConnected: boolean;
+    readonly sql: BetterSqlite3.Database;
     readonly imgur: ImgurClient;
-    connectRedis(): Promise<void>;
   }
 }

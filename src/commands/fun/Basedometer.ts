@@ -133,7 +133,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     if (rating < 0 || rating > 10) {
       await interaction.reply({ content: 'Rating must be between 0 and 10. -10 social credit.', ephemeral: true });
       await addSocialCredit(
-        interaction.client.redisClient,
+        interaction.client.sql,
         interaction.user.id,
         -10
       );
@@ -144,7 +144,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     if (instance === undefined) {
       await interaction.reply({ content: 'You must have an active test in order to use that command. -10 social credit.', ephemeral: true });
       await addSocialCredit(
-        interaction.client.redisClient,
+        interaction.client.sql,
         interaction.user.id,
         -10
       );
@@ -154,7 +154,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     if (interaction.channel !== instance.channel) {
       await interaction.reply({ content: 'This is the wrong channel. -10 social credit.', ephemeral: true });
       await addSocialCredit(
-        interaction.client.redisClient,
+        interaction.client.sql,
         interaction.user.id,
         -10
       );

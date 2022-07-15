@@ -44,7 +44,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   await interaction.reply({ content: `Set pitch to **${newPitch}%**` });
   await addSocialCredit(
-    interaction.client.redisClient,
+    interaction.client.sql,
     interaction.user.id,
     1
   );

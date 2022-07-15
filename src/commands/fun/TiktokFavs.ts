@@ -75,7 +75,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   await interaction.followUp({ files: [{ name: 'tiktok.mp4', attachment: buffer }] });
 
   await addSocialCredit(
-    interaction.client.redisClient,
+    interaction.client.sql,
     interaction.user.id,
     10
   );

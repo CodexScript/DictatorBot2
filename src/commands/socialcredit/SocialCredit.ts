@@ -25,7 +25,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   await interaction.deferReply({ ephemeral: true });
 
   const flag = await SocialCreditManager.createUserBanner(
-    interaction.client.redisClient,
+    interaction.client.sql,
     targetUser
   );
   await interaction.followUp({ files: [flag] });

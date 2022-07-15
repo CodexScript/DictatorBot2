@@ -63,7 +63,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   await interaction.followUp({ files: [ethanCanvas.toBuffer()] });
   await SocialCreditManager.addSocialCredit(
-    interaction.client.redisClient,
+    interaction.client.sql,
     interaction.user.id,
     10
   );

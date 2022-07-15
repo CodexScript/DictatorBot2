@@ -3,12 +3,8 @@ import { TiktokConfig } from './TiktokConfig.js';
 export interface Config {
   botToken: string
   ownerID: string
+  currentPfp: string | null
   adminGuildID: string
-  settingsDatabase: {
-    host: string,
-    port: number,
-    password: string
-  },
   socialCreditPhrases: Map<string, number>
   socialCreditRegex: Map<string, number>
   invalidCommandPenalty: number

@@ -52,7 +52,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   await interaction.reply({ content: `Toggled underwater to **${state}**` });
   await addSocialCredit(
-    interaction.client.redisClient,
+    interaction.client.sql,
     interaction.user.id,
     1
   );

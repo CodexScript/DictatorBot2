@@ -7,11 +7,8 @@ import { registerCommands, registerEvents } from './util/CommandUtils.js';
 import { getCurrentPfp, setPfp } from './util/settings/GlobalSettingsManager.js';
 
 async function setProfilePicture(client: Bot) {
-  if (!client.redisConnected) {
-    await client.connectRedis();
-  }
 
-  const pfp = await getCurrentPfp(client.redisClient);
+  const pfp = await getCurrentPfp(client.config);
 
   let newPfp;
   const now = new Date();
@@ -52,14 +49,12 @@ async function setProfilePicture(client: Bot) {
   if (pfp !== newPfp) {
     console.log('Changing PFP...');
     await client.user?.setAvatar(newPfp);
-    await setPfp(client.redisClient, newPfp);
+    await setPfp(client, newPfp);
   }
 }
 
 (async () => {
   const client = new Bot();
-
-  await client.connectRedis();
 
   client.music.on('connect', () => {
     console.log('Connected to lavalink.');

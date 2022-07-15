@@ -46,7 +46,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   await interaction.reply({ content: `Set speed to **${newSpeed}%**` });
   await addSocialCredit(
-    interaction.client.redisClient,
+    interaction.client.sql,
     interaction.user.id,
     1
   );
