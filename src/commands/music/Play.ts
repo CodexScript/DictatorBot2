@@ -45,31 +45,15 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     await interaction.reply({ content: 'Could not find any tracks.' });
     return;
   }
-
-  for (const blacklist of interaction.client.config.lavalink.linkBlacklist) {
-    if (res.tracks[0].info.uri === blacklist) {
-      await interaction.reply({ content: 'That link is blacklisted.' });
-      return;
-    }
-  }
-
-  for (const blacklist of interaction.client.config.lavalink.titleBlacklist) {
-    if (res.tracks[0].info.title.toLowerCase().includes(blacklist.toLowerCase())) {
-      await interaction.reply({ content: 'That track is blacklisted.' });
-      return;
-    }
-  }
-
   const player = interaction.client.music.createPlayer(interaction.guildId);
 
   player.on('trackEnd', async (track, reason) => {
-    if (reason === 'REPLACED') {
-      return;
-    }
     // eslint-disable-next-line no-promise-executor-return
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await player.disconnect();
-    await player.destroy();
+    if (!player.playing) {
+      await player.disconnect();
+      await player.destroy();
+    }
   });
 
   const channel = interaction.member.voice.channelId;
@@ -82,12 +66,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   if (!player.playing) {
     await interaction.followUp({ content: `Now playing: **${res.tracks[0].info.title}**` });
+    await player.queue.start();
   } else {
     await interaction.followUp({ content: `Queued: **${res.tracks[0].info.title}**` });
-  }
-
-  if (!player.playing) {
-    await player.queue.start();
   }
 
   await addSocialCredit(
