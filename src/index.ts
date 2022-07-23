@@ -68,7 +68,7 @@ async function setProfilePicture(client: Bot) {
     await client.music.connect(client.user!.id);
     await setProfilePicture(client);
 
-    await client.user?.setActivity({ name: 'femboy moans 👨‍❤️‍💋‍👨', type: ActivityTypes.LISTENING });
+    await client.user?.setActivity({ name: 'RED & WHITE 🔴⚪️', type: ActivityTypes.LISTENING });
 
     setInterval(async () => {
       await setProfilePicture(client);
