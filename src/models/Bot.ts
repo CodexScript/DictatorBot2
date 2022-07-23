@@ -14,23 +14,10 @@ import * as BetterSqlite3 from 'better-sqlite3';
 import path from 'path';
 
 export default class Bot extends Client {
+
+  config: Config;
+
   readonly music: Node;
-
-  private _config: Config;
-
-  public set config(config: Config) {
-    this._config = config;
-    const readyYaml = yaml.dump(config, { quotingType: '"'});
-    fs.writeFile('./config.yml', readyYaml, (err) => {
-      if (err) {
-        console.error(err);
-      }
-    });
-  }
-
-  public get config(): Config {
-    return this._config;
-  };
 
   readonly commands: Collection<Snowflake, [string, SlashCommand]> = new Collection();
 
@@ -53,7 +40,7 @@ export default class Bot extends Client {
         Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS],
     });
 
-    this._config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
+    this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
 
     console.log(path.resolve('./assets/memes.sqlite'));
     this.sql = new Database('./assets/memes.sqlite');
