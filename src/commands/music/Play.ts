@@ -32,11 +32,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   try {
     const url = new URL(query);
-    if (url.host.includes('youtube.com') || url.host.includes('youtu.be')) {
-      res = await node.rest.loadTracks(query);
-    } else {
-      res = await node.rest.loadTracks(`ytsearch:${query}`);
-    }
+    res = await node.rest.loadTracks(query);
   } catch (_) {
     res = await node.rest.loadTracks(`ytsearch:${query}`);
   }
