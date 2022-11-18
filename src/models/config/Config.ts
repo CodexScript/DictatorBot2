@@ -3,12 +3,19 @@ import { TiktokConfig } from './TiktokConfig.js';
 export interface Config {
   botToken: string
   ownerID: string
-  currentPfp: string | null
+  pfp: {
+    current: string
+    forced: boolean
+  }
   adminGuildID: string
   socialCreditPhrases: Map<string, number>
   socialCreditRegex: Map<string, number>
   invalidCommandPenalty: number
-  openaiToken: string | null
+  minecraft: {
+    serverIP: string
+    rconPort: number
+    rconPassword: string
+  } | null
   lavalink: {
     ip: string,
     port: number,

@@ -6,14 +6,16 @@ import * as fs from 'fs';
 export async function getCurrentPfp(
   config: Config
 ): Promise<string | null> {
-  return config.currentPfp;
+  return config.pfp.current;
 }
 
 export async function setPfp(
   client: Bot,
-  pfp: string
+  pfp: string,
+  force = false
 ): Promise<void> {
-  client.config.currentPfp = pfp;
+  client.config.pfp.current = pfp;
+  client.config.pfp.forced = force;
   const readyYaml = yaml.dump(client.config, { quotingType: '"'});
   fs.writeFile('./config.yml', readyYaml, (err: any) => {
     if (err) {
