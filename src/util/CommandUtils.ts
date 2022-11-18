@@ -46,11 +46,7 @@ export async function registerCommands(
     const commands = [];
     const adminCommands = [];
     for (const command of client.commands) {
-      if (command[1][0] === 'admin') {
-        adminCommands.push(command[1][1].data.toJSON());
-      } else {
-        commands.push(command[1][1].data.toJSON());
-      }
+      commands.push(command[1][1].data.toJSON());
     }
     if (client.application) {
       console.log('Pushing commands to application endpoint...');
