@@ -42,6 +42,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
             return;
         }
         await setPfp(interaction.client.Bot, url, force);
+        await interaction.client.user?.setAvatar(url);
         await interaction.reply({ content: 'Profile picture changed.', ephemeral: true });
     }
 }
