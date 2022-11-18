@@ -31,6 +31,7 @@
     "puppeteer": "^13.5.1",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-stealth": "^2.9.0",
+    "rcon-client": "^4.2.3",
     "utf-8-validate": "^5.0.9",
     "zlib-sync": "^0.1.7"
   },

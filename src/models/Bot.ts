@@ -27,6 +27,8 @@ export default class Bot extends Client {
 
   readonly imgur: ImgurClient;
 
+  readonly Bot: Bot = this;
+
   redisConnected: boolean = false;
 
   constructor() {
@@ -37,10 +39,11 @@ export default class Bot extends Client {
         }
       },
       intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS],
+        Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     });
 
     this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
+    
 
     console.log(path.resolve('./assets/memes.sqlite'));
     this.sql = new Database('./assets/memes.sqlite');
@@ -70,9 +73,10 @@ declare module 'discord.js' {
   // eslint-disable-next-line no-shadow
   interface Client {
     readonly music: Node;
-    config: Config;    
+    readonly config: Config;    
     readonly spotify: SpotifyClient;
     readonly sql: BetterSqlite3.Database;
     readonly imgur: ImgurClient;
+    readonly Bot: Bot;
   }
 }

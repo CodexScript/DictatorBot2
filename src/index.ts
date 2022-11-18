@@ -8,6 +8,9 @@ import { getCurrentPfp, setPfp } from './util/settings/GlobalSettingsManager.js'
 
 async function setProfilePicture(client: Bot) {
 
+  if (client.config.pfp.forced) {
+    return;
+  }
   const pfp = await getCurrentPfp(client.config);
 
   let newPfp;
@@ -62,7 +65,7 @@ async function setProfilePicture(client: Bot) {
 
   client.once('ready', async () => {
     const filename = fileURLToPath(import.meta.url);
-    await registerCommands(client, path.join(path.dirname(filename), 'commands'), client.config.adminGuildID, process.argv.includes('--force-sync'), process.argv.includes('--remove'));
+    await registerCommands(client, path.join(path.dirname(filename), 'commands'), client.config.adminGuildID, process.argv.includes('--force-sync'), process.argv.includes('--remove'), '272896244412579841');
     await registerEvents(client, path.join(path.dirname(filename), 'events'));
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await client.music.connect(client.user!.id);
@@ -77,6 +80,7 @@ async function setProfilePicture(client: Bot) {
     await (await client.guilds.fetch('575404293935595531')).members.fetch();
 
     console.log(`${client.user?.username} is now providing they/their services to the CCP.`);
+
   });
 
   client.on('interactionCreate', async (interaction: Interaction) => {

@@ -4,7 +4,6 @@ import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
 export const data = new SlashCommandBuilder()
   .setName('nick')
   .setDescription('Changes nickname of the bot.')
-  .setDefaultPermission(false)
   .addStringOption((option) => option.setName('guild_id')
     .setDescription('The ID of the guild to change the nickname in.')
     .setRequired(true))
@@ -13,6 +12,10 @@ export const data = new SlashCommandBuilder()
     .setRequired(false));
 
 export async function execute(interaction: CommandInteraction): Promise<void> {
+  if (interaction.user.id != interaction.client.config.ownerID) {
+    await interaction.reply({ content: 'You can\'t use that command.', ephemeral: true });
+    return;
+  }
   if (!interaction.guildId || !(interaction.member instanceof GuildMember)
 || !(interaction.channel instanceof TextChannel)) {
     await interaction.reply({ content: 'You can\'t use that command here.', ephemeral: true });
