@@ -6,7 +6,7 @@ import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
   .setName('play')
-  .setDescription('Tells you the social credit of the specified user.')
+  .setDescription('Play music on the bot.')
   .addStringOption((option) => option.setName('query')
     .setDescription('The URL or search term to play.')
     .setRequired(true));
@@ -31,14 +31,14 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   let res: LoadTracksResponse;
 
   try {
-    const url = new URL(query);
+    new URL(query); // If this doesn't throw, it's a URL
     res = await node.rest.loadTracks(query);
   } catch (_) {
     res = await node.rest.loadTracks(`ytsearch:${query}`);
   }
 
   if (res.tracks.length === 0) {
-    await interaction.reply({ content: 'Could not find any tracks.' });
+    await interaction.followUp({ content: 'Could not find any tracks.' });
     return;
   }
   const player = interaction.client.music.createPlayer(interaction.guildId);
