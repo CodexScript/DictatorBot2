@@ -56,6 +56,22 @@ async function setProfilePicture(client: Bot) {
   }
 }
 
+function thanksgiving(year: number): Date {
+  const lastOfNov = new Date(year, 10, 30).getDay();
+  const turkyDay = (lastOfNov >= 4 ? 34 : 27) - lastOfNov;
+  return new Date(year, 10, turkyDay);
+}
+
+async function setStatus(client: Bot) {
+  const now = new Date();
+  const thanksgivingDate = thanksgiving(now.getFullYear());
+  if (now.getMonth() === 10 && now.getDate() === thanksgivingDate.getDate()) {
+    await client.user?.setActivity('Woke Up Thankful', { type: ActivityTypes.LISTENING, url: 'https://www.youtube.com/watch?v=XE69NQbbV8Y' });
+  } else {
+    await client.user?.setActivity({ name: 'RED & WHITE 🔴⚪️', type: ActivityTypes.LISTENING });
+  }
+}
+
 (async () => {
   const client = new Bot();
 
@@ -71,7 +87,7 @@ async function setProfilePicture(client: Bot) {
     await client.music.connect(client.user!.id);
     await setProfilePicture(client);
 
-    await client.user?.setActivity({ name: 'RED & WHITE 🔴⚪️', type: ActivityTypes.LISTENING });
+    await setStatus(client);
 
     setInterval(async () => {
       await setProfilePicture(client);
