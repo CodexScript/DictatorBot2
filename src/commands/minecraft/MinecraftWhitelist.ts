@@ -54,6 +54,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   }
 
   if (interaction.user.id === interaction.client.config.ownerID) {
+    await interaction.deferReply();
     await whitelist(username, interaction);
     return;
   }
