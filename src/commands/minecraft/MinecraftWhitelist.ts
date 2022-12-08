@@ -6,6 +6,22 @@ const filter = (reaction: MessageReaction) => {
 	return reaction.emoji.name === '✅' || reaction.emoji.name === '❌';
 };
 
+async function whitelist(username: string, interaction: CommandInteraction) {
+  const followUp = await interaction.followUp({ content: `Whitelisting **${username}**...`, fetchReply: true });
+  const rcon = await Rcon.connect({
+    // @ts-ignore
+    host: interaction.client.config.minecraft.serverIP,
+    // @ts-ignore
+    port: interaction.client.config.minecraft.rconPort,
+    // @ts-ignore
+    password: interaction.client.config.minecraft.rconPassword,
+  });
+  const result = await rcon.send(`whitelist add ${username}`);
+  await rcon.end();
+  if (followUp instanceof Message) {
+    await followUp.edit({ content: `Whitelisted **${username}**. Result: \`${result}\`` });
+  }
+}
 
 export const data = new SlashCommandBuilder()
   .setName('whitelist')
@@ -34,6 +50,11 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   if (username.length > 16) {
     await interaction.reply({ content: 'That username is too long.', ephemeral: true });
+    return;
+  }
+
+  if (interaction.user.id === interaction.client.config.ownerID) {
+    await whitelist(username, interaction);
     return;
   }
 
@@ -66,21 +87,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
     collector.on('end', async () => {
       if (yes > 5 && yes > no) {
-        const followUp = await interaction.followUp({ content: `Whitelisting **${username}**...`, fetchReply: true });
-        const rcon = await Rcon.connect({
-          // @ts-ignore
-          host: interaction.client.config.minecraft.serverIP,
-          // @ts-ignore
-          port: interaction.client.config.minecraft.rconPort,
-          // @ts-ignore
-          password: interaction.client.config.minecraft.rconPassword,
-        });
-        const result = await rcon.send(`whitelist add ${username}`);
-        await rcon.end();
-        if (followUp instanceof Message) {
-          await followUp.edit({ content: `Whitelisted **${username}**. Result: \`${result}\`` });
-        }
-    
+        await whitelist(username, interaction);
       } else {
         await interaction.editReply({ content: `Not enough yes votes. Yes: ${yes} No: ${no}` });
       }
