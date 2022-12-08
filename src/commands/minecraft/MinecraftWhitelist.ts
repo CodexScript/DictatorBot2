@@ -63,13 +63,27 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   if (vote instanceof Message) {
     let yes = 0;
     let no = 0;
+
+    let override = false;
     
     const collector = vote.createReactionCollector({ filter, time: 60000 });
     collector.on('collect', async (reaction: MessageReaction) => {
       if (reaction.emoji.name === '✅') {
+        if (reaction.users.cache.has(interaction.client.config.ownerID)) {
+          override = true;
+          collector.stop();
+          await whitelist(username, interaction);
+          return;
+        }
         yes++;
       }
       else if (reaction.emoji.name === '❌') {
+        if (reaction.users.cache.has(interaction.client.config.ownerID)) {
+          override = true;
+          collector.stop();
+          await interaction.editReply({ content: 'Bot owner voted No. Vote ended.' });
+          return;
+        }
         no++;
       }
     });
@@ -87,9 +101,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     await vote.react('❌');
 
     collector.on('end', async () => {
-      if (yes > 5 && yes > no) {
+      if (yes > 5 && yes > no && !override) {
         await whitelist(username, interaction);
-      } else {
+      } else if (!override) {
         await interaction.editReply({ content: `Not enough yes votes. Yes: ${yes} No: ${no}` });
       }
     
