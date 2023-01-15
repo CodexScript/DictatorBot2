@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import {
-  CommandInteraction, DMChannel, GuildMember, Interaction, TextBasedChannel, TextChannel
+  ChatInputCommandInteraction, DMChannel, GuildMember, Interaction, PublicThreadChannel, TextBasedChannel, TextChannel
 } from 'discord.js';
 import BasedometerInstance from '../../util/basedometer/BasedometerInstance.js';
 import BasedometerManager from '../../util/basedometer/BasedometerManager.js';
@@ -20,7 +20,7 @@ async function createNewQuiz(interaction: Interaction, useThread: boolean, visib
       name: `basedometer-${interaction.user.username.toLowerCase()}-${interaction.id}`,
       autoArchiveDuration: 60,
       reason: 'Basedometer test',
-    });
+    }) as PublicThreadChannel<boolean>;
   }
 
   return new BasedometerInstance(manager, interaction.member, quizChannel, visible);
@@ -43,7 +43,7 @@ export const data = new SlashCommandBuilder()
       .setDescription('Your rating for these images')
       .setRequired(true)));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   if (interaction.channel === null) {
     await interaction.reply({ content: 'You can\'t use that command here.', ephemeral: true });
     return;

@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder } from '@discordjs/builders';
 import {
+  ActionRow,
+  APISelectMenuOption,
+  ButtonStyle,
+  ComponentType,
   GuildMember, Message,
-  MessageActionRow,
-  MessageButton,
   MessageComponentInteraction,
-  MessageSelectMenu,
-  MessageSelectOptionData,
-  Permissions,
+  PermissionFlagsBits,
   TextBasedChannel
 } from 'discord.js';
-import { MessageButtonStyles } from 'discord.js/typings/enums';
 import { BasedometerCategory } from '../../models/basedometer/Basedometer.js';
 import { addSocialCredit } from '../SocialCreditManager.js';
 import BasedometerManager from './BasedometerManager.js';
@@ -49,7 +49,7 @@ export default class BasedometerInstance {
   }
 
   async startQuiz() {
-    const selectOptions: Array<MessageSelectOptionData> = [];
+    const selectOptions: Array<APISelectMenuOption> = [];
 
     for (const [, category] of this.manager.categories.entries()) {
       selectOptions.push({
@@ -59,9 +59,9 @@ export default class BasedometerInstance {
       });
     }
 
-    const selectRow = new MessageActionRow()
+    const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>()
       .addComponents(
-        new MessageSelectMenu()
+        new StringSelectMenuBuilder()
           .setCustomId('basedometerCategorySelector')
           .setPlaceholder('No category selected')
           .addOptions(selectOptions)
@@ -74,7 +74,7 @@ export default class BasedometerInstance {
     const filter = (i: MessageComponentInteraction) => i.customId === 'basedometerCategorySelector' && i.user.id === this.member.user.id;
 
     try {
-      const selectInteraction = await selectMessage.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 60000 });
+      const selectInteraction = await selectMessage.awaitMessageComponent({ filter, componentType: ComponentType.SelectMenu, time: 60000 });
       const categoryName = selectInteraction.values[0];
       const category = this.manager.categories.get(categoryName);
       if (category === undefined) {
@@ -119,15 +119,15 @@ export default class BasedometerInstance {
       return;
     }
 
-    const slideshowRow = new MessageActionRow()
+    const slideshowRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId('basedometerPrevImage')
-          .setStyle(MessageButtonStyles.PRIMARY)
+          .setStyle(ButtonStyle.Primary)
           .setLabel('⬅️'),
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId('basedometerNextImage')
-          .setStyle(MessageButtonStyles.PRIMARY)
+          .setStyle(ButtonStyle.Primary)
           .setLabel('➡️'),
       );
     let filesIndex = 0;
@@ -140,7 +140,7 @@ export default class BasedometerInstance {
     this.currentSlide = categoryMsg;
 
     const slideshowCollector = categoryMsg.createMessageComponentCollector({
-      componentType: 'BUTTON',
+      componentType: ComponentType.Button,
       time: 15000 * 60,
     });
     slideshowCollector.on('collect', async (i) => {
@@ -186,7 +186,7 @@ export default class BasedometerInstance {
       average = this.userDiffs.reduce((a, b) => a + b) / this.userDiffs.length;
     }
 
-    const components: Array<MessageActionRow> = [];
+    const components: Array<ActionRowBuilder<ButtonBuilder>> = [];
 
     let doneString = `The Basedometer is now finished!\nThe average difference for your ratings was: ***${average}***`;
 
@@ -207,18 +207,18 @@ export default class BasedometerInstance {
     }
 
     if (this.channel.isThread()
-     && this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+     && this.channel.guild.members.me?.permissions.has(PermissionFlagsBits.ManageThreads)) {
       if (immediateDelete) {
         await this.deleteThread();
         return;
       }
 
       doneString += '\n\nThis thread will automatically be deleted in 15 minutes if you do not choose to keep it.';
-      components.push(new MessageActionRow()
+      components.push(new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('basedometerKeepThread')
-            .setStyle(MessageButtonStyles.SUCCESS)
+            .setStyle(ButtonStyle.Success)
             .setLabel('Keep this thread'),
         ));
 
@@ -229,7 +229,7 @@ export default class BasedometerInstance {
       }, 15000 * 60);
 
       const keepCollector = done.createMessageComponentCollector({
-        componentType: 'BUTTON',
+        componentType: ComponentType.Button,
         time: 15000 * 60,
       });
 
@@ -238,7 +238,7 @@ export default class BasedometerInstance {
           if (keepInteraction.user.id === this.member.user.id
             || keepInteraction.user.id === keepInteraction.client.config.ownerID
             || (keepInteraction.member instanceof GuildMember
-              && keepInteraction.member.permissions.has(Permissions.FLAGS.MANAGE_THREADS))) {
+              && keepInteraction.member.permissions.has(PermissionFlagsBits.ManageThreads))) {
             clearTimeout(threadDelete);
             await keepInteraction.update({ content: 'This thread will no longer be deleted.', components: [] });
           } else {
@@ -256,7 +256,7 @@ export default class BasedometerInstance {
 
   private async deleteThread(done?: Message) {
     if (this.channel.isThread()) {
-      if (this.channel.guild.me?.permissions.has(Permissions.FLAGS.MANAGE_THREADS)) {
+      if (this.channel.guild.members.me?.permissions.has(PermissionFlagsBits.ManageThreads)) {
         await this.channel.delete();
       } else {
         // Permissions could theoretically change in the 15 minutes that we wait before calling this function

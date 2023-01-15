@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, GuildMember, Message, MessageReaction, TextChannel } from 'discord.js';
+import { ChatInputCommandInteraction, CommandInteraction, GuildMember, Message, MessageReaction, TextChannel } from 'discord.js';
 import { Rcon } from 'rcon-client';
 
 const filter = (reaction: MessageReaction) => {
@@ -30,7 +30,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('The username to whitelist.')
     .setRequired(true));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   if (!interaction.guildId || !(interaction.member instanceof GuildMember)
 || !(interaction.channel instanceof TextChannel)) {
     await interaction.reply({ content: 'You can\'t use that command here.', ephemeral: true });

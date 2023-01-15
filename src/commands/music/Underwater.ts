@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 let state = false;
@@ -25,7 +25,7 @@ export const data = new SlashCommandBuilder()
   .setName('underwater')
   .setDescription('Toggles the "underwater" effect found on a lot of modern rap songs.');
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   if (!interaction.guildId
      || !(interaction.member instanceof GuildMember)
       || !(interaction.channel instanceof TextChannel)) {

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, GuildMember } from 'discord.js';
+import { ActivityType, CommandInteraction, GuildMember } from 'discord.js';
 import { playURL } from '../../util/PlayerUtils.js';
 
 const responses: Array<string> = ['I disagree', 'OK, here\'s the schpiel... *incoherent rambling*', 'Based', 'Nigger', 'Big dick style',
@@ -40,7 +40,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   if (interaction.member instanceof GuildMember) {
     if (interaction.member.presence?.activities?.length !== undefined && interaction.member.presence.activities.length > 0) {
-      if (interaction.member.presence.activities[0].type === 'PLAYING') {
+      if (interaction.member.presence.activities[0].type === ActivityType.Playing) {
         triggers.push(gameTrigger);
       }
     }

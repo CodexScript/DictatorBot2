@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { EventEmitter } from 'events';
 import got from 'got';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
@@ -18,7 +18,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('Force the list of favorites to update. Only President Xi may use')
     .setRequired(false));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   const index = interaction.options.getInteger('index');
   let force = interaction.options.getBoolean('force-update');
 
@@ -39,7 +39,14 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   if (force || manager.videos.length === 0 || new Date().getTime() - manager.lastFetch.getTime() > 21600000) {
     const waitMessage = await interaction.channel.send('Populating TikTok favorites list. This may take awhile...');
-    await manager.populateFavs(bus);
+    try {
+      await manager.populateFavs(bus);
+    } catch (e) {
+      await interaction.followUp({ content: 'Failed to populate TikTok favorites list.' });
+      await waitMessage.delete();
+      return;
+    }
+    
     await waitMessage.delete();
   }
 

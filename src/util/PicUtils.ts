@@ -1,4 +1,4 @@
-import canvas from 'canvas';
+import canvas, { SKRSContext2D } from '@napi-rs/canvas';
 
 export function writeText(
   text: string,
@@ -6,7 +6,7 @@ export function writeText(
   y: number,
   maxWidth: number,
   fontSize: number,
-  ctx: canvas.CanvasRenderingContext2D
+  ctx: SKRSContext2D
 ): void {
   let lineWidth = 0;
 

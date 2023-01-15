@@ -36,7 +36,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
   for (const memberArr of members) {
     const member = memberArr[1];
     console.log(member.user.username);
-    if (member.user.id !== interaction.client.user?.id && bot.permissions.has('MANAGE_NICKNAMES') && bot.roles.highest.position > member.roles.highest.position && (member.nickname === null || member.nickname.endsWith('ussy') === false)) {
+    if (member.user.id !== interaction.client.user?.id && bot.permissions.has('ManageNicknames') && bot.roles.highest.position > member.roles.highest.position && (member.nickname === null || member.nickname.endsWith('ussy') === false)) {
       await member.setNickname(`${member.nickname ? member.nickname : member.user.username}ussy`);
     }
   }

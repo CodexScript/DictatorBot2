@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageAttachment } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import * as fsSync from 'fs';
 import * as fs from 'fs/promises';
 import puppeteer from 'puppeteer-extra';
@@ -17,7 +17,7 @@ export const data = new SlashCommandBuilder()
       .setDescription('The problem URL.')
       .setRequired(true)));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   const url = interaction.options.getString('url');
 
   // url == null is the same as url === undefined || url === null
@@ -80,9 +80,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
     await browser.close();
 
-    const attach = new MessageAttachment(screen);
+    // const attach = new MessageAttachment(screen);
 
-    await interaction.followUp({ files: [attach] });
+    // await interaction.followUp({ files: [attach] });
   }
 
   await SocialCreditManager.addSocialCredit(

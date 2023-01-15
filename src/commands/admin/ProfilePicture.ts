@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { ChatInputCommandInteraction, CommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { setPfp } from '../../util/settings/GlobalSettingsManager.js';
+import Bot, { setProfilePicture } from '../../models/Bot.js';
 
 export const data = new SlashCommandBuilder()
   .setName('pfp')
@@ -18,7 +19,7 @@ export const data = new SlashCommandBuilder()
         .setName('reset')
         .setDescription('Resets the profile picture of the bot.'));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
     if (interaction.user.id != interaction.client.config.ownerID) {
         await interaction.reply({ content: 'You can\'t use that command.', ephemeral: true });
         return;
@@ -44,5 +45,10 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
         await setPfp(interaction.client.Bot, url, force);
         await interaction.client.user?.setAvatar(url);
         await interaction.reply({ content: 'Profile picture changed.', ephemeral: true });
+    }
+
+    else if (subcommand === 'reset') {
+        await setProfilePicture(interaction.client.Bot);
+        await interaction.reply({ content: 'Profile picture reset.', ephemeral: true });
     }
 }

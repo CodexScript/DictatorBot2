@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import '@lavaclient/queue/register.js';
-import { LoadTracksResponse } from '@lavaclient/types';
-import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import '@lavaclient/queue/register';
+import { LoadTracksResponse } from '@lavaclient/types/v3';
+import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
@@ -11,7 +11,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('The URL or search term to play.')
     .setRequired(true));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   if (!interaction.guildId || !(interaction.member instanceof GuildMember) || !(interaction.channel instanceof TextChannel)) {
     await interaction.reply({ content: 'You can\'t use that command here.', ephemeral: true });
     return;

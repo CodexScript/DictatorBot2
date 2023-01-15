@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import got from 'got';
 import { UncletopiaServersResponse } from '../../models/Uncletopia';
 
@@ -34,7 +34,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('The distance to search in km. Must be 500 <= x <= 5000. Default: 1500')
     .setRequired(false));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   let freeSlots = interaction.options.getInteger('free_slots');
   let distance = interaction.options.getInteger('distance');
   let minPlayers = interaction.options.getInteger('min_players');
@@ -68,7 +68,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   await interaction.deferReply();
 
-  const servers = await got.get('https://uncletopia.com/api/servers').json() as UncletopiaServersResponse;
+  const servers = await got.get('https://uncletopia.com/api/servers/state').json() as UncletopiaServersResponse;
 
   for (const server of servers.data) {
     if ((server.a2s.MaxPlayers - server.a2s.Players) >= freeSlots && (minPlayers !== 0 && server.a2s.Players >= minPlayers) && (distance !== 0 && coordsDistance(40.65965, -73.54340, server.latitude, server.longitude) <= distance)) {

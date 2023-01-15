@@ -8,6 +8,7 @@ export interface Config {
     forced: boolean
   }
   adminGuildID: string
+  mainGuildID: string
   socialCreditPhrases: Map<string, number>
   socialCreditRegex: Map<string, number>
   invalidCommandPenalty: number
