@@ -1,11 +1,11 @@
-import canvas from 'canvas';
+import canvas from '@napi-rs/canvas';
 import { GuildMember, Message } from 'discord.js';
 import * as fs from 'fs/promises';
 import got from 'got';
 import * as BetterSqlite3 from 'better-sqlite3';
 import SocialCreditTier from '../models/SocialCreditTier.js';
 
-canvas.registerFont('./assets/font/seven-monkey-fury-bb.regular.ttf', { family: 'Seven Monkey Fury BB' });
+canvas.GlobalFonts.registerFromPath('./assets/font/seven-monkey-fury-bb.regular.ttf', 'Seven Monkey Fury BB');
 
 export async function setSocialCredit(
   client: BetterSqlite3.Database,
@@ -104,7 +104,7 @@ export async function createUserBanner(
   const socialCredit = await getSocialCredit(client, member.id);
   const tier = getSocialCreditTier(socialCredit);
 
-  const avatar = await got.get(member.displayAvatarURL({ format: 'png' })).buffer();
+  const avatar = await got.get(member.displayAvatarURL({forceStatic: true})).buffer();
 
   const flagBuffer = await fs.readFile('./assets/picedit/china.png');
 
@@ -139,5 +139,5 @@ export async function createUserBanner(
 
   ctx.save();
 
-  return drawCanvas.toBuffer();
+  return drawCanvas.toBuffer("image/png");
 }

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import fs from 'fs/promises';
 import got from 'got';
 
@@ -12,10 +12,9 @@ export const data = new SlashCommandBuilder()
   .addStringOption((option) => option.setName('show')
     .setDescription('The show to get a title card from.')
     .setRequired(false)
-    .addChoice('Adventure Time', 'adventure_time')
-    .addChoice('SpongeBob', 'spongebob'));
+    .addChoices({ name: 'Adventure Time', value: 'adventure_time' }, { name: 'SpongeBob', value: 'spongebob' }));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   const show = interaction.options.getString('show');
 
   if (show && show !== 'adventure_time' && show !== 'spongebob') {

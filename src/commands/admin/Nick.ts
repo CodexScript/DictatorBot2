@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
   .setName('nick')
@@ -11,7 +11,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('The nickname to change to. Do not specify a nickname in order to reset.')
     .setRequired(false));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   if (interaction.user.id != interaction.client.config.ownerID) {
     await interaction.reply({ content: 'You can\'t use that command.', ephemeral: true });
     return;

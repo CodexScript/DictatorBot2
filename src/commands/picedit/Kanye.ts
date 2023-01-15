@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import canvas from 'canvas';
-import { CommandInteraction } from 'discord.js';
+import canvas from '@napi-rs/canvas';
+import { ChatInputCommandInteraction } from 'discord.js';
 import got from 'got';
 import { isValidHttpUrl, writeText } from '../../util/PicUtils.js';
 import * as SocialCreditManager from '../../util/SocialCreditManager.js';
@@ -12,7 +12,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('Your text or URL.')
     .setRequired(true));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   const text = interaction.options.getString('text');
 
   // url == null is the same as url === undefined || url === null
@@ -60,7 +60,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
 
   ctx.save();
 
-  await interaction.followUp({ files: [kanyeCanvas.toBuffer()] });
+  await interaction.followUp({ files: [kanyeCanvas.toBuffer("image/png")] });
   await SocialCreditManager.addSocialCredit(
     interaction.client.sql,
     interaction.user.id,

@@ -2,11 +2,9 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 import { ApplicationCommand } from 'discord.js';
-import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import * as fsSync from 'fs';
 import * as fs from 'fs/promises';
 import Bot from '../models/Bot';
-import CommandPutResponse from '../models/discord_api/CommandPutResponse';
 
 export async function registerCommands(
   client: Bot,

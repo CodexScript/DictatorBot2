@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
@@ -10,7 +10,7 @@ export const data = new SlashCommandBuilder()
     .setMinValue(1)
     .setRequired(true));
 
-export async function execute(interaction: CommandInteraction): Promise<void> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   if (!interaction.guildId
      || !(interaction.member instanceof GuildMember)
       || !(interaction.channel instanceof TextChannel)) {

@@ -1,4 +1,4 @@
-import { LoadTracksResponse } from "@lavaclient/types";
+import { LoadTracksResponse } from "@lavaclient/types/v3";
 import { CommandInteraction, GuildMember } from "discord.js";
 
 export async function playURL(interaction: CommandInteraction, url: URL) {
