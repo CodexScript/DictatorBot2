@@ -1,51 +1,48 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('pitch')
-  .setDescription('Sets playback pitch.')
-  .addIntegerOption((option) => option.setName('pitch')
-    .setDescription('The new pitch. Must be at least 0.')
-    .setMinValue(0)
-    .setRequired(true));
+    .setName('pitch')
+    .setDescription('Sets playback pitch.')
+    .addIntegerOption((option) =>
+        option.setName('pitch').setDescription('The new pitch. Must be at least 0.').setMinValue(0).setRequired(true),
+    );
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-  if (!interaction.guildId || !(interaction.member instanceof GuildMember) || !(interaction.channel instanceof TextChannel)) {
-    await interaction.reply({ content: 'You can\'t use that command here.', ephemeral: true });
-    return;
-  }
+    if (
+        !interaction.guildId ||
+        !(interaction.member instanceof GuildMember) ||
+        !(interaction.channel instanceof TextChannel)
+    ) {
+        await interaction.reply({ content: "You can't use that command here.", ephemeral: true });
+        return;
+    }
 
-  const scheduler = interaction.client.music.createPlayer(interaction.guildId);
+    const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
-  if (!scheduler || scheduler.trackData === undefined) {
-    await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
-    return;
-  }
+    if (!scheduler || scheduler.trackData === undefined) {
+        await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
+        return;
+    }
 
-  const newPitch = interaction.options.getInteger('pitch');
+    const newPitch = interaction.options.getInteger('pitch');
 
-  if (newPitch === null) {
-    await interaction.reply({ content: 'You must specify a new pitch.', ephemeral: true });
-    return;
-  }
+    if (newPitch === null) {
+        await interaction.reply({ content: 'You must specify a new pitch.', ephemeral: true });
+        return;
+    }
 
-  if (newPitch < 0) {
-    await interaction.reply({ content: 'Pitch must be a positive integer.', ephemeral: true });
-    return;
-  }
+    if (newPitch < 0) {
+        await interaction.reply({ content: 'Pitch must be a positive integer.', ephemeral: true });
+        return;
+    }
 
-  if (!scheduler.filters.timescale) {
-    scheduler.filters.timescale = { pitch: newPitch / 100, rate: 1, speed: 1 };
-  } else {
-    scheduler.filters.timescale.pitch = newPitch / 100;
-  }
-  await scheduler.setFilters();
+    if (!scheduler.filters.timescale) {
+        scheduler.filters.timescale = { pitch: newPitch / 100, rate: 1, speed: 1 };
+    } else {
+        scheduler.filters.timescale.pitch = newPitch / 100;
+    }
+    await scheduler.setFilters();
 
-  await interaction.reply({ content: `Set pitch to **${newPitch}%**` });
-  await addSocialCredit(
-    interaction.client.sql,
-    interaction.user.id,
-    1
-  );
+    await interaction.reply({ content: `Set pitch to **${newPitch}%**` });
 }
