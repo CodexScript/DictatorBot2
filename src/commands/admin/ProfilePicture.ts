@@ -1,33 +1,44 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction, CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { setPfp } from '../../util/settings/GlobalSettingsManager.js';
-import Bot, { setProfilePicture } from '../../models/Bot.js';
+import { setProfilePicture } from '../../models/Bot.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('pfp')
-  .setDescription('Changes the profile picture of the bot.')
-  .addSubcommand((subcommand) => subcommand
-    .setName('set')
-    .setDescription('Sets the profile picture of the bot.')
-    .addStringOption((option) => option.setName('url')
-        .setDescription('The URL of the image to set as the profile picture.')
-        .setRequired(true))
-    .addBooleanOption((option) => option.setName('force')
-        .setDescription('Whether or not to force the profile picture to be set.')
-        .setRequired(false)))
-    .addSubcommand((subcommand) => subcommand
-        .setName('reset')
-        .setDescription('Resets the profile picture of the bot.'));
+    .setName('pfp')
+    .setDescription('Changes the profile picture of the bot.')
+    .addSubcommand((subcommand) =>
+        subcommand
+            .setName('set')
+            .setDescription('Sets the profile picture of the bot.')
+            .addStringOption((option) =>
+                option
+                    .setName('url')
+                    .setDescription('The URL of the image to set as the profile picture.')
+                    .setRequired(true),
+            )
+            .addBooleanOption((option) =>
+                option
+                    .setName('force')
+                    .setDescription('Whether or not to force the profile picture to be set.')
+                    .setRequired(false),
+            ),
+    )
+    .addSubcommand((subcommand) =>
+        subcommand.setName('reset').setDescription('Resets the profile picture of the bot.'),
+    );
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
     if (interaction.user.id != interaction.client.config.ownerID) {
-        await interaction.reply({ content: 'You can\'t use that command.', ephemeral: true });
+        await interaction.reply({ content: "You can't use that command.", ephemeral: true });
         return;
     }
-    
-    if (!interaction.guildId || !(interaction.member instanceof GuildMember)
-        || !(interaction.channel instanceof TextChannel)) {
-            await interaction.reply({ content: 'You can\'t use that command here.', ephemeral: true });
+
+    if (
+        !interaction.guildId ||
+        !(interaction.member instanceof GuildMember) ||
+        !(interaction.channel instanceof TextChannel)
+    ) {
+        await interaction.reply({ content: "You can't use that command here.", ephemeral: true });
     }
 
     const subcommand = interaction.options.getSubcommand();
@@ -45,9 +56,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         await setPfp(interaction.client.Bot, url, force);
         await interaction.client.user?.setAvatar(url);
         await interaction.reply({ content: 'Profile picture changed.', ephemeral: true });
-    }
-
-    else if (subcommand === 'reset') {
+    } else if (subcommand === 'reset') {
         await setProfilePicture(interaction.client.Bot);
         await interaction.reply({ content: 'Profile picture reset.', ephemeral: true });
     }

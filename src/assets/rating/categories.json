@@ -1,8 +1,8 @@
 [
-  {
-    "directoryName": "girls",
-    "displayName": "Girls (social media influencers)",
-    "desc": "Mainly IG models and Twitch streamers.",
-    "tolerance": 0.5
-  }
+    {
+        "directoryName": "girls",
+        "displayName": "Girls (social media influencers)",
+        "desc": "Mainly IG models and Twitch streamers.",
+        "tolerance": 0.5
+    }
 ]
