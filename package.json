@@ -21,6 +21,7 @@
         "discord-api-types": "^0.37.24",
         "discord.js": "^14.7.1",
         "got": "^12.5.3",
+        "gpt4all": "^1.0.0",
         "js-yaml": "^4.1.0",
         "jsonwebtoken": "^9.0.0",
         "lavaclient": "^4.1.1",
