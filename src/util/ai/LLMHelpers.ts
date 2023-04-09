@@ -57,7 +57,7 @@ export class GPT4AllChat extends LLMChat {
     private _gpt: GPT4All;
     constructor() {
         super();
-        this._gpt = new GPT4All('gpt4all-lora-unfiltered-quantized', true);
+        this._gpt = new GPT4All('gpt4all-lora-unfiltered-quantized');
     }
     async init(): Promise<void> {
         await this._gpt.init();
