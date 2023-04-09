@@ -1,4 +1,5 @@
 import { OpenAIApi } from 'openai';
+import { GPT4All } from 'gpt4all';
 
 abstract class LLMChat {
     abstract init(): Promise<void>;
@@ -36,6 +37,7 @@ export class ChatGPTChat extends LLMChat {
         const completion = await this._openai.createChatCompletion({
             model: 'gpt-3.5-turbo',
             messages: this._messages,
+            temperature: 1.25,
         });
 
         if (completion.data.choices.length == 0 || completion.data.choices[0].message === undefined) {
@@ -48,5 +50,31 @@ export class ChatGPTChat extends LLMChat {
     }
     close(): void {
         this._messages = [];
+    }
+}
+
+export class GPT4AllChat extends LLMChat {
+    private _gpt: GPT4All;
+    constructor() {
+        super();
+        this._gpt = new GPT4All('gpt4all-lora-unfiltered-quantized', true);
+    }
+    async init(): Promise<void> {
+        await this._gpt.init();
+        await this._gpt.open();
+    }
+
+    async prompt(message: string): Promise<string | null> {
+        const response = await this._gpt.prompt(message);
+
+        if (response.length == 0) {
+            return null;
+        }
+
+        return response;
+    }
+
+    close(): void {
+        this._gpt.close();
     }
 }
