@@ -40,7 +40,7 @@ export const execute = async (msg: Message) => {
         const reply = await gpt.prompt(prompt);
 
         if (reply) {
-            await response.edit(reply);
+            await response.edit(reply.substring(0, 2000));
         } else {
             await response.edit('Sorry, I could not think of a response. Please contact the bot owner.');
         }
