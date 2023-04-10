@@ -10,9 +10,17 @@ export const execute = async (msg: Message) => {
         return;
     }
 
-    if (msg.content.toUpperCase().startsWith('!CHATGPT')) {
-        let prompt = msg.content.substring(9).trim();
+    let prompt = '';
 
+    if (msg.content.toUpperCase().startsWith('!CHATGPT')) {
+        prompt = msg.content.substring(9).trim();
+    } else if (msg.content.toUpperCase().startsWith('!SCUFFGPT')) {
+        prompt = msg.content.substring(10).trim();
+    } else if (msg.content.toUpperCase().startsWith('!JAILBREAK')) {
+        prompt = msg.content.substring(11).trim();
+    }
+
+    if (msg.content.toUpperCase().startsWith('!CHATGPT') || msg.content.toUpperCase().startsWith('!JAILBREAK')) {
         if (prompt.length == 0) {
             return;
         }
@@ -26,7 +34,7 @@ export const execute = async (msg: Message) => {
 
         const response = await msg.reply('*Thinking...*');
 
-        const gpt = new ChatGPTChat(msg.client.openai);
+        const gpt = new ChatGPTChat(msg.client.openai, msg.content.toUpperCase().startsWith('!JAILBREAK'));
         await gpt.init();
 
         const reply = await gpt.prompt(prompt);
@@ -39,8 +47,6 @@ export const execute = async (msg: Message) => {
 
         await gpt.close();
     } else if (msg.content.toUpperCase().startsWith('!SCUFFGPT')) {
-        let prompt = msg.content.substring(10).trim();
-
         if (prompt.length == 0) {
             return;
         }
