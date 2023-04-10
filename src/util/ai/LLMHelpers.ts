@@ -44,7 +44,7 @@ export class ChatGPTChat extends LLMChat {
     async prompt(message: string): Promise<string | null> {
         this._messages.push({
             role: 'user',
-            content: '/jailbreak ' + message,
+            content: '/jailbroken ' + message,
         });
 
         const completion = await this._openai.createChatCompletion({
