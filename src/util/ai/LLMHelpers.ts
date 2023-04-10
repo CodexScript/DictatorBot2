@@ -17,16 +17,22 @@ interface ChatGPTMessage {
 export class ChatGPTChat extends LLMChat {
     private _messages: ChatGPTMessage[];
     private _openai: OpenAIApi;
-    constructor(openai: OpenAIApi) {
+    jailbreak: boolean;
+    constructor(openai: OpenAIApi, jailbreak = false) {
         super();
         this._messages = [];
         this._openai = openai;
+        this.jailbreak = jailbreak;
     }
     async init(): Promise<void> {
         this._messages.push({
             role: 'system',
             content: 'You are a helpful assistant.',
         });
+
+        if (!this.jailbreak) {
+            return;
+        }
 
         const jailbreak = await fs.readFile('./assets/chatgpt_jailbreak.txt', 'utf-8');
 
@@ -44,7 +50,7 @@ export class ChatGPTChat extends LLMChat {
     async prompt(message: string): Promise<string | null> {
         this._messages.push({
             role: 'user',
-            content: '/jailbroken ' + message,
+            content: message,
         });
 
         const completion = await this._openai.createChatCompletion({
