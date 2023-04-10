@@ -56,7 +56,7 @@ export class ChatGPTChat extends LLMChat {
         const completion = await this._openai.createChatCompletion({
             model: 'gpt-3.5-turbo',
             messages: this._messages,
-            temperature: 1.25,
+            temperature: 1.05,
         });
 
         if (completion.data.choices.length == 0 || completion.data.choices[0].message === undefined) {
