@@ -1,5 +1,5 @@
 import { Events, Message, MessageType } from 'discord.js';
-import { ChatGPTChat, GPT4AllChat } from '../util/ai/LLMHelpers.js';
+import { ChatGPTChat, ChatGPTModel, GPT4AllChat } from '../util/ai/LLMHelpers.js';
 
 export const name = Events.MessageCreate;
 export const once = false;
@@ -34,7 +34,7 @@ export const execute = async (msg: Message) => {
 
         const response = await msg.reply('*Thinking...*');
 
-        const gpt = new ChatGPTChat(msg.client.openai, msg.content.toUpperCase().startsWith('!JAILBREAK'));
+        const gpt = new ChatGPTChat(msg.client.openai, ChatGPTModel.GPT4, msg.content.toUpperCase().startsWith('!JAILBREAK'));
         await gpt.init();
 
         const reply = await gpt.prompt(prompt);

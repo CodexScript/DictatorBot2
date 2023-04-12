@@ -14,15 +14,22 @@ interface ChatGPTMessage {
     name?: string;
 }
 
+export enum ChatGPTModel {
+    CHATGPT = 'gpt-3.5-turbo',
+    GPT4 = 'gpt-4',
+}
+
 export class ChatGPTChat extends LLMChat {
     private _messages: ChatGPTMessage[];
     private _openai: OpenAIApi;
-    jailbreak: boolean;
-    constructor(openai: OpenAIApi, jailbreak = false) {
+    private _jailbreak: boolean;
+    private _model: ChatGPTModel;
+    constructor(openai: OpenAIApi, model = ChatGPTModel.GPT4, jailbreak = false) {
         super();
         this._messages = [];
         this._openai = openai;
-        this.jailbreak = jailbreak;
+        this._jailbreak = jailbreak;
+        this._model = model;
     }
     async init(): Promise<void> {
         this._messages.push({
@@ -30,7 +37,7 @@ export class ChatGPTChat extends LLMChat {
             content: 'You are a helpful assistant.',
         });
 
-        if (!this.jailbreak) {
+        if (!this._jailbreak) {
             return;
         }
 
@@ -54,7 +61,7 @@ export class ChatGPTChat extends LLMChat {
         });
 
         const completion = await this._openai.createChatCompletion({
-            model: 'gpt-3.5-turbo',
+            model: this._model,
             messages: this._messages,
             temperature: 1.05,
         });
