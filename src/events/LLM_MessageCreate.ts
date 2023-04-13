@@ -117,6 +117,11 @@ export const execute = async (msg: Message) => {
             !jailbreak <prompt>
             \`\`\``);
             return;
+        } else if (gpt.channel.type === ChannelType.PrivateThread || gpt.channel.type === ChannelType.PublicThread) {
+            await msg.reply(
+                'You already have a thread going! Continue the conversation there, or start a new one here.',
+            );
+            return;
         }
 
         const thread = await msg.startThread({
