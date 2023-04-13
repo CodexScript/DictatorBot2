@@ -11,6 +11,7 @@ export const execute = async (msg: Message) => {
         if (chat.channel.type === ChannelType.PrivateThread || chat.channel.type === ChannelType.PublicThread) {
             if (chat.channel instanceof ThreadChannel) {
                 if (chat.channel.archived) {
+                    await chat.close();
                     chatInstances.delete(userId);
                 }
             }
