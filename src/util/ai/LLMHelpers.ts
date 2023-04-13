@@ -1,11 +1,14 @@
 import { OpenAIApi } from 'openai';
 import { GPT4All } from 'gpt4all';
 import fs from 'fs/promises';
+import { BaseGuildTextChannel, ThreadChannel } from 'discord.js';
 
-abstract class LLMChat {
+export abstract class LLMChat {
     abstract init(): Promise<void>;
     abstract prompt(message: string): Promise<string | null>;
     abstract close(): void;
+    abstract channel: ThreadChannel | BaseGuildTextChannel;
+    abstract readonly model: string;
 }
 
 interface ChatGPTMessage {
@@ -23,13 +26,20 @@ export class ChatGPTChat extends LLMChat {
     private _messages: ChatGPTMessage[];
     private _openai: OpenAIApi;
     private _jailbreak: boolean;
-    private _model: ChatGPTModel;
-    constructor(openai: OpenAIApi, model = ChatGPTModel.GPT4, jailbreak = false) {
+    readonly model: ChatGPTModel;
+    channel: ThreadChannel | BaseGuildTextChannel;
+    constructor(
+        channel: ThreadChannel | BaseGuildTextChannel,
+        openai: OpenAIApi,
+        model = ChatGPTModel.GPT4,
+        jailbreak = false,
+    ) {
         super();
         this._messages = [];
         this._openai = openai;
         this._jailbreak = jailbreak;
-        this._model = model;
+        this.model = model;
+        this.channel = channel;
     }
     async init(): Promise<void> {
         this._messages.push({
@@ -61,7 +71,7 @@ export class ChatGPTChat extends LLMChat {
         });
 
         const completion = await this._openai.createChatCompletion({
-            model: this._model,
+            model: this.model,
             messages: this._messages,
             temperature: 1.05,
         });
@@ -81,8 +91,11 @@ export class ChatGPTChat extends LLMChat {
 
 export class GPT4AllChat extends LLMChat {
     private _gpt: GPT4All;
-    constructor() {
+    channel: ThreadChannel | BaseGuildTextChannel;
+    readonly model = 'ScuffGPT';
+    constructor(channel: ThreadChannel | BaseGuildTextChannel) {
         super();
+        this.channel = channel;
         this._gpt = new GPT4All('gpt4all-lora-unfiltered-quantized');
     }
     async init(): Promise<void> {
