@@ -6,6 +6,17 @@ const chatInstances = new Map<string, LLMChat>();
 export const name = Events.MessageCreate;
 export const once = false;
 export const execute = async (msg: Message) => {
+    // Clean out old chat instances
+    for (const [userId, chat] of chatInstances) {
+        if (chat.channel.type === ChannelType.PrivateThread || chat.channel.type === ChannelType.PublicThread) {
+            if (chat.channel instanceof ThreadChannel) {
+                if (chat.channel.archived) {
+                    chatInstances.delete(userId);
+                }
+            }
+        }
+    }
+
     if (
         (msg.channel.type !== ChannelType.PublicThread &&
             msg.channel.type !== ChannelType.PrivateThread &&
