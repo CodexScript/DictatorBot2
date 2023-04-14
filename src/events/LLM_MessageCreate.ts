@@ -68,7 +68,12 @@ export const execute = async (msg: Message) => {
     }
 
     if (openAi) {
-        if (!gpt || gpt instanceof GPT4AllChat || gpt.channel.id !== msg.channel.id) {
+        if (
+            !gpt ||
+            gpt instanceof GPT4AllChat ||
+            gpt.channel.id !== msg.channel.id ||
+            msg.channel.type === ChannelType.GuildText
+        ) {
             if (gpt) {
                 await gpt.close();
                 if (gpt.channel.type === ChannelType.PrivateThread || gpt.channel.type === ChannelType.PublicThread) {
