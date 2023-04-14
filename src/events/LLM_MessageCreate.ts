@@ -10,6 +10,9 @@ export const execute = async (msg: Message) => {
     for (const [userId, chat] of chatInstances) {
         if (chat.channel.type === ChannelType.PrivateThread || chat.channel.type === ChannelType.PublicThread) {
             if (chat.channel instanceof ThreadChannel) {
+                if (chat.channel.archived) {
+                    await chat.channel.setLocked(true, 'Chat session ended.');
+                }
                 if (chat.channel.archived || chat.channel.locked) {
                     await chat.close();
                     chatInstances.delete(userId);
