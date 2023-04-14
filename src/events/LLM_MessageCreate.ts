@@ -78,7 +78,7 @@ export const execute = async (msg: Message) => {
                 }
             }
 
-            const model = command === 'GPT4' ? ChatGPTModel.GPT4 : ChatGPTModel.CHATGPT;
+            const model = command === 'GPT4' || command === 'JAILBREAK4' ? ChatGPTModel.GPT4 : ChatGPTModel.CHATGPT;
 
             const shouldJailbreak = command === 'JAILBREAK' || command === 'JAILBREAK4';
 
