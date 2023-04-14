@@ -43,6 +43,9 @@ export const execute = async (msg: Message) => {
     } else if (command === 'GPT4') {
         prompt = msg.content.substring(6).trim();
         openAi = true;
+    } else if (command === 'JAILBREAK4') {
+        prompt = msg.content.substring(12).trim();
+        openAi = true;
     }
 
     if (prompt.length == 0 && command !== 'CONTINUE') {
@@ -77,7 +80,9 @@ export const execute = async (msg: Message) => {
 
             const model = command === 'GPT4' ? ChatGPTModel.GPT4 : ChatGPTModel.CHATGPT;
 
-            gpt = new ChatGPTChat(msg.channel, msg.client.openai, model, command === 'JAILBREAK');
+            const shouldJailbreak = command === 'JAILBREAK' || command === 'JAILBREAK4';
+
+            gpt = new ChatGPTChat(msg.channel, msg.client.openai, model, shouldJailbreak);
 
             chatInstances.set(msg.author.id, gpt);
 
