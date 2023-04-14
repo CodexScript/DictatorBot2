@@ -83,6 +83,9 @@ export const execute = async (msg: Message) => {
         if (response) {
             if (reply) {
                 await response.edit(reply.substring(0, 2000));
+                if (reply.toLowerCase().startsWith("i'm sorry,")) {
+                    await response.react('🤓');
+                }
             } else {
                 await response.edit('Sorry, I could not think of a response. Please contact the bot owner.');
             }
