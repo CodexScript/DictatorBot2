@@ -10,7 +10,7 @@ export const execute = async (msg: Message) => {
     for (const [userId, chat] of chatInstances) {
         if (chat.channel.type === ChannelType.PrivateThread || chat.channel.type === ChannelType.PublicThread) {
             if (chat.channel instanceof ThreadChannel) {
-                if (chat.channel.archived) {
+                if (chat.channel.archived || chat.channel.locked) {
                     await chat.close();
                     chatInstances.delete(userId);
                 }
@@ -39,6 +39,9 @@ export const execute = async (msg: Message) => {
         prompt = msg.content.substring(10).trim();
     } else if (command === 'JAILBREAK') {
         prompt = msg.content.substring(11).trim();
+        openAi = true;
+    } else if (command === 'GPT4') {
+        prompt = msg.content.substring(6).trim();
         openAi = true;
     }
 
@@ -71,7 +74,10 @@ export const execute = async (msg: Message) => {
                     }
                 }
             }
-            gpt = new ChatGPTChat(msg.channel, msg.client.openai, ChatGPTModel.CHATGPT, command === 'JAILBREAK');
+
+            const model = command === 'GPT4' ? ChatGPTModel.GPT4 : ChatGPTModel.CHATGPT;
+
+            gpt = new ChatGPTChat(msg.channel, msg.client.openai, model, command === 'JAILBREAK');
 
             chatInstances.set(msg.author.id, gpt);
 
