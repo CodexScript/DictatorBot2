@@ -17,3 +17,12 @@ export async function setPfp(client: Bot, pfp: string, force = false): Promise<v
         }
     });
 }
+
+export async function writeConfig(config: Config) {
+    const readyYaml = yaml.dump(config, { quotingType: '"' });
+    fs.writeFile('./config.yml', readyYaml, (err: any) => {
+        if (err) {
+            console.error(err);
+        }
+    });
+}
