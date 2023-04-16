@@ -117,11 +117,12 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                     for (const user of selectedUsers) {
                         const member = await interaction.guild.members.fetch(user);
                         try {
-                            member.voice.disconnect();
+                            await member.voice.disconnect();
                         } catch (error) {
                             failedOnOne = true;
                         }
                     }
+
                     if (failedOnOne) {
                         await response.edit({
                             content: 'Failed to kick one or more users from voice.',
