@@ -5,6 +5,7 @@ import { ApplicationCommand } from 'discord.js';
 import * as fsSync from 'fs';
 import * as fs from 'fs/promises';
 import Bot from '../models/Bot';
+import { join } from 'path';
 
 export async function registerCommands(
     client: Bot,
@@ -79,10 +80,26 @@ export async function registerCommands(
     console.log();
 }
 
+async function getFilesRecursively(directory: string): Promise<string[]> {
+    const files = await fs.readdir(directory, { withFileTypes: true });
+    const fileNames = await Promise.all(
+        files.map(async (file) => {
+            if (file.isDirectory()) {
+                return getFilesRecursively(join(directory, file.name));
+            }
+            return join(directory, file.name);
+        }),
+    );
+
+    return Array.prototype.concat(...fileNames);
+}
+
 export async function registerEvents(client: Bot, dir: string): Promise<void> {
-    const events = (await fs.readdir(dir)).filter((file) => file.endsWith('.js'));
+    const files = await getFilesRecursively(dir);
+    const events = files.filter((file) => file.endsWith('.js'));
+
     for (const file of events) {
-        const event = await import(`file:///${dir}/${file}`);
+        const event = await import(`file:///${file}`);
         console.log(`Registering event: ${event.name}`);
         if (event.once) {
             client.once(event.name, async (...args) => await event.execute(...args));

@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Node } from 'lavaclient';
 import { ImgurClient } from '../util/imgur/ImgurClient.js';
-import SpotifyClient from '../util/spotify/SpotifyClient.js';
 import { Config } from './config/Config.js';
 import { SlashCommand } from './SlashCommand.js';
 import { Configuration, OpenAIApi } from 'openai';
@@ -66,8 +65,6 @@ export default class Bot extends Client {
 
     readonly commands: Collection<Snowflake, [string, SlashCommand]> = new Collection();
 
-    readonly spotify: SpotifyClient;
-
     readonly imgur: ImgurClient;
 
     readonly openai: OpenAIApi;
@@ -106,8 +103,6 @@ export default class Bot extends Client {
 
         this.openai = new OpenAIApi(openaiConfig);
 
-        this.spotify = new SpotifyClient(this.config.spotify.token, this.config.spotify.secret);
-
         this.imgur = new ImgurClient(this.config.imgur.clientId, this.config.imgur.clientSecret);
 
         this.ws.on(GatewayDispatchEvents.VoiceServerUpdate, (data) => this.music.handleVoiceUpdate(data));
@@ -120,7 +115,6 @@ declare module 'discord.js' {
     interface Client {
         readonly music: Node;
         readonly config: Config;
-        readonly spotify: SpotifyClient;
         readonly imgur: ImgurClient;
         readonly openai: OpenAIApi;
         readonly Bot: Bot;

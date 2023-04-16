@@ -1,7 +1,7 @@
 import { OpenAIApi } from 'openai';
 import { GPT4All } from 'gpt4all';
 import fs from 'fs/promises';
-import { BaseGuildTextChannel, Message, ThreadChannel } from 'discord.js';
+import { BaseGuildTextChannel, ThreadChannel } from 'discord.js';
 
 export abstract class LLMChat {
     abstract init(): Promise<void>;

@@ -31,6 +31,8 @@ export const execute = async (msg: Message) => {
 
     if (!msg.content.startsWith('!')) return;
 
+    if (msg.client.config.bannedFromGPT.includes(msg.author.id)) return;
+
     const command = msg.content.split(' ')[0].substring(1).toUpperCase();
 
     let openAi = false;
@@ -80,7 +82,7 @@ export const execute = async (msg: Message) => {
             msg.channel.type === ChannelType.GuildText
         ) {
             if (gpt) {
-                await gpt.close();
+                gpt.close();
                 if (gpt.channel.type === ChannelType.PrivateThread || gpt.channel.type === ChannelType.PublicThread) {
                     if (gpt.channel instanceof ThreadChannel) {
                         await gpt.channel.setLocked(true, 'Chat session ended.');
@@ -118,7 +120,7 @@ export const execute = async (msg: Message) => {
     } else if (command === 'SCUFFGPT') {
         if (!gpt || gpt instanceof ChatGPTChat || gpt.channel.id !== msg.channel.id) {
             if (gpt) {
-                await gpt.close();
+                gpt.close();
                 if (gpt.channel.type === ChannelType.PrivateThread || gpt.channel.type === ChannelType.PublicThread) {
                     if (gpt.channel instanceof ThreadChannel) {
                         await gpt.channel.setLocked(true, 'Chat session ended.');

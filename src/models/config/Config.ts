@@ -11,6 +11,7 @@ export interface Config {
     mainGuildID: string;
     socialCreditPhrases: Map<string, number>;
     socialCreditRegex: Map<string, number>;
+    bannedFromGPT: string[];
     invalidCommandPenalty: number;
     minecraft: {
         serverIP: string;
