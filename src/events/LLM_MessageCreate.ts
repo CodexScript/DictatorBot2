@@ -29,6 +29,8 @@ export const execute = async (msg: Message) => {
     )
         return;
 
+    if (!msg.content.startsWith('!')) return;
+
     const command = msg.content.split(' ')[0].substring(1).toUpperCase();
 
     let openAi = false;
@@ -94,6 +96,8 @@ export const execute = async (msg: Message) => {
 
             chatInstances.set(msg.author.id, gpt);
 
+            gpt.lastMsg = msg.id;
+
             await gpt.init();
         }
 
@@ -125,6 +129,8 @@ export const execute = async (msg: Message) => {
             gpt = new GPT4AllChat(msg.channel);
 
             chatInstances.set(msg.author.id, gpt);
+
+            gpt.lastMsg = msg.id;
 
             await gpt.init();
         }
@@ -158,7 +164,13 @@ export const execute = async (msg: Message) => {
             return;
         }
 
-        const thread = await msg.startThread({
+        let lastMsg = msg;
+
+        if (gpt.lastMsg) {
+            lastMsg = await msg.channel.messages.fetch(gpt.lastMsg);
+        }
+
+        const thread = await lastMsg.startThread({
             name: `${gpt.model}-${msg.author.username}-${msg.id}`,
             reason: 'AI Conversation',
             autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,

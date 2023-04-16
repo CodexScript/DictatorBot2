@@ -1,13 +1,14 @@
 import { OpenAIApi } from 'openai';
 import { GPT4All } from 'gpt4all';
 import fs from 'fs/promises';
-import { BaseGuildTextChannel, ThreadChannel } from 'discord.js';
+import { BaseGuildTextChannel, Message, ThreadChannel } from 'discord.js';
 
 export abstract class LLMChat {
     abstract init(): Promise<void>;
     abstract prompt(message: string): Promise<string | null>;
     abstract close(): void;
     abstract channel: ThreadChannel | BaseGuildTextChannel;
+    abstract lastMsg: string | null;
     abstract readonly model: string;
 }
 
@@ -26,6 +27,7 @@ export class ChatGPTChat extends LLMChat {
     private _messages: ChatGPTMessage[];
     private _openai: OpenAIApi;
     private _jailbreak: boolean;
+    lastMsg: string | null = null;
     readonly model: ChatGPTModel;
     channel: ThreadChannel | BaseGuildTextChannel;
     constructor(
@@ -92,6 +94,7 @@ export class ChatGPTChat extends LLMChat {
 export class GPT4AllChat extends LLMChat {
     private _gpt: GPT4All;
     channel: ThreadChannel | BaseGuildTextChannel;
+    lastMsg: string | null = null;
     readonly model = 'ScuffGPT';
     constructor(channel: ThreadChannel | BaseGuildTextChannel) {
         super();
