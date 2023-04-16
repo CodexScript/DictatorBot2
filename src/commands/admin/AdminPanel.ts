@@ -112,12 +112,24 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                         return;
                     }
 
+                    let failedOnOne = false;
+
                     for (const user of selectedUsers) {
                         const member = await interaction.guild.members.fetch(user);
-                        member.voice.disconnect();
+                        try {
+                            member.voice.disconnect();
+                        } catch (error) {
+                            failedOnOne = true;
+                        }
                     }
-
-                    await response.edit({ content: 'Kicked user(s) from voice.', components: [] });
+                    if (failedOnOne) {
+                        await response.edit({
+                            content: 'Failed to kick one or more users from voice.',
+                            components: [],
+                        });
+                    } else {
+                        await response.edit({ content: 'Kicked user(s) from voice.', components: [] });
+                    }
                 }
             } catch (error) {
                 await response.edit({ content: 'Timed out.', components: [] });
