@@ -31,7 +31,7 @@ export const execute = async (msg: Message) => {
 
     if (!msg.content.startsWith('!')) return;
 
-    if (msg.client.config.bannedFromGPT.includes(msg.author.id)) return;
+    if (msg.client.config.bannedFromGPT && msg.client.config.bannedFromGPT.includes(msg.author.id)) return;
 
     const command = msg.content.split(' ')[0].substring(1).toUpperCase();
 
