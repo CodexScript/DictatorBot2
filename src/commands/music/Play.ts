@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import '@lavaclient/queue/register';
 import { LoadTracksResponse } from '@lavaclient/types/v3';
-import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
     .setName('play')
@@ -32,7 +32,16 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     let channel = interaction.options.getChannel('channel')?.id;
 
-    if (!channel) {
+    if (channel) {
+        const tmpChannel = await interaction.guild?.channels.fetch(channel);
+        if (!(tmpChannel instanceof VoiceChannel)) {
+            await interaction.reply({
+                content: 'You must specify a voice channel.',
+                ephemeral: true,
+            });
+            return;
+        }
+    } else {
         channel = interaction.member.voice.channel?.id;
     }
 
