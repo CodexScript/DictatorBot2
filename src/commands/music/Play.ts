@@ -2,13 +2,15 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import '@lavaclient/queue/register';
 import { LoadTracksResponse } from '@lavaclient/types/v3';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { addSocialCredit } from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
     .setName('play')
     .setDescription('Play music on the bot.')
     .addStringOption((option) =>
         option.setName('query').setDescription('The URL or search term to play.').setRequired(true),
+    )
+    .addChannelOption((option) =>
+        option.setName('channel').setDescription('The channel to play in.').setRequired(false),
     );
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -24,7 +26,21 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     const query = interaction.options.getString('query');
 
     if (!query) {
-        await interaction.reply('You must specify a query.');
+        await interaction.reply({ content: 'You must specify a query.', ephemeral: true });
+        return;
+    }
+
+    let channel = interaction.options.getChannel('channel')?.id;
+
+    if (!channel) {
+        channel = interaction.member.voice.channel?.id;
+    }
+
+    if (!channel) {
+        await interaction.reply({
+            content: 'Could not locate voice channel. If you are not in voice, join and try again.',
+            ephemeral: true,
+        });
         return;
     }
 
@@ -55,8 +71,6 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             await player.destroy();
         }
     });
-
-    const channel = interaction.member.voice.channelId;
 
     if (!player.connected || player.channelId !== channel) {
         player.connect(channel, { deafened: true });
