@@ -43,6 +43,10 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         .setCustomId('kick_from_voice')
         .setLabel('⛔ Kick from Voice')
         .setStyle(ButtonStyle.Danger);
+    const change_nick = new ButtonBuilder()
+        .setCustomId('change_nick')
+        .setLabel('👤 Change Nickname')
+        .setStyle(ButtonStyle.Primary);
     const ban_gpt = new ButtonBuilder()
         .setCustomId('ban_from_gpt')
         .setLabel('🚫 Ban from GPT')
@@ -55,6 +59,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(
         kick_voice,
         delete_message,
+        change_nick,
         ban_gpt,
         pardon_gpt,
     );
@@ -135,6 +140,34 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             } catch (error) {
                 await response.edit({ content: 'Timed out.', components: [] });
             }
+        } else if (buttonInteraction.customId === 'change_nick') {
+            const idInput = new TextInputBuilder()
+                .setCustomId('change_nick_id_input')
+                .setLabel('User ID')
+                .setPlaceholder('123456789012345678')
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(15)
+                .setMaxLength(20)
+                .setRequired(true);
+
+            const newNickInput = new TextInputBuilder()
+                .setCustomId('change_nick_new_nick_input')
+                .setLabel('New Nickname')
+                .setPlaceholder('New Nickname')
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(1)
+                .setMaxLength(32)
+                .setRequired(true);
+
+            const row = new ActionRowBuilder<TextInputBuilder>().addComponents(idInput);
+            const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(newNickInput);
+
+            const modal = new ModalBuilder()
+                .setCustomId('change_nick_modal')
+                .setTitle('Change Nickname')
+                .addComponents(row, row2);
+
+            await buttonInteraction.showModal(modal);
         } else if (buttonInteraction.customId === 'ban_from_gpt') {
             const idInput = new TextInputBuilder()
                 .setCustomId('ban_from_gpt_id_input')
