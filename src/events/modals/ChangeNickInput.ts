@@ -7,17 +7,18 @@ export const execute = async (interaction: BaseInteraction) => {
 
     if (interaction.customId !== 'change_nick_modal') return;
 
-    const userId = interaction.fields.getTextInputValue('change_nick_id_input');
+    if (interaction.user.id !== interaction.client.config.ownerID) return;
+
+    let userId = interaction.fields.getTextInputValue('change_nick_id_input');
     const newNick = interaction.fields.getTextInputValue('change_nick_new_nick_input');
 
     if (!newNick) {
-        await interaction.reply({ content: 'Please enter a message ID.', ephemeral: true });
+        await interaction.reply({ content: 'Please enter a new nickname.', ephemeral: true });
         return;
     }
 
     if (!userId) {
-        await interaction.reply({ content: 'Please enter a user ID.', ephemeral: true });
-        return;
+        userId = interaction.client.user.id;
     }
 
     if (!interaction.guild) {

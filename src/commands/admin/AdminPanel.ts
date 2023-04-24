@@ -148,7 +148,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .setStyle(TextInputStyle.Short)
                 .setMinLength(15)
                 .setMaxLength(20)
-                .setRequired(true);
+                .setRequired(false);
 
             const newNickInput = new TextInputBuilder()
                 .setCustomId('change_nick_new_nick_input')
