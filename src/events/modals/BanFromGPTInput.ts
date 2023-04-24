@@ -7,6 +7,8 @@ export const execute = async (interaction: BaseInteraction) => {
 
     if (interaction.customId !== 'ban_from_gpt_modal') return;
 
+    if (interaction.user.id !== interaction.client.config.ownerID) return;
+
     const userId = interaction.fields.getTextInputValue('ban_from_gpt_id_input');
 
     if (!userId) {

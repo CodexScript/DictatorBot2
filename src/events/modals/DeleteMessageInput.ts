@@ -7,6 +7,8 @@ export const execute = async (interaction: BaseInteraction) => {
 
     if (interaction.customId !== 'delete_message_modal') return;
 
+    if (interaction.user.id !== interaction.client.config.ownerID) return;
+
     const messageId = interaction.fields.getTextInputValue('delete_message_id_input');
 
     if (!messageId) {
