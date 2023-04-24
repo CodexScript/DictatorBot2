@@ -4,18 +4,14 @@ import {
     ModalBuilder,
     SlashCommandBuilder,
     TextInputBuilder,
-    UserSelectMenuBuilder,
 } from '@discordjs/builders';
 import {
     ButtonStyle,
-    CacheType,
     ChatInputCommandInteraction,
     ComponentType,
     GuildMember,
-    MessageComponentInteraction,
     TextChannel,
     TextInputStyle,
-    UserSelectMenuInteraction,
 } from 'discord.js';
 
 export const data = new SlashCommandBuilder().setName('admin').setDescription('For admin functionality.');
@@ -88,58 +84,23 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
             await buttonInteraction.showModal(modal);
         } else if (buttonInteraction.customId === 'kick_from_voice') {
-            const userSelect = new UserSelectMenuBuilder({
-                custom_id: 'kick_from_voice_user_select',
-                placeholder: 'Select a user',
-                min_values: 1,
-            });
+            const idInput = new TextInputBuilder()
+                .setCustomId('kick_from_voice_id_input')
+                .setLabel('User ID')
+                .setPlaceholder('123456789012345678')
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(15)
+                .setMaxLength(20)
+                .setRequired(true);
 
-            const row = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(userSelect);
+            const row = new ActionRowBuilder<TextInputBuilder>().addComponents(idInput);
 
-            const response = await buttonInteraction.reply({
-                content: 'Select user(s) to kick from voice.',
-                components: [row],
-                ephemeral: true,
-            });
+            const modal = new ModalBuilder()
+                .setCustomId('kick_from_voice_modal')
+                .setTitle('Kick from Voice')
+                .addComponents(row);
 
-            const filter = (i: MessageComponentInteraction) =>
-                i.customId === 'kick_from_voice_user_select' && i.user.id === interaction.user.id;
-            try {
-                const collected = await response.awaitMessageComponent({ filter, time: 60000 });
-                if (
-                    collected instanceof UserSelectMenuInteraction<CacheType> ||
-                    collected instanceof UserSelectMenuInteraction
-                ) {
-                    const selectedUsers = collected.values;
-
-                    if (!interaction.guild) {
-                        await interaction.reply({ content: 'Guild not found.', ephemeral: true });
-                        return;
-                    }
-
-                    let failedOnOne = false;
-
-                    for (const user of selectedUsers) {
-                        const member = await interaction.guild.members.fetch(user);
-                        try {
-                            await member.voice.disconnect();
-                        } catch (error) {
-                            failedOnOne = true;
-                        }
-                    }
-
-                    if (failedOnOne) {
-                        await response.edit({
-                            content: 'Failed to kick one or more users from voice.',
-                            components: [],
-                        });
-                    } else {
-                        await response.edit({ content: 'Kicked user(s) from voice.', components: [] });
-                    }
-                }
-            } catch (error) {
-                await response.edit({ content: 'Timed out.', components: [] });
-            }
+            await buttonInteraction.showModal(modal);
         } else if (buttonInteraction.customId === 'change_nick') {
             const idInput = new TextInputBuilder()
                 .setCustomId('change_nick_id_input')
