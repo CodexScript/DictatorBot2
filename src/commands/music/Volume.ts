@@ -18,6 +18,11 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         return;
     }
 
+    if (interaction.client.config.bannedFromMusic.includes(interaction.user.id)) {
+        await interaction.reply({ content: 'You are banned from doing that.', ephemeral: true });
+        return;
+    }
+
     const scheduler = interaction.client.music.createPlayer(interaction.guildId);
 
     if (!scheduler || !scheduler.playing || scheduler.track === undefined) {

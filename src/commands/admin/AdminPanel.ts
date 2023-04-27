@@ -165,6 +165,42 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addComponents(row);
 
             await buttonInteraction.showModal(modal);
+        } else if (buttonInteraction.customId === 'ban_from_music') {
+            const idInput = new TextInputBuilder()
+                .setCustomId('ban_from_music_id_input')
+                .setLabel('User ID')
+                .setPlaceholder('123456789012345678')
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(15)
+                .setMaxLength(20)
+                .setRequired(true);
+
+            const row = new ActionRowBuilder<TextInputBuilder>().addComponents(idInput);
+
+            const modal = new ModalBuilder()
+                .setCustomId('ban_from_music_modal')
+                .setTitle('Ban from MusicBot')
+                .addComponents(row);
+
+            await buttonInteraction.showModal(modal);
+        } else if (buttonInteraction.customId === 'unban_from_music') {
+            const idInput = new TextInputBuilder()
+                .setCustomId('unban_from_music_id_input')
+                .setLabel('User ID')
+                .setPlaceholder('123456789012345678')
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(15)
+                .setMaxLength(20)
+                .setRequired(true);
+
+            const row = new ActionRowBuilder<TextInputBuilder>().addComponents(idInput);
+
+            const modal = new ModalBuilder()
+                .setCustomId('unban_from_music_modal')
+                .setTitle('Unban from MusicBot')
+                .addComponents(row);
+
+            await buttonInteraction.showModal(modal);
         }
     });
 }
