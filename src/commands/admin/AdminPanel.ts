@@ -62,15 +62,19 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(
         kick_voice,
-        delete_message,
-        change_nick,
-        ban_gpt,
-        pardon_gpt,
         ban_music,
         pardon_music,
+        delete_message,
+        change_nick,
     );
 
-    const message = await interaction.reply({ components: [mainMenu], content: 'Admin Panel', ephemeral: true });
+    const mainMenu2 = new ActionRowBuilder<ButtonBuilder>().addComponents(ban_gpt, pardon_gpt);
+
+    const message = await interaction.reply({
+        components: [mainMenu, mainMenu2],
+        content: 'Admin Panel',
+        ephemeral: true,
+    });
 
     const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
