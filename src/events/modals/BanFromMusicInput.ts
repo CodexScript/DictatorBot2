@@ -5,26 +5,26 @@ export const once = false;
 export const execute = async (interaction: BaseInteraction) => {
     if (!interaction.isModalSubmit()) return;
 
-    if (interaction.customId !== 'ban_from_gpt_modal') return;
+    if (interaction.customId !== 'ban_from_music_modal') return;
 
     if (interaction.user.id !== interaction.client.config.ownerID) return;
 
-    const userId = interaction.fields.getTextInputValue('ban_from_gpt_id_input');
+    const userId = interaction.fields.getTextInputValue('ban_from_music_id_input');
 
     if (!userId) {
         await interaction.reply({ content: 'Please enter a user ID.', ephemeral: true });
         return;
     }
 
-    if (interaction.client.config.bannedFromGPT) {
-        if (!interaction.client.config.bannedFromGPT.includes(userId)) {
-            interaction.client.config.bannedFromGPT.push(userId);
+    if (interaction.client.config.bannedFromMusic) {
+        if (!interaction.client.config.bannedFromMusic.includes(userId)) {
+            interaction.client.config.bannedFromMusic.push(userId);
         }
     } else {
-        interaction.client.config.bannedFromGPT = [userId];
+        interaction.client.config.bannedFromMusic = [userId];
     }
 
     await writeConfig(interaction.client.config);
 
-    await interaction.reply({ content: 'User banned from GPT.', ephemeral: true });
+    await interaction.reply({ content: 'User banned from MusicBot.', ephemeral: true });
 };

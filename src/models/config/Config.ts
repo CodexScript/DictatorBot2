@@ -12,6 +12,7 @@ export interface Config {
     socialCreditPhrases: Map<string, number>;
     socialCreditRegex: Map<string, number>;
     bannedFromGPT: string[];
+    bannedFromMusic: string[];
     invalidCommandPenalty: number;
     minecraft: {
         serverIP: string;
