@@ -60,15 +60,9 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         .setLabel('✅ Pardon from 🎵Music')
         .setStyle(ButtonStyle.Success);
 
-    const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        kick_voice,
-        ban_music,
-        pardon_music,
-        delete_message,
-        change_nick,
-    );
+    const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(kick_voice, delete_message, change_nick);
 
-    const mainMenu2 = new ActionRowBuilder<ButtonBuilder>().addComponents(ban_gpt, pardon_gpt);
+    const mainMenu2 = new ActionRowBuilder<ButtonBuilder>().addComponents(ban_gpt, pardon_gpt, ban_music, pardon_music);
 
     const message = await interaction.reply({
         components: [mainMenu, mainMenu2],
