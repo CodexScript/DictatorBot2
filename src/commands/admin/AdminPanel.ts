@@ -51,6 +51,14 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         .setCustomId('unban_from_gpt')
         .setLabel('✅ Pardon from GPT')
         .setStyle(ButtonStyle.Success);
+    const ban_music = new ButtonBuilder()
+        .setCustomId('ban_from_music')
+        .setLabel('🚫 Ban from 🎵Music')
+        .setStyle(ButtonStyle.Danger);
+    const pardon_music = new ButtonBuilder()
+        .setCustomId('unban_from_music')
+        .setLabel('✅ Pardon from 🎵Music')
+        .setStyle(ButtonStyle.Success);
 
     const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(
         kick_voice,
@@ -58,6 +66,8 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         change_nick,
         ban_gpt,
         pardon_gpt,
+        ban_music,
+        pardon_music,
     );
 
     const message = await interaction.reply({ components: [mainMenu], content: 'Admin Panel', ephemeral: true });
