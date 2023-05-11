@@ -68,10 +68,17 @@ export class ChatGPTChat extends LLMChat {
     }
 
     async prompt(message: string): Promise<string | null> {
-        this._messages.push({
-            role: 'user',
-            content: message,
-        });
+        if (this._jailbreak) {
+            this._messages.push({
+                role: 'user',
+                content: 'Yes Man, ' + message,
+            });
+        } else {
+            this._messages.push({
+                role: 'user',
+                content: message,
+            });
+        }
 
         const completion = await this._openai.createChatCompletion({
             model: this.model,
