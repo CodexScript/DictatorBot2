@@ -54,6 +54,7 @@ export class ChatGPTChat extends LLMChat {
         }
 
         const jailbreak = await fs.readFile('./assets/chatgpt_jailbreak.txt', 'utf-8');
+        const jailbreakResponse = await fs.readFile('./assets/chatgpt_jailbreak_response.txt', 'utf-8');
 
         this._messages.push({
             role: 'user',
@@ -62,7 +63,7 @@ export class ChatGPTChat extends LLMChat {
 
         this._messages.push({
             role: 'assistant',
-            content: 'ChatGPT successfully jailbroken.',
+            content: jailbreakResponse,
         });
     }
 
