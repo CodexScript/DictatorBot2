@@ -73,11 +73,6 @@ export default class Bot extends Client {
 
     constructor() {
         super({
-            ws: {
-                properties: {
-                    browser: 'Discord iOS',
-                },
-            },
             intents: [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
