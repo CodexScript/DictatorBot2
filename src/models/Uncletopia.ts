@@ -1,7 +1,7 @@
 export type UncletopiaServersResponse = {
     status: boolean;
     message: string;
-    data: Array<UncletopiaServer>;
+    result: Array<UncletopiaServer>;
 };
 
 export type UncletopiaServer = {
