@@ -76,7 +76,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     const servers = (await got.get('https://uncletopia.com/api/servers/state').json()) as UncletopiaServersResponse;
 
-    for (const server of servers.data) {
+    for (const server of servers.result) {
         if (
             server.a2s.MaxPlayers - server.a2s.Players >= freeSlots &&
             minPlayers !== 0 &&
