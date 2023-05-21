@@ -78,9 +78,9 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     for (const server of servers.result) {
         if (
-            server.a2s.MaxPlayers - server.a2s.Players >= freeSlots &&
+            server.max_players - server.player_count >= freeSlots &&
             minPlayers !== 0 &&
-            server.a2s.Players >= minPlayers &&
+            server.player_count >= minPlayers &&
             distance !== 0 &&
             coordsDistance(40.65965, -73.5434, server.latitude, server.longitude) <= distance
         ) {

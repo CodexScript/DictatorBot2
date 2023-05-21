@@ -14,6 +14,8 @@ export type UncletopiaServer = {
     latitude: number;
     longitude: number;
     is_enabled: boolean;
+    max_players: number;
+    player_count: number;
     cc: string;
     last_had_players: string;
     state: {
