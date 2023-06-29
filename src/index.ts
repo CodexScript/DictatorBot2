@@ -19,7 +19,11 @@ async function setStatus(client: Bot) {
             url: 'https://www.youtube.com/watch?v=XE69NQbbV8Y',
         });
     } else {
-        await client.user?.setActivity({ name: 'RED & WHITE 🔴⚪️', type: ActivityType.Listening });
+        await client.user?.setActivity({
+            name: 'PINK TAPE',
+            type: ActivityType.Listening,
+            url: 'https://www.youtube.com/watch?v=jbSQTQrYAB4',
+        });
     }
 }
 
