@@ -8,6 +8,7 @@ import { Config } from './config/Config.js';
 import { SlashCommand } from './SlashCommand.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { getCurrentPfp, setPfp } from '../util/settings/GlobalSettingsManager.js';
+import { XKeyScore } from '../util/XKeyScore.js';
 
 export async function setProfilePicture(client: Bot): Promise<void> {
     if (client.config.pfp.forced) {
@@ -71,6 +72,8 @@ export default class Bot extends Client {
 
     readonly Bot: Bot = this;
 
+    readonly XKeyscore: XKeyScore;
+
     constructor() {
         super({
             intents: [
@@ -80,6 +83,7 @@ export default class Bot extends Client {
                 GatewayIntentBits.GuildMembers,
                 GatewayIntentBits.GuildMessageReactions,
                 GatewayIntentBits.MessageContent,
+                GatewayIntentBits.GuildModeration
             ],
         });
 
@@ -99,6 +103,8 @@ export default class Bot extends Client {
         this.openai = new OpenAIApi(openaiConfig);
 
         this.imgur = new ImgurClient(this.config.imgur.clientId, this.config.imgur.clientSecret);
+
+        this.XKeyscore = new XKeyScore();
 
         this.ws.on(GatewayDispatchEvents.VoiceServerUpdate, (data) => this.music.handleVoiceUpdate(data));
         this.ws.on(GatewayDispatchEvents.VoiceStateUpdate, (data) => this.music.handleVoiceUpdate(data));
