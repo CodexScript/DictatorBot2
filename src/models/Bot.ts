@@ -9,8 +9,8 @@ import { SlashCommand } from './SlashCommand.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { getCurrentPfp, setPfp } from '../util/settings/GlobalSettingsManager.js';
 
-export async function setProfilePicture(client: Bot): Promise<void> {
-    if (client.config.pfp.forced) {
+export async function setProfilePicture(client: Bot, force: boolean = false): Promise<void> {
+    if (client.config.pfp.forced && !force) {
         return;
     }
     const pfp = await getCurrentPfp(client.config);
