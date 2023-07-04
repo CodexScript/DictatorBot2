@@ -57,7 +57,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         await interaction.client.user?.setAvatar(url);
         await interaction.reply({ content: 'Profile picture changed.', ephemeral: true });
     } else if (subcommand === 'reset') {
-        await setProfilePicture(interaction.client.Bot);
+        await setProfilePicture(interaction.client.Bot, true);
         await interaction.reply({ content: 'Profile picture reset.', ephemeral: true });
     }
 }
