@@ -2,26 +2,27 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { ActivityType, CommandInteraction, GuildMember } from 'discord.js';
 import { playURL } from '../../util/PlayerUtils.js';
 
-type TriggerFunction = () => void;
+type TriggerFunction = () => Promise<boolean>;
 
 const responses: Array<string> = [
     'I disagree',
     "OK, here's the schpiel... *incoherent rambling*",
-    'Based',
     'Nigger',
     'Big dick style',
-    'Zesty.',
     "It's time for the twerkulator",
     'Free Wi-Fi anywhere you go',
     "Well no it's like the whole schpiel",
     'Wait no but like unironically...',
-    'Kumalala',
     'OK nerd',
     '*unprompted* CS:GO is the best shooter of all time',
     '*whines about back pain*',
     'I feel no remorse watching an animal die at my hand',
     "You can't understand art because you're not trained in it.",
     'Die',
+    '*watches child porn*',
+    "I'm not the CP guy STOP",
+    'You are wrong, I am correct',
+    '*watches gross fetish porn*',
 ];
 
 export const data = new SlashCommandBuilder()
@@ -29,24 +30,21 @@ export const data = new SlashCommandBuilder()
     .setDescription('A Magic 8-ball but with responses like Payton.');
 
 export async function execute(interaction: CommandInteraction): Promise<void> {
-    const kumalaTrigger = async () => {
-        await playURL(interaction, new URL('https://www.youtube.com/watch?v=aOIPt1TQXZA'));
-    };
-
     const gameTrigger = async () => {
         if (!(interaction.member instanceof GuildMember)) {
-            return;
+            return false;
         }
 
         const activities = interaction.member.presence?.activities;
 
         if (!activities) {
-            return;
+            return false;
         }
 
         const current = activities[0];
 
         await interaction.reply(`*unprompted* ${current.name} is probably the worst game in terms of art and design`);
+        return true;
     };
 
     const triggers: Array<TriggerFunction> = [];
@@ -60,17 +58,16 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
                 triggers.push(gameTrigger);
             }
         }
-
-        if (interaction.member.voice.channel) {
-            triggers.push(kumalaTrigger);
-        }
     }
 
     const allResponses = [...responses, ...triggers];
 
     const response = allResponses[Math.floor(Math.random() * allResponses.length)];
     if (response instanceof Function) {
-        await response();
+        const success = await response();
+        if (!success) {
+            await interaction.reply('I disagree');
+        }
     } else {
         await interaction.reply(response);
     }

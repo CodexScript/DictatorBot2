@@ -9,6 +9,35 @@ import { SlashCommand } from './SlashCommand.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { getCurrentPfp, setPfp } from '../util/settings/GlobalSettingsManager.js';
 
+function isDaylightSavingsReady(): boolean {
+    // Get current date
+    const currentDate = new Date();
+
+    // Check if the current month is March
+    if (currentDate.getMonth() !== 2) {
+        return false;
+    }
+
+    // Get day of the month
+    const currentDay = currentDate.getDate();
+
+    // Find the date of the second Sunday in March
+    let secondSundayInMarch = 8; // March 1st is a Wednesday at latest, so March 8th is a Sunday at least
+
+    // if March 1 is Sunday, then March 8 is second Sunday
+    // if not, add difference between 7 and day of week to get second Sunday
+    if (new Date(currentDate.getFullYear(), 2, 1).getDay() !== 0) {
+        secondSundayInMarch += 7 - new Date(currentDate.getFullYear(), 2, 1).getDay();
+    }
+
+    // Check if the current day of the month is the second Sunday of March, or past that
+    if (currentDay < secondSundayInMarch) {
+        return false;
+    }
+
+    return true;
+}
+
 export async function setProfilePicture(client: Bot, force: boolean = false): Promise<void> {
     if (client.config.pfp.forced && !force) {
         return;
@@ -44,7 +73,7 @@ export async function setProfilePicture(client: Bot, force: boolean = false): Pr
     } else if (now.getMonth() === 3 && now.getDate() === 20) {
         // 420
         newPfp = './assets/pfp/uzi-smacked.jpg';
-    } else if (now.getMonth() === 2 && now.getDate() > 13) {
+    } else if (isDaylightSavingsReady()) {
         // Daylight savings begins
         newPfp = './assets/pfp/uzi-tart.png';
     } else {
