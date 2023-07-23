@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
-import got from 'got';
+import axios from 'axios';
 import { UncletopiaServersResponse } from '../../models/Uncletopia';
 
 function deg2rad(deg: number) {
@@ -74,15 +74,15 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     await interaction.deferReply();
 
-    const servers = (await got.get('https://uncletopia.com/api/servers/state').json()) as UncletopiaServersResponse;
+    const servers = (await axios.get('https://uncletopia.com/api/servers/state')).data as UncletopiaServersResponse;
 
-    for (const server of servers.result) {
+    for (const server of servers.result.servers) {
         if (
-            server.max_players - server.player_count >= freeSlots &&
+            server.max_players - server.players >= freeSlots &&
             minPlayers !== 0 &&
-            server.player_count >= minPlayers &&
+            server.players >= minPlayers &&
             distance !== 0 &&
-            coordsDistance(40.65965, -73.5434, server.latitude, server.longitude) <= distance
+            server.distance <= distance
         ) {
             await interaction.followUp({
                 content: `Connect using the following URL: steam://connect/${server.host}:${server.port}`,
@@ -90,4 +90,5 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             return;
         }
     }
+    await interaction.followUp({ content: 'No servers found.' });
 }

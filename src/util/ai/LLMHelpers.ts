@@ -5,7 +5,7 @@ import { BaseGuildTextChannel, ThreadChannel } from 'discord.js';
 
 export abstract class LLMChat {
     abstract init(): Promise<void>;
-    abstract prompt(message: string): Promise<string | null>;
+    abstract prompt(message: string): Promise<string | undefined>;
     abstract close(): void;
     abstract channel: ThreadChannel | BaseGuildTextChannel;
     abstract lastMsg: string | null;
@@ -14,7 +14,7 @@ export abstract class LLMChat {
 
 interface ChatGPTMessage {
     role: 'user' | 'assistant' | 'system';
-    content: string;
+    content?: string;
     name?: string;
 }
 
@@ -67,7 +67,7 @@ export class ChatGPTChat extends LLMChat {
         });
     }
 
-    async prompt(message: string): Promise<string | null> {
+    async prompt(message: string): Promise<string | undefined> {
         if (this._jailbreak) {
             this._messages.push({
                 role: 'user',
@@ -87,10 +87,13 @@ export class ChatGPTChat extends LLMChat {
         });
 
         if (completion.data.choices.length == 0 || completion.data.choices[0].message === undefined) {
-            return null;
+            return undefined;
         }
 
-        this._messages.push(completion.data.choices[0].message);
+        this._messages.push({
+            role: 'assistant',
+            content: completion.data.choices[0].message.content,
+        });
 
         return completion.data.choices[0].message.content;
     }
@@ -114,11 +117,11 @@ export class GPT4AllChat extends LLMChat {
         await this._gpt.open();
     }
 
-    async prompt(message: string): Promise<string | null> {
+    async prompt(message: string): Promise<string | undefined> {
         const response = await this._gpt.prompt(message);
 
         if (response.length == 0) {
-            return null;
+            return undefined;
         }
 
         return response;

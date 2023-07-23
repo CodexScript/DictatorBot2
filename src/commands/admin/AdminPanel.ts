@@ -66,7 +66,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     const message = await interaction.reply({
         components: [mainMenu, mainMenu2],
-        content: 'Admin Panel',
+        content: 'Admin Panel. Please select an option within 60 seconds.',
         ephemeral: true,
     });
 

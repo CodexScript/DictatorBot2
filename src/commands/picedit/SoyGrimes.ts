@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import canvas from '@napi-rs/canvas';
 import { ChatInputCommandInteraction } from 'discord.js';
-import got from 'got';
+import axios from 'axios';
 
 export const data = new SlashCommandBuilder()
     .setName('soygrimes')
@@ -29,8 +29,8 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     await interaction.deferReply();
 
-    const response = await got.get(url, {
-        responseType: 'buffer',
+    const response = await axios.get(url, {
+        responseType: 'arraybuffer',
     });
 
     const contentHeader = response.headers['content-type'];
@@ -43,7 +43,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         return;
     }
 
-    const baseImage = await canvas.loadImage(response.body);
+    const baseImage = await canvas.loadImage(response.data);
     const soy = await canvas.loadImage('./assets/picedit/grimes-soyjack.png');
 
     const soyCanvas = canvas.createCanvas(soy.width, soy.height);
