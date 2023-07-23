@@ -8,9 +8,8 @@ const responses: Array<string> = [
     'I disagree',
     "OK, here's the schpiel... *incoherent rambling*",
     'Nigger',
-    'Big dick style',
+    'Long dick style',
     "It's time for the twerkulator",
-    'Free Wi-Fi anywhere you go',
     "Well no it's like the whole schpiel",
     'Wait no but like unironically...',
     'OK nerd',
@@ -23,6 +22,8 @@ const responses: Array<string> = [
     "I'm not the CP guy STOP",
     'You are wrong, I am correct',
     '*watches gross fetish porn*',
+    "AI can't create art, I swear I'll still be employed in five years guys",
+    'I signed an NDA',
 ];
 
 export const data = new SlashCommandBuilder()
@@ -47,6 +48,11 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
         return true;
     };
 
+    const wrTrigger = async () => {
+        interaction.reply({ files: ['./assets/wr_mc_speedrun.mp4'] });
+        return true;
+    };
+
     const triggers: Array<TriggerFunction> = [];
 
     if (interaction.member instanceof GuildMember) {
@@ -61,7 +67,9 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
         }
     }
 
-    const allResponses = [...triggers];
+    triggers.push(wrTrigger);
+
+    const allResponses = [...responses, ...triggers];
 
     const response = allResponses[Math.floor(Math.random() * allResponses.length)];
     if (response instanceof Function) {
