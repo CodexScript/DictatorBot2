@@ -14,13 +14,13 @@ async function setStatus(client: Bot) {
     const now = new Date();
     const thanksgivingDate = thanksgiving(now.getFullYear());
     if (now.getMonth() === 10 && now.getDate() === thanksgivingDate.getDate()) {
-        await client.user?.setActivity('Woke Up Thankful', {
-            type: ActivityType.Listening,
+        client.user?.setActivity('Woke Up Thankful', {
+            type: ActivityType.Streaming,
             url: 'https://www.youtube.com/watch?v=XE69NQbbV8Y',
         });
     } else {
-        await client.user?.setActivity('PINK TAPE', {
-            type: ActivityType.Listening,
+        client.user?.setActivity('PINK TAPE', {
+            type: ActivityType.Streaming,
             url: 'https://www.youtube.com/watch?v=jbSQTQrYAB4',
         });
     }
@@ -47,7 +47,9 @@ async function setStatus(client: Bot) {
         await client.music.connect(client.user!.id);
         await setProfilePicture(client);
 
-        await setStatus(client);
+        setInterval(async () => {
+            await setStatus(client);
+        }, 900000);
 
         setInterval(async () => {
             await setProfilePicture(client);

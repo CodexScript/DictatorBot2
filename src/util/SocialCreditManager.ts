@@ -1,7 +1,7 @@
 import canvas from '@napi-rs/canvas';
 import { GuildMember, Message } from 'discord.js';
 import * as fs from 'fs/promises';
-import got from 'got';
+import axios from 'axios';
 import * as BetterSqlite3 from 'better-sqlite3';
 import SocialCreditTier from '../models/SocialCreditTier.js';
 
@@ -90,12 +90,13 @@ export async function createUserBanner(client: BetterSqlite3.Database, member: G
     const socialCredit = await getSocialCredit(client, member.id);
     const tier = getSocialCreditTier(socialCredit);
 
-    const avatar = await got.get(member.displayAvatarURL({ forceStatic: true })).buffer();
-
+    const avatar = await axios.get(member.displayAvatarURL({ forceStatic: true }), {
+        responseType: 'arraybuffer',
+    });
     const flagBuffer = await fs.readFile('./assets/picedit/china.png');
 
     const flag = await canvas.loadImage(flagBuffer);
-    const avatarImage = await canvas.loadImage(avatar);
+    const avatarImage = await canvas.loadImage(avatar.data);
 
     const drawCanvas = canvas.createCanvas(flag.width, flag.height);
     const ctx = drawCanvas.getContext('2d');

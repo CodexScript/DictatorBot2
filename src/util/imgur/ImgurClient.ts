@@ -1,4 +1,4 @@
-import got from 'got';
+import axios from 'axios';
 
 const BASE_URL = 'https://api.imgur.com/3';
 
@@ -13,13 +13,13 @@ export class ImgurClient {
     }
 
     async getAlbum(albumId: string): Promise<ImgurAlbum> {
-        return (await got
-            .get(`${BASE_URL}/album/${albumId}`, {
+        return (
+            await axios.get(`${BASE_URL}/album/${albumId}`, {
                 headers: {
                     Authorization: `Client-ID ${this.clientId}`,
                 },
             })
-            .json()) as ImgurAlbum;
+        ).data as ImgurAlbum;
     }
 }
 

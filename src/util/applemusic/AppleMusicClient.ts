@@ -1,4 +1,4 @@
-import got from 'got';
+import axios from 'axios';
 import { AppleMusicAccessToken, signToken } from './AppleMusicAccessToken';
 
 export default class AppleMusicClient {
@@ -13,16 +13,14 @@ export default class AppleMusicClient {
             this.accessToken = await signToken(this.accessToken);
         }
 
-        const response = await got
-            .get(`https://api.music.apple.com/v1/catalog/us/songs?filter[isrc]=${isrc}`, {
-                headers: {
-                    Authorization: `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json',
-                },
-            })
-            .json();
+        const response = await axios.get(`https://api.music.apple.com/v1/catalog/us/songs?filter[isrc]=${isrc}`, {
+            headers: {
+                Authorization: `Bearer ${this.accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
-        return response;
+        return response.data;
     }
 
     public async getAlbumByUPC(upc: string): Promise<unknown> {
@@ -30,16 +28,14 @@ export default class AppleMusicClient {
             this.accessToken = await signToken(this.accessToken);
         }
 
-        const response = await got
-            .get(`https://api.music.apple.com/v1/catalog/us/albums?filter[upc]=${upc}`, {
-                headers: {
-                    Authorization: `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json',
-                },
-            })
-            .json();
+        const response = await axios.get(`https://api.music.apple.com/v1/catalog/us/albums?filter[upc]=${upc}`, {
+            headers: {
+                Authorization: `Bearer ${this.accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
-        return response;
+        return response.data;
     }
 
     private shouldResignAccessToken(): boolean {

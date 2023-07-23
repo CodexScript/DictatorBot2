@@ -1,7 +1,9 @@
 export type UncletopiaServersResponse = {
     status: boolean;
     message: string;
-    result: Array<UncletopiaServer>;
+    result: {
+        servers: Array<UncletopiaServer>;
+    };
 };
 
 export type UncletopiaServer = {
@@ -15,8 +17,9 @@ export type UncletopiaServer = {
     longitude: number;
     is_enabled: boolean;
     max_players: number;
-    player_count: number;
+    players: number;
     cc: string;
+    distance: number;
     last_had_players: string;
     state: {
         PlayersCount: number;

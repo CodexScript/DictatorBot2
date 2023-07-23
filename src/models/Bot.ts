@@ -107,6 +107,7 @@ export default class Bot extends Client {
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildPresences,
                 GatewayIntentBits.GuildMessageReactions,
                 GatewayIntentBits.MessageContent,
             ],

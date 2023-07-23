@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import canvas from '@napi-rs/canvas';
 import { ChatInputCommandInteraction } from 'discord.js';
-import got from 'got';
+import axios from 'axios';
 import { isValidHttpUrl, writeText } from '../../util/PicUtils.js';
 import * as SocialCreditManager from '../../util/SocialCreditManager.js';
 
@@ -28,8 +28,8 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     const ctx = kanyeCanvas.getContext('2d');
 
     if (isValidHttpUrl(text)) {
-        const response = await got.get(text, {
-            responseType: 'buffer',
+        const response = await axios.get(text, {
+            responseType: 'arraybuffer',
         });
 
         const contentHeader = response.headers['content-type'];
@@ -42,7 +42,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             return;
         }
 
-        const responseImage = await canvas.loadImage(response.body);
+        const responseImage = await canvas.loadImage(response.data);
 
         ctx.drawImage(base, 0, 0);
 

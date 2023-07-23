@@ -1,4 +1,4 @@
-import got from 'got';
+import axios from 'axios';
 import { EventEmitter } from 'events';
 import { TiktokFavsResponse, TiktokVideo, TiktokVideoListing } from '../models/Tiktok';
 import { TiktokConfig } from '../models/config/TiktokConfig.js';
@@ -32,18 +32,16 @@ export class TiktokManager {
         while (hasMore && iterated < 500) {
             const url = `https://api19-normal-c-useast1a.tiktokv.com/aweme/v1/aweme/listcollection/?app_language=en&count=30&cursor=${cursor}&account_region=US`;
 
-            const response = await got
-                .get(url, {
-                    headers: {
-                        'user-agent': 'TikTok 16.6.5 rv:166515 (iPhone; iOS 14.0; en_US) Cronet',
-                        'x-khronos': this.config.xKhronos,
-                        'x-gorgon': this.config.xGorgon,
-                        cookie: this.config.cookie,
-                    },
-                })
-                .json();
+            const response = await axios.get(url, {
+                headers: {
+                    'user-agent': 'TikTok 16.6.5 rv:166515 (iPhone; iOS 14.0; en_US) Cronet',
+                    'x-khronos': this.config.xKhronos,
+                    'x-gorgon': this.config.xGorgon,
+                    cookie: this.config.cookie,
+                },
+            });
 
-            const favs = response as TiktokFavsResponse;
+            const favs = response.data as TiktokFavsResponse;
 
             for (const vid of favs.aweme_list) {
                 if (

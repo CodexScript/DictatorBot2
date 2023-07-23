@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
 import fs from 'fs/promises';
-import got from 'got';
+import axios from 'axios';
 
 // Album IDs, each represents an imgur url. eg. QtYaS = https://imgur.com/a/QtYaS
 const TITLE_CARDS_ADVENTURE_TIME = 'bMUUI';
@@ -38,7 +38,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         titleCard = album.data.images[Math.floor(Math.random() * album.data.images.length)].link;
     }
 
-    const headers = await got.head(titleCard);
+    const headers = await axios.head(titleCard);
 
     if (!headers.headers['content-type']?.startsWith('image')) {
         await interaction.followUp({

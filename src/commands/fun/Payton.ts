@@ -54,19 +54,20 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
             interaction.member.presence?.activities?.length !== undefined &&
             interaction.member.presence.activities.length > 0
         ) {
+            console.log(interaction.member.presence);
             if (interaction.member.presence.activities[0].type === ActivityType.Playing) {
                 triggers.push(gameTrigger);
             }
         }
     }
 
-    const allResponses = [...responses, ...triggers];
+    const allResponses = [...triggers];
 
     const response = allResponses[Math.floor(Math.random() * allResponses.length)];
     if (response instanceof Function) {
         const success = await response();
         if (!success) {
-            await interaction.reply('I disagree');
+            await interaction.reply(responses[Math.floor(Math.random() * responses.length)]);
         }
     } else {
         await interaction.reply(response);

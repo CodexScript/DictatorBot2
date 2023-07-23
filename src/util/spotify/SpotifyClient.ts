@@ -1,4 +1,3 @@
-import got from 'got';
 import {
     SpotifyAccessToken,
     SpotifyAlbum,
@@ -6,6 +5,7 @@ import {
     SpotifySearchResult,
     SpotifyTrack,
 } from '../../models/Spotify';
+import axios from 'axios';
 
 export default class SpotifyClient {
     private clientId: string;
@@ -27,8 +27,8 @@ export default class SpotifyClient {
             return this.accessToken;
         }
 
-        const authData = (await got
-            .post('https://accounts.spotify.com/api/token', {
+        const authData = (
+            await axios.post('https://accounts.spotify.com/api/token', {
                 headers: {
                     Authorization: `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`,
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -37,7 +37,7 @@ export default class SpotifyClient {
                     grant_type: 'client_credentials',
                 },
             })
-            .json()) as SpotifyAccessToken;
+        ).data as SpotifyAccessToken;
 
         authData.created_at = new Date();
 
@@ -68,8 +68,8 @@ export default class SpotifyClient {
             await this.initialize();
         }
 
-        return (await got
-            .get(
+        return (
+            await axios.get(
                 `${this.BASE_URL}/search?q=${q}&type=${type.join(',')}${
                     options?.include_external ? `&include_external=${options.include_external}` : ''
                 }${options?.limit ? `&limit=${options?.limit}` : ''}${
@@ -83,7 +83,7 @@ export default class SpotifyClient {
                     responseType: 'json',
                 },
             )
-            .json()) as SpotifySearchResult;
+        ).data as SpotifySearchResult;
     }
 
     public async getTrack(id: string): Promise<SpotifyTrack> {
@@ -91,15 +91,15 @@ export default class SpotifyClient {
             await this.initialize();
         }
 
-        return (await got
-            .get(`${this.BASE_URL}/tracks/${id}?market=us`, {
+        return (
+            await axios.get(`${this.BASE_URL}/tracks/${id}?market=us`, {
                 headers: {
                     Authorization: `Bearer ${this.accessToken?.access_token}`,
                     'Content-Type': 'application/json',
                 },
                 responseType: 'json',
             })
-            .json()) as SpotifyTrack;
+        ).data as SpotifyTrack;
     }
 
     public async getAlbum(id: string): Promise<SpotifyAlbum> {
@@ -107,15 +107,15 @@ export default class SpotifyClient {
             await this.initialize();
         }
 
-        return (await got
-            .get(`${this.BASE_URL}/albums/${id}?market=us`, {
+        return (
+            await axios.get(`${this.BASE_URL}/albums/${id}?market=us`, {
                 headers: {
                     Authorization: `Bearer ${this.accessToken?.access_token}`,
                     'Content-Type': 'application/json',
                 },
                 responseType: 'json',
             })
-            .json()) as SpotifyAlbum;
+        ).data as SpotifyAlbum;
     }
 
     public async getArtist(id: string): Promise<SpotifyArtist> {
@@ -123,14 +123,14 @@ export default class SpotifyClient {
             await this.initialize();
         }
 
-        return (await got
-            .get(`${this.BASE_URL}/artists/${id}`, {
+        return (
+            await axios.get(`${this.BASE_URL}/artists/${id}`, {
                 headers: {
                     Authorization: `Bearer ${this.accessToken?.access_token}`,
                     'Content-Type': 'application/json',
                 },
                 responseType: 'json',
             })
-            .json()) as SpotifyArtist;
+        ).data as SpotifyArtist;
     }
 }
