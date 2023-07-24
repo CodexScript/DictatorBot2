@@ -49,7 +49,7 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
     };
 
     const wrTrigger = async () => {
-        interaction.reply({ files: ['./assets/wr_mc_speedrun.mp4'] });
+        await interaction.reply({ files: ['./assets/wr_mc_speedrun.mp4'] });
         return true;
     };
 
