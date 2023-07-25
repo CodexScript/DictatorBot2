@@ -24,6 +24,7 @@ const responses: Array<string> = [
     '*watches gross fetish porn*',
     "AI can't create art, I swear I'll still be employed in five years guys",
     'I signed an NDA',
+    "I don't think there is any talent in being a good actor",
 ];
 
 export const data = new SlashCommandBuilder()
