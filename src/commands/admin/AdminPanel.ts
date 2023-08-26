@@ -260,5 +260,6 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addComponents(row);
 
             await buttonInteraction.showModal(modal);
+        }
     });
 }
