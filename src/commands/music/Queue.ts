@@ -1,19 +1,18 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { isInteractionGood } from '../util/music.js';
 
 export const data = new SlashCommandBuilder().setName('queue').setDescription('Lists the current queue.');
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    if (
-        !interaction.guildId ||
-        !(interaction.member instanceof GuildMember) ||
-        !(interaction.channel instanceof TextChannel)
-    ) {
-        await interaction.reply({ content: "You can't use that command here.", ephemeral: true });
+    const [good, reason] = isInteractionGood(interaction);
+
+    if (!good) {
+        await interaction.reply({ content: reason, ephemeral: true });
         return;
     }
 
-    const scheduler = interaction.client.music.createPlayer(interaction.guildId);
+    const scheduler = interaction.client.music.createPlayer(interaction.guildId!);
 
     if (!scheduler || scheduler.trackData === undefined) {
         await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });

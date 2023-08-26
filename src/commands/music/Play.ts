@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import '@lavaclient/queue/register';
 import { LoadTracksResponse } from '@lavaclient/types/v3';
 import { ChatInputCommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import { isInteractionGood } from '../util/music.js';
 
 export const data = new SlashCommandBuilder()
     .setName('play')
@@ -14,17 +15,10 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    if (
-        !interaction.guildId ||
-        !(interaction.member instanceof GuildMember) ||
-        !(interaction.channel instanceof TextChannel)
-    ) {
-        await interaction.reply({ content: "You can't use that command here.", ephemeral: true });
-        return;
-    }
+    const [good, reason] = isInteractionGood(interaction);
 
-    if (interaction.client.config.bannedFromMusic.includes(interaction.user.id)) {
-        await interaction.reply({ content: 'You are banned from doing that.', ephemeral: true });
+    if (!good) {
+        await interaction.reply({ content: reason, ephemeral: true });
         return;
     }
 
