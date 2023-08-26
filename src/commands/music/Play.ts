@@ -41,7 +41,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             return;
         }
     } else {
-        channel = interaction.member.voice.channel?.id;
+        channel = (interaction.member as GuildMember).voice.channel?.id;
     }
 
     if (!channel) {
@@ -69,7 +69,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         await interaction.followUp({ content: 'Could not find any tracks.' });
         return;
     }
-    const player = interaction.client.music.createPlayer(interaction.guildId);
+    const player = interaction.client.music.createPlayer(interaction.guildId!);
 
     player.on('trackEnd', async (_, __) => {
         // eslint-disable-next-line no-promise-executor-return
