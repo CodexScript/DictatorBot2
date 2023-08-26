@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import '@lavaclient/queue/register';
 import { LoadTracksResponse } from '@lavaclient/types/v3';
 import { ChatInputCommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
-import { isInteractionGood } from '../util/music.js';
+import { isInteractionGood } from '../../util/music.js';
 
 export const data = new SlashCommandBuilder()
     .setName('play')

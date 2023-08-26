@@ -22,6 +22,7 @@ export async function registerCommands(
         const categoryCommands = fsSync.readdirSync(`${dir}/${category}`).filter((file) => file.endsWith('.js'));
 
         for (const file of categoryCommands) {
+            console.log(`Loading command: ${dir}/${category}/${file}`);
             const command = await import(`file:///${dir}/${category}/${file}`);
             console.log(`Adding command to client: ${command.data.name}`);
             client.commands.set(command.data.name, [category, command]);

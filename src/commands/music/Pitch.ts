@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { isInteractionGood } from '../util/music.js';
+import { isInteractionGood } from '../../util/music.js';
 
 export const data = new SlashCommandBuilder()
     .setName('pitch')
