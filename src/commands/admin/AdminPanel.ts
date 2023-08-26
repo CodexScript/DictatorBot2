@@ -59,13 +59,28 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         .setCustomId('unban_from_music')
         .setLabel('✅ Pardon from 🎵Music')
         .setStyle(ButtonStyle.Success);
+    const ban_server_music = new ButtonBuilder()
+        .setCustomId('ban_guild_from_music')
+        .setLabel('🚫 Ban Guild from 🎵Music')
+        .setStyle(ButtonStyle.Danger);
+    const pardon_server_music = new ButtonBuilder()
+        .setCustomId('unban_guild_from_music')
+        .setLabel('✅ Pardon Guild from 🎵Music')
+        .setStyle(ButtonStyle.Success);
 
     const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(kick_voice, delete_message, change_nick);
 
-    const mainMenu2 = new ActionRowBuilder<ButtonBuilder>().addComponents(ban_gpt, pardon_gpt, ban_music, pardon_music);
+    const mainMenu2 = new ActionRowBuilder<ButtonBuilder>().addComponents(ban_gpt, pardon_gpt);
+
+    const mainMenu3 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        ban_music,
+        pardon_music,
+        ban_server_music,
+        pardon_server_music,
+    );
 
     const message = await interaction.reply({
-        components: [mainMenu, mainMenu2],
+        components: [mainMenu, mainMenu2, mainMenu3],
         content: 'Admin Panel. Please select an option within 60 seconds.',
         ephemeral: true,
     });
@@ -209,6 +224,41 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addComponents(row);
 
             await buttonInteraction.showModal(modal);
-        }
+        } else if (buttonInteraction.customId === 'ban_guild_from_music') {
+            const idInput = new TextInputBuilder()
+                .setCustomId('ban_guild_from_music_id_input')
+                .setLabel('Guild ID')
+                .setPlaceholder('123456789012345678')
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(15)
+                .setMaxLength(20)
+                .setRequired(true);
+
+            const row = new ActionRowBuilder<TextInputBuilder>().addComponents(idInput);
+
+            const modal = new ModalBuilder()
+                .setCustomId('ban_guild_from_music_modal')
+                .setTitle('Ban from MusicBot')
+                .addComponents(row);
+
+            await buttonInteraction.showModal(modal);
+        } else if (buttonInteraction.customId === 'unban_from_music') {
+            const idInput = new TextInputBuilder()
+                .setCustomId('unban_guild_from_music_id_input')
+                .setLabel('Guild ID')
+                .setPlaceholder('123456789012345678')
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(15)
+                .setMaxLength(20)
+                .setRequired(true);
+
+            const row = new ActionRowBuilder<TextInputBuilder>().addComponents(idInput);
+
+            const modal = new ModalBuilder()
+                .setCustomId('unban_guild_from_music_modal')
+                .setTitle('Unban from MusicBot')
+                .addComponents(row);
+
+            await buttonInteraction.showModal(modal);
     });
 }

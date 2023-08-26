@@ -25,6 +25,7 @@ const responses: Array<string> = [
     "AI can't create art, I swear I'll still be employed in five years guys",
     'I signed an NDA',
     "I don't think there is any talent in being a good actor",
+    "The average person can't tell the difference between 30 and 60 FPS.",
 ];
 
 export const data = new SlashCommandBuilder()
