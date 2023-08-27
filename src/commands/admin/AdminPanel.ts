@@ -242,7 +242,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addComponents(row);
 
             await buttonInteraction.showModal(modal);
-        } else if (buttonInteraction.customId === 'unban_from_music') {
+        } else if (buttonInteraction.customId === 'unban_guild_from_music') {
             const idInput = new TextInputBuilder()
                 .setCustomId('unban_guild_from_music_id_input')
                 .setLabel('Guild ID')
