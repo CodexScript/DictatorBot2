@@ -16,12 +16,12 @@ export const execute = async (interaction: BaseInteraction) => {
         return;
     }
 
-    if (interaction.client.config.bannedFromMusic) {
+    if (interaction.client.config.guildsBannedFromMusic) {
         if (!interaction.client.config.guildsBannedFromMusic.includes(guildId)) {
             interaction.client.config.guildsBannedFromMusic.push(guildId);
         }
     } else {
-        interaction.client.config.bannedFromMusic = [guildId];
+        interaction.client.config.guildsBannedFromMusic = [guildId];
     }
 
     await writeConfig(interaction.client.config);
