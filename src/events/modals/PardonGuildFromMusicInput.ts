@@ -16,7 +16,7 @@ export const execute = async (interaction: BaseInteraction) => {
         return;
     }
 
-    interaction.client.config.bannedFromMusic = interaction.client.config.guildsBannedFromMusic.filter(
+    interaction.client.config.guildsBannedFromMusic = interaction.client.config.guildsBannedFromMusic.filter(
         (item) => item !== guildId,
     );
 
