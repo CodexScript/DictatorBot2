@@ -14,7 +14,6 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': 1,
         '@typescript-eslint/no-empty-function': 1,
         '@typescript-eslint/no-empty-interface': 1,
-        '@typescript-eslint/no-non-null-assertion': 0,
-        'prettier/prettier': 'error',
+        '@typescript-eslint/no-non-null-assertion': 0
     },
 };

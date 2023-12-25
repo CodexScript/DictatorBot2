@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Bot, { setProfilePicture } from './models/Bot.js';
 import { registerCommands, registerEvents } from './util/CommandUtils.js';
+import { createServer } from './server/APIServer.js';
 
 function thanksgiving(year: number): Date {
     const lastOfNov = new Date(year, 10, 30).getDay();
@@ -89,5 +90,8 @@ async function setStatus(client: Bot) {
         // }
     });
 
-    await client.login(client.config.botToken);
+    await Promise.all([
+        client.login(client.config.botToken),
+        createServer(client)
+    ])
 })();
