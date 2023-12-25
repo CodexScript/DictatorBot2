@@ -25,26 +25,27 @@ function kickContinous(durationMillis: number, discordBot: Bot, id: string): Pro
                 resolve();
             } else {
                 try {
-                const guild = discordBot.guilds.cache.get(discordBot.config.mainGuildID);
-                if(!guild) {
-                    resolve();
-                }
-
-                const member = await guild?.members.fetch(id);
-
-                if (!member) {
-                    resolve();
-                }
-
-                if (member) {
-                    if (member.voice.channel) {
-                        await member.voice.setChannel(null);
+                    const guild = discordBot.guilds.cache.get(discordBot.config.mainGuildID);
+                    if(!guild) {
+                        resolve();
                     }
+
+                    const member = await guild?.members.fetch(id);
+
+                    if (!member) {
+                        resolve();
+                    }
+
+                    if (member) {
+                        if (member.voice.channel) {
+                            await member.voice.setChannel(null);
+                        }
+                    }
+                    setTimeout(checkTime, 100);
+                } catch (e) {
+                    console.log(e);
+                    resolve();
                 }
-                setTimeout(checkTime, 100);
-            } catch (e) {
-                console.log(e);
-                resolve();
             }
         }
 
