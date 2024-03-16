@@ -74,7 +74,7 @@ export default class BasedometerInstance {
         try {
             const selectInteraction = await selectMessage.awaitMessageComponent({
                 filter,
-                componentType: ComponentType.SelectMenu,
+                componentType: ComponentType.StringSelect,
                 time: 60000,
             });
             const categoryName = selectInteraction.values[0];

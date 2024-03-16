@@ -1,31 +1,9 @@
-import { ActivityType, Interaction } from 'discord.js';
+import { Interaction } from 'discord.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import Bot, { setProfilePicture } from './models/Bot.js';
+import Bot, { setProfilePicture, setStatus } from './models/Bot.js';
 import { registerCommands, registerEvents } from './util/CommandUtils.js';
 import { createServer } from './server/APIServer.js';
-
-function thanksgiving(year: number): Date {
-    const lastOfNov = new Date(year, 10, 30).getDay();
-    const turkyDay = (lastOfNov >= 4 ? 34 : 27) - lastOfNov;
-    return new Date(year, 10, turkyDay);
-}
-
-async function setStatus(client: Bot) {
-    const now = new Date();
-    const thanksgivingDate = thanksgiving(now.getFullYear());
-    if (now.getMonth() === 10 && now.getDate() === thanksgivingDate.getDate()) {
-        client.user?.setActivity('Woke Up Thankful', {
-            type: ActivityType.Streaming,
-            url: 'https://www.youtube.com/watch?v=XE69NQbbV8Y',
-        });
-    } else {
-        client.user?.setActivity('PINK TAPE', {
-            type: ActivityType.Streaming,
-            url: 'https://www.youtube.com/watch?v=jbSQTQrYAB4',
-        });
-    }
-}
 
 (async () => {
     const client = new Bot();
