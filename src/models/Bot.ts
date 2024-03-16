@@ -1,5 +1,5 @@
 import '@lavaclient/queue';
-import { Client, Collection, GatewayDispatchEvents, GatewayIntentBits, Snowflake } from 'discord.js';
+import { ActivityType, Client, Collection, GatewayDispatchEvents, GatewayIdentifyProperties, GatewayIntentBits, Snowflake } from 'discord.js';
 import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Node } from 'lavaclient';
@@ -36,6 +36,63 @@ function isDaylightSavingsReady(): boolean {
     }
 
     return true;
+}
+
+function thanksgiving(year: number): Date {
+    const lastOfNov = new Date(year, 10, 30).getDay();
+    const turkyDay = (lastOfNov >= 4 ? 34 : 27) - lastOfNov;
+    return new Date(year, 10, turkyDay);
+}
+
+export async function setStatus(client: Bot) {
+    const now = new Date();
+    const thanksgivingDate = thanksgiving(now.getFullYear());
+    if (now.getMonth() === 10 && now.getDate() === thanksgivingDate.getDate()) {
+        client.user?.setActivity('Woke Up Thankful', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=XE69NQbbV8Y',
+        });
+    } else if (now.getMonth() === 5 && now.getDate() === 30) {
+        client.user?.setActivity('PINK TAPE', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=jbSQTQrYAB4',
+        });
+    } else if (now.getMonth() === 3 && now.getDate() === 15) {
+        client.user?.setActivity('LUV vs. The World', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=2g-lAExcH7Y&list=PLC-tfB9OwTFEbmcQE_s7uqHc-aE-F5TSZ',
+        });
+    } else if (now.getMonth() === 2 && now.getDate() === 13) {
+        client.user?.setActivity('LUV vs. The World 2', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=Bt-brUAx3Uo&list=PLC-tfB9OwTFE-XE_PxgJDrOGgXPgYKR-a',
+        });
+    } else if (now.getMonth() === 2 && now.getDate() === 6) {
+        client.user?.setActivity('Eternal Atake', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=juoznBaQbJE&list=PLC-tfB9OwTFHdk7GnG1CAoxUr4rbV2rci',
+        });
+    } else if (now.getMonth() === 7 && now.getDate() === 25) {
+        client.user?.setActivity('LUV Is Rage 2', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=zy3HAa4wIes&list=PLsHcErHZWqJkzofPzes5qL03OR7yDnVps',
+        });
+    } else if (now.getMonth() === 6 && now.getDate() === 31) {
+        client.user?.setActivity('The Perfect LUV Tape', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=9G-7P6-FLLM&list=PLC-tfB9OwTFHdKSDMVmQf4pUa4lqZE8Xt',
+        });
+    } else if (now.getMonth() === 9 && now.getDate() === 30) {
+        client.user?.setActivity('LUV Is Rage', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=DKDfz4AEIPg&list=PLkKsSM2rrWtSY8nHB4Tozzj6whvNV1RWc',
+        });
+    } else {
+        client.user?.setActivity('LUV Is Rage', {
+            type: ActivityType.Streaming,
+            url: 'https://www.youtube.com/watch?v=DKDfz4AEIPg&list=PLkKsSM2rrWtSY8nHB4Tozzj6whvNV1RWc',
+        });
+    }
 }
 
 export async function setProfilePicture(client: Bot, force: boolean = false): Promise<void> {
@@ -111,6 +168,13 @@ export default class Bot extends Client {
                 GatewayIntentBits.GuildMessageReactions,
                 GatewayIntentBits.MessageContent,
             ],
+            ws: {
+                identifyProperties: {
+                    browser: 'Discord iOS',
+                    device: 'iPhone',
+                    os: 'iOS',
+                }
+            }
         });
 
         this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
@@ -143,5 +207,8 @@ declare module 'discord.js' {
         readonly imgur: ImgurClient;
         readonly openai: OpenAIApi;
         readonly Bot: Bot;
+    }
+    interface WebSocketOptions {
+        identifyProperties: GatewayIdentifyProperties;
     }
 }
