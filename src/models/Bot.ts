@@ -2,7 +2,7 @@ import '@lavaclient/queue';
 import { ActivityType, Client, Collection, GatewayDispatchEvents, GatewayIdentifyProperties, GatewayIntentBits, Snowflake } from 'discord.js';
 import * as fs from 'fs';
 import yaml from 'js-yaml';
-import { Node } from 'lavaclient';
+import { Node, type NodeOptions } from 'lavaclient';
 import { ImgurClient } from '../util/imgur/ImgurClient.js';
 import { Config } from './config/Config.js';
 import { SlashCommand } from './SlashCommand.js';
@@ -179,13 +179,23 @@ export default class Bot extends Client {
 
         this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
 
+        const info: NodeOptions["info"] = {
+            host: this.config.lavalink.ip,
+            port: this.config.lavalink.port,
+            auth: this.config.lavalink.password,
+        };
+
         this.music = new Node({
-            sendGatewayPayload: (id, payload) => this.guilds.cache.get(id)?.shard?.send(payload),
-            connection: {
-                host: this.config.lavalink.ip,
-                port: this.config.lavalink.port,
-                password: this.config.lavalink.password,
+            info,
+            ws: {
+                clientName: "DictatorBot",
             },
+            discord: {
+                sendGatewayCommand: (id, payload) => {
+                    this.guilds.cache.get(id)?.shard?.send(payload);
+                }
+            }
+           
         });
 
         const openaiConfig = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
@@ -194,8 +204,8 @@ export default class Bot extends Client {
 
         this.imgur = new ImgurClient(this.config.imgur.clientId, this.config.imgur.clientSecret);
 
-        this.ws.on(GatewayDispatchEvents.VoiceServerUpdate, (data) => this.music.handleVoiceUpdate(data));
-        this.ws.on(GatewayDispatchEvents.VoiceStateUpdate, (data) => this.music.handleVoiceUpdate(data));
+        this.ws.on(GatewayDispatchEvents.VoiceServerUpdate, (data) => this.music.players.handleVoiceUpdate(data));
+        this.ws.on(GatewayDispatchEvents.VoiceStateUpdate, (data) => this.music.players.handleVoiceUpdate(data));
     }
 }
 

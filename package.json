@@ -24,7 +24,7 @@
         "gpt4all": "^1.0.0",
         "js-yaml": "^4.1.0",
         "jsonwebtoken": "^9.0.1",
-        "lavaclient": "^4.1.1",
+        "lavaclient": "^5.0.0-rc.3",
         "openai": "^3.3.0",
         "pg": "^8.11.1",
         "pino": "^8.14.1",

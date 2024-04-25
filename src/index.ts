@@ -8,7 +8,7 @@ import { createServer } from './server/APIServer.js';
 (async () => {
     const client = new Bot();
 
-    client.music.on('connect', () => {
+    client.music.on('connected', () => {
         console.log('Connected to lavalink.');
     });
 
@@ -23,7 +23,9 @@ import { createServer } from './server/APIServer.js';
         );
         await registerEvents(client, path.join(path.dirname(filename), 'events'));
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await client.music.connect(client.user!.id);
+        await client.music.connect({
+            userId: client.user!.id,
+        });
         await setProfilePicture(client);
 
         setInterval(async () => {
