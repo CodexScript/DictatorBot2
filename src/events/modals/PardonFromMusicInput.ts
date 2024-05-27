@@ -1,5 +1,6 @@
 import { BaseInteraction, Events } from 'discord.js';
 import { writeConfig } from '../../util/settings/GlobalSettingsManager.js';
+
 export const name = Events.InteractionCreate;
 export const once = false;
 export const execute = async (interaction: BaseInteraction) => {

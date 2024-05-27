@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
-import { isInteractionGood } from '../../util/music.js';
+import { getSchedulerAfterChecks, isInteractionGood } from '../../util/music.js';
 
 let state = false;
 
@@ -27,29 +27,19 @@ export const data = new SlashCommandBuilder()
     .setDescription('Toggles the "underwater" effect found on a lot of modern rap songs.');
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const [good, reason] = isInteractionGood(interaction);
+    const scheduler = await getSchedulerAfterChecks(interaction);
 
-    if (!good) {
-        await interaction.reply({ content: reason, ephemeral: true });
-        return;
-    }
-
-    const scheduler = interaction.client.music.createPlayer(interaction.guildId!);
-
-    if (!scheduler || scheduler.trackData === undefined) {
-        await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
+    if (!scheduler) {
         return;
     }
 
     if (!state) {
-        scheduler.filters.equalizer = generateBands(5);
+        scheduler.filters.setEqualizer(generateBands(5));
     } else {
-        scheduler.filters.equalizer = generateBands(5, true);
+        scheduler.filters.setEqualizer(generateBands(5, true));
     }
 
     state = !state;
-
-    await scheduler.setFilters();
 
     await interaction.reply({ content: `Toggled underwater to **${state}**` });
 }

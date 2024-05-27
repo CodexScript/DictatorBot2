@@ -3,7 +3,6 @@ import canvas from '@napi-rs/canvas';
 import { ChatInputCommandInteraction } from 'discord.js';
 import axios from 'axios';
 import { isValidHttpUrl, writeText } from '../../util/PicUtils.js';
-import * as SocialCreditManager from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
     .setName('kanye')

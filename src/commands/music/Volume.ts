@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { isInteractionGood } from '../../util/music.js';
+import { getSchedulerAfterChecks, isInteractionGood } from '../../util/music.js';
 
 export const data = new SlashCommandBuilder()
     .setName('volume')
@@ -10,17 +10,9 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const [good, reason] = isInteractionGood(interaction);
+    const scheduler = await getSchedulerAfterChecks(interaction);
 
-    if (!good) {
-        await interaction.reply({ content: reason, ephemeral: true });
-        return;
-    }
-
-    const scheduler = interaction.client.music.createPlayer(interaction.guildId!);
-
-    if (!scheduler || !scheduler.playing || scheduler.track === undefined) {
-        await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
+    if (!scheduler) {
         return;
     }
 
@@ -36,7 +28,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         return;
     }
 
-    await scheduler.setVolume(newVol);
+    scheduler.setVolume(newVol);
 
     await interaction.reply({ content: `Set volume to **${newVol}**` });
 }

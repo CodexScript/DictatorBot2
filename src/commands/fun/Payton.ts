@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ActivityType, CommandInteraction, GuildMember } from 'discord.js';
-import { playURL } from '../../util/PlayerUtils.js';
 
 type TriggerFunction = () => Promise<boolean>;
 

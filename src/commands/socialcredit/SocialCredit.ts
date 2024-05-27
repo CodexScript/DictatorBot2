@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, GuildMember } from 'discord.js';
-import * as SocialCreditManager from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
     .setName('socialcredit')
@@ -10,7 +9,7 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction: CommandInteraction): Promise<void> {
-    const user = interaction.options.getMember('user');
+    const user = interaction.options.get('user')?.member;
 
     let targetUser = interaction.member;
     if (user instanceof GuildMember) {

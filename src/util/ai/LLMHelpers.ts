@@ -1,12 +1,14 @@
-import { OpenAIApi } from 'openai';
-import { GPT4All } from 'gpt4all';
+import { OpenAI } from 'openai';
 import fs from 'fs/promises';
 import { BaseGuildTextChannel, ThreadChannel } from 'discord.js';
 
 export abstract class LLMChat {
     abstract init(): Promise<void>;
-    abstract prompt(message: string): Promise<string | undefined>;
+
+    abstract prompt(message: string): Promise<string | null>;
+
     abstract close(): void;
+
     abstract channel: ThreadChannel | BaseGuildTextChannel;
     abstract lastMsg: string | null;
     abstract readonly model: string;
@@ -14,7 +16,7 @@ export abstract class LLMChat {
 
 interface ChatGPTMessage {
     role: 'user' | 'assistant' | 'system';
-    content?: string;
+    content: string;
     name?: string;
 }
 
@@ -25,14 +27,15 @@ export enum ChatGPTModel {
 
 export class ChatGPTChat extends LLMChat {
     private _messages: ChatGPTMessage[];
-    private _openai: OpenAIApi;
+    private _openai: OpenAI;
     private _jailbreak: boolean;
     lastMsg: string | null = null;
     readonly model: ChatGPTModel;
     channel: ThreadChannel | BaseGuildTextChannel;
+
     constructor(
         channel: ThreadChannel | BaseGuildTextChannel,
-        openai: OpenAIApi,
+        openai: OpenAI,
         model = ChatGPTModel.GPT4,
         jailbreak = false,
     ) {
@@ -43,6 +46,7 @@ export class ChatGPTChat extends LLMChat {
         this.model = model;
         this.channel = channel;
     }
+
     async init(): Promise<void> {
         this._messages.push({
             role: 'system',
@@ -67,7 +71,7 @@ export class ChatGPTChat extends LLMChat {
         });
     }
 
-    async prompt(message: string): Promise<string | undefined> {
+    async prompt(message: string): Promise<string | null> {
         if (this._jailbreak) {
             this._messages.push({
                 role: 'user',
@@ -80,54 +84,29 @@ export class ChatGPTChat extends LLMChat {
             });
         }
 
-        const completion = await this._openai.createChatCompletion({
+        const completion = await this._openai.chat.completions.create({
             model: this.model,
             messages: this._messages,
             temperature: 1.05,
         });
 
-        if (completion.data.choices.length == 0 || completion.data.choices[0].message === undefined) {
-            return undefined;
+        if (
+            completion.choices.length == 0 ||
+            completion.choices[0].message === null ||
+            completion.choices[0].message.content === null
+        ) {
+            return null;
         }
 
         this._messages.push({
             role: 'assistant',
-            content: completion.data.choices[0].message.content,
+            content: completion.choices[0].message.content,
         });
 
-        return completion.data.choices[0].message.content;
+        return completion.choices[0].message.content;
     }
+
     close(): void {
         this._messages = [];
-    }
-}
-
-export class GPT4AllChat extends LLMChat {
-    private _gpt: GPT4All;
-    channel: ThreadChannel | BaseGuildTextChannel;
-    lastMsg: string | null = null;
-    readonly model = 'ScuffGPT';
-    constructor(channel: ThreadChannel | BaseGuildTextChannel) {
-        super();
-        this.channel = channel;
-        this._gpt = new GPT4All('gpt4all-lora-unfiltered-quantized');
-    }
-    async init(): Promise<void> {
-        await this._gpt.init();
-        await this._gpt.open();
-    }
-
-    async prompt(message: string): Promise<string | undefined> {
-        const response = await this._gpt.prompt(message);
-
-        if (response.length == 0) {
-            return undefined;
-        }
-
-        return response;
-    }
-
-    close(): void {
-        this._gpt.close();
     }
 }

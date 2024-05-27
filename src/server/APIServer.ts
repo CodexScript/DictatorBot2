@@ -5,10 +5,9 @@ export async function createServer(discordBot: Bot) {
     const app = express();
 
     app.get('/kick/:id', async (req, res) => {
-        console.log("Got request with id " + req.params.id);
+        console.log('Got request with id ' + req.params.id);
         res.send('Kick Endpoint');
         await kickContinous(20000, discordBot, req.params.id);
-        
     });
 
     app.listen(3000, () => {
@@ -17,7 +16,7 @@ export async function createServer(discordBot: Bot) {
 }
 
 function kickContinous(durationMillis: number, discordBot: Bot, id: string): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         const startTime = Date.now();
 
         async function checkTime() {
@@ -26,7 +25,7 @@ function kickContinous(durationMillis: number, discordBot: Bot, id: string): Pro
             } else {
                 try {
                     const guild = discordBot.guilds.cache.get(discordBot.config.mainGuildID);
-                    if(!guild) {
+                    if (!guild) {
                         resolve();
                     }
 

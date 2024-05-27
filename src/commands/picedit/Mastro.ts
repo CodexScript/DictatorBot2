@@ -2,7 +2,6 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import canvas from '@napi-rs/canvas';
 import { ChatInputCommandInteraction } from 'discord.js';
 import { writeText } from '../../util/PicUtils.js';
-import * as SocialCreditManager from '../../util/SocialCreditManager.js';
 
 export const data = new SlashCommandBuilder()
     .setName('mastro')

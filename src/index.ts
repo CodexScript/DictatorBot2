@@ -8,8 +8,12 @@ import { createServer } from './server/APIServer.js';
 (async () => {
     const client = new Bot();
 
-    client.music.on('connected', () => {
+    client.music.on('nodeConnect', () => {
         console.log('Connected to lavalink.');
+    });
+
+    client.music.on('nodeError', (node, error) => {
+        console.error(`Node Error: ${error}`);
     });
 
     client.once('ready', async () => {
@@ -23,9 +27,7 @@ import { createServer } from './server/APIServer.js';
         );
         await registerEvents(client, path.join(path.dirname(filename), 'events'));
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await client.music.connect({
-            userId: client.user!.id,
-        });
+        client.music.init(client.user!.id);
         await setProfilePicture(client);
 
         setInterval(async () => {
@@ -70,8 +72,5 @@ import { createServer } from './server/APIServer.js';
         // }
     });
 
-    await Promise.all([
-        client.login(client.config.botToken),
-        createServer(client)
-    ])
+    await Promise.all([client.login(client.config.botToken), createServer(client)]);
 })();

@@ -1,42 +1,74 @@
 [
-    {
-        "name": "Dixie D'Amelio",
-        "files": ["dixie/dixie.jpg", "dixie/dixie3.jpg", "dixie/dixie2.png"],
-        "baseRating": 9.1
-    },
-    {
-        "name": "HeyImBee",
-        "files": ["bee/1.jpg", "bee/2.png", "bee/3.png"],
-        "baseRating": 9.4
-    },
-    {
-        "name": "Billie Eilish",
-        "files": ["billie/1.jpg", "billie/2.jpg", "billie/3.jpg"],
-        "baseRating": 9.8
-    },
-    {
-        "name": "Addison Rae",
-        "files": ["rae/1.jpg", "rae/2.jpg", "rae/3.jpg"],
-        "baseRating": 9
-    },
-    {
-        "name": "Pokimane",
-        "files": ["pokimane/2.jpg", "pokimane/1.png", "pokimane/3.jpg"],
-        "baseRating": 5
-    },
-    {
-        "name": "Emiru",
-        "files": ["emiru/1.jpeg", "emiru/2.jpg", "emiru/3.jpg"],
-        "baseRating": 8.4
-    },
-    {
-        "name": "Justa Minx",
-        "files": ["minx/1.jpg", "minx/2.jpg", "minx/3.jpg"],
-        "baseRating": 8.2
-    },
-    {
-        "name": "Corinna Kopf",
-        "files": ["corinna/1.jpg", "corinna/2.jpg", "corinna/3.jpg"],
-        "baseRating": 9
-    }
+  {
+    "name": "Dixie D'Amelio",
+    "files": [
+      "dixie/dixie.jpg",
+      "dixie/dixie3.jpg",
+      "dixie/dixie2.png"
+    ],
+    "baseRating": 9.1
+  },
+  {
+    "name": "HeyImBee",
+    "files": [
+      "bee/1.jpg",
+      "bee/2.png",
+      "bee/3.png"
+    ],
+    "baseRating": 9.4
+  },
+  {
+    "name": "Billie Eilish",
+    "files": [
+      "billie/1.jpg",
+      "billie/2.jpg",
+      "billie/3.jpg"
+    ],
+    "baseRating": 9.8
+  },
+  {
+    "name": "Addison Rae",
+    "files": [
+      "rae/1.jpg",
+      "rae/2.jpg",
+      "rae/3.jpg"
+    ],
+    "baseRating": 9
+  },
+  {
+    "name": "Pokimane",
+    "files": [
+      "pokimane/2.jpg",
+      "pokimane/1.png",
+      "pokimane/3.jpg"
+    ],
+    "baseRating": 5
+  },
+  {
+    "name": "Emiru",
+    "files": [
+      "emiru/1.jpeg",
+      "emiru/2.jpg",
+      "emiru/3.jpg"
+    ],
+    "baseRating": 8.4
+  },
+  {
+    "name": "Justa Minx",
+    "files": [
+      "minx/1.jpg",
+      "minx/2.jpg",
+      "minx/3.jpg"
+    ],
+    "baseRating": 8.2
+  },
+  {
+    "name": "Corinna Kopf",
+    "files": [
+      "corinna/1.jpg",
+      "corinna/2.jpg",
+      "corinna/3.jpg"
+    ],
+    "baseRating": 9
+  }
 ]

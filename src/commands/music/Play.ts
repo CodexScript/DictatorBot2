@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import '@lavaclient/queue/register';
-import { LoadTracksResponse } from '@lavaclient/types/v3';
 import { ChatInputCommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import { isInteractionGood } from '../../util/music.js';
+import { SearchResult } from 'magmastream';
 
 export const data = new SlashCommandBuilder()
     .setName('play')
@@ -56,40 +55,45 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
     const node = interaction.client.music;
 
-    let res: LoadTracksResponse;
+    let res: SearchResult;
+
+    // try {
+    //     new URL(query); // If this doesn't throw, it's a URL
+    //     res = await node.rest.loadTracks(query);
+    // } catch (_) {
+    //     res = await node.rest.loadTracks(`ytsearch:${query}`);
+    // }
 
     try {
-        new URL(query); // If this doesn't throw, it's a URL
-        res = await node.rest.loadTracks(query);
-    } catch (_) {
-        res = await node.rest.loadTracks(`ytsearch:${query}`);
-    }
-
-    if (res.tracks.length === 0) {
-        await interaction.followUp({ content: 'Could not find any tracks.' });
+        res = await node.search(query, interaction.user);
+        if (res.loadType === 'empty') {
+            await interaction.followUp({ content: 'Could not find any tracks.' });
+            return;
+        }
+    } catch (err) {
+        // @ts-ignore
+        await interaction.followUp({ content: `There was an error while searching: ${err.message}` });
         return;
     }
-    const player = interaction.client.music.createPlayer(interaction.guildId!);
 
-    player.on('trackEnd', async (_, __) => {
-        // eslint-disable-next-line no-promise-executor-return
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        if (!player.playing) {
-            await player.disconnect();
-            await player.destroy();
-        }
+    const player = interaction.client.music.create({
+        guild: interaction.guildId!,
+        voiceChannel: channel,
+        textChannel: interaction.channel!.id,
+        volume: 100,
     });
 
-    if (!player.connected || player.channelId !== channel) {
-        player.connect(channel, { deafened: true });
-    }
-
+    if (player.state !== 'CONNECTED') player.connect();
     player.queue.add(res.tracks[0]);
 
-    if (!player.playing) {
-        await interaction.followUp({ content: `Now playing: **${res.tracks[0].info.title}**` });
-        await player.queue.start();
+    if (!player.playing && !player.paused && !player.queue.length) {
+        console.log('Now we play');
+        await player.play();
+    }
+
+    if (player.queue.size === 0) {
+        await interaction.followUp({ content: `Now playing: **${res.tracks[0].title}**` });
     } else {
-        await interaction.followUp({ content: `Queued: **${res.tracks[0].info.title}**` });
+        await interaction.followUp({ content: `Queued: **${res.tracks[0].title}**` });
     }
 }

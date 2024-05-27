@@ -1,12 +1,19 @@
-import '@lavaclient/queue';
-import { ActivityType, Client, Collection, GatewayDispatchEvents, GatewayIdentifyProperties, GatewayIntentBits, Snowflake } from 'discord.js';
+import {
+    ActivityType,
+    Client,
+    Collection,
+    GatewayDispatchEvents,
+    GatewayIdentifyProperties,
+    GatewayIntentBits,
+    Snowflake,
+} from 'discord.js';
 import * as fs from 'fs';
 import yaml from 'js-yaml';
-import { Node, type NodeOptions } from 'lavaclient';
+import { Manager, Payload } from 'magmastream';
 import { ImgurClient } from '../util/imgur/ImgurClient.js';
 import { Config } from './config/Config.js';
 import { SlashCommand } from './SlashCommand.js';
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 import { getCurrentPfp, setPfp } from '../util/settings/GlobalSettingsManager.js';
 
 function isDaylightSavingsReady(): boolean {
@@ -132,6 +139,7 @@ export async function setProfilePicture(client: Bot, force: boolean = false): Pr
         newPfp = './assets/pfp/uzi-smacked.jpg';
     } else if (isDaylightSavingsReady()) {
         // Daylight savings begins
+        // TODO: Currently broken
         newPfp = './assets/pfp/uzi-tart.png';
     } else {
         newPfp = './assets/pfp/uzi-donda.jpg';
@@ -147,13 +155,13 @@ export async function setProfilePicture(client: Bot, force: boolean = false): Pr
 export default class Bot extends Client {
     config: Config;
 
-    readonly music: Node;
+    readonly music: Manager;
 
     readonly commands: Collection<Snowflake, [string, SlashCommand]> = new Collection();
 
     readonly imgur: ImgurClient;
 
-    readonly openai: OpenAIApi;
+    readonly openai: OpenAI | null;
 
     readonly Bot: Bot = this;
 
@@ -173,51 +181,81 @@ export default class Bot extends Client {
                     browser: 'Discord iOS',
                     device: 'iPhone',
                     os: 'iOS',
-                }
-            }
+                },
+            },
         });
 
         this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
 
-        const info: NodeOptions["info"] = {
-            host: this.config.lavalink.ip,
-            port: this.config.lavalink.port,
-            auth: this.config.lavalink.password,
-        };
-
-        this.music = new Node({
-            info,
-            ws: {
-                clientName: "DictatorBot",
+        const nodes = [
+            {
+                host: this.config.lavalink.ip,
+                identifier: 'Node 1',
+                port: this.config.lavalink.port,
+                secure: false,
+                password: this.config.lavalink.password,
+                retryAmount: 1000,
+                retryDelay: 10000,
+                resumeStatus: false,
+                resumeTimeout: 1000,
             },
-            discord: {
-                sendGatewayCommand: (id, payload) => {
-                    this.guilds.cache.get(id)?.shard?.send(payload);
+        ];
+
+        this.music = new Manager({
+            nodes,
+
+            send: (id: string, payload: Payload) => {
+                const guild = this.Bot.guilds.cache.get(id);
+                if (guild) {
+                    console.log('Sending shard');
+                    guild.shard.send(payload);
+                } else {
+                    console.warn('No guild found for send');
                 }
-            }
-           
+            },
         });
 
-        const openaiConfig = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
+        this.on('raw', (data) => {
+            this.music.updateVoiceState(data);
+        });
 
-        this.openai = new OpenAIApi(openaiConfig);
+        this.music.on('queueEnd', async (eventPlayer) => {
+            console.warn('Queue is over');
+            eventPlayer.destroy();
+        });
+
+        this.music.on('trackStart', async (eventPlayer, track, payload) => {
+            console.log('Track starting...');
+        });
+
+        this.music.on('trackError', async (eventPlayer, track, payload) => {
+            console.warn('TRACK ERROR!: ' + JSON.stringify(payload));
+        });
+
+        this.music.on('trackStuck', async (eventPlayer, track, payload) => {
+            console.warn('TRACK STUCK!: ' + payload);
+        });
+
+        if (process.env.OPENAI_API_KEY == undefined) {
+            this.openai = null;
+        } else {
+            this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        }
 
         this.imgur = new ImgurClient(this.config.imgur.clientId, this.config.imgur.clientSecret);
-
-        this.ws.on(GatewayDispatchEvents.VoiceServerUpdate, (data) => this.music.players.handleVoiceUpdate(data));
-        this.ws.on(GatewayDispatchEvents.VoiceStateUpdate, (data) => this.music.players.handleVoiceUpdate(data));
     }
 }
 
 declare module 'discord.js' {
     // eslint-disable-next-line no-shadow
     interface Client {
-        readonly music: Node;
+        readonly music: Manager;
         readonly config: Config;
         readonly imgur: ImgurClient;
-        readonly openai: OpenAIApi;
+        readonly openai: OpenAI | null;
         readonly Bot: Bot;
     }
+
     interface WebSocketOptions {
         identifyProperties: GatewayIdentifyProperties;
     }

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { addSocialCredit } from '../../util/SocialCreditManager.js';
-import { isInteractionGood } from '../../util/music.js';
+import { getSchedulerAfterChecks, isInteractionGood } from '../../util/music.js';
 
 export const data = new SlashCommandBuilder()
     .setName('speed')
@@ -11,17 +11,9 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const [good, reason] = isInteractionGood(interaction);
+    const scheduler = await getSchedulerAfterChecks(interaction);
 
-    if (!good) {
-        await interaction.reply({ content: reason, ephemeral: true });
-        return;
-    }
-
-    const scheduler = interaction.client.music.createPlayer(interaction.guildId!);
-
-    if (!scheduler || scheduler.trackData === undefined) {
-        await interaction.reply({ content: 'There is nothing playing.', ephemeral: true });
+    if (!scheduler) {
         return;
     }
 
@@ -38,11 +30,10 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     }
 
     if (!scheduler.filters.timescale) {
-        scheduler.filters.timescale = { pitch: 1, rate: 1, speed: newSpeed / 100 };
+        scheduler.filters.setTimescale({ pitch: 1, rate: 1, speed: newSpeed / 100 });
     } else {
-        scheduler.filters.timescale.speed = newSpeed / 100;
+        scheduler.filters.setTimescale({ speed: newSpeed / 100 });
     }
-    await scheduler.setFilters();
 
     await interaction.reply({ content: `Set speed to **${newSpeed}%**` });
 }
