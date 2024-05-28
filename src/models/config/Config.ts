@@ -15,6 +15,7 @@ export interface Config {
     bannedFromMusic: string[];
     guildsBannedFromMusic: string[];
     invalidCommandPenalty: number;
+    APImusicURL: string;
     minecraft: {
         serverIP: string;
         rconPort: number;
