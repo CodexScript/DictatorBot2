@@ -1,5 +1,6 @@
-import { Events, Message } from 'discord.js';
+import { ButtonStyle, Events, Message } from 'discord.js';
 import axios from 'axios';
+import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 
 function extractSpotifyURL(text: string) {
     const spotifyPattern = /https:\/\/open\.spotify\.com\/(album|track)\/[a-zA-Z0-9]{22}(?:\?si=[a-zA-Z0-9]{22})?/g;
@@ -77,9 +78,39 @@ export const execute = async (msg: Message) => {
 
         const oppositeService = service === 'spotify' ? 'Apple Music' : 'Spotify';
 
-        await msg.reply({
+        const trash = new ButtonBuilder().setCustomId('delete-music').setLabel('🗑️').setStyle(ButtonStyle.Primary);
+
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(trash);
+
+        const msgResponse = await msg.reply({
             content: `${response.data.originTitle} by ${response.data.originArtist} on ${oppositeService}: ${response.data.url}`,
+            components: [row],
         });
+
+        const collectorFilter = (i: any) => {
+            if (i.user.id === msg.author.id) {
+                return true;
+            } else {
+                i.reply({
+                    content: `Only <@${msg.author.id}> can delete this message`,
+                    ephemeral: true,
+                });
+                return false;
+            }
+        };
+
+        try {
+            const confirmation = await msgResponse.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+
+            if (confirmation.customId === 'delete-music') {
+                await msgResponse.delete();
+            }
+        } catch (e: any) {
+            await msgResponse.edit({
+                content: `${response.data.originTitle} by ${response.data.originArtist} on ${oppositeService}: ${response.data.url}`,
+                components: [],
+            });
+        }
     } catch (e: any) {
         console.warn(`Error while trying to convert music streaming URL: ${e.message}`);
         return;
