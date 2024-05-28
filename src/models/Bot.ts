@@ -52,6 +52,7 @@ function thanksgiving(year: number): Date {
 }
 
 export async function setStatus(client: Bot) {
+    return;
     const now = new Date();
     const thanksgivingDate = thanksgiving(now.getFullYear());
     if (now.getMonth() === 10 && now.getDate() === thanksgivingDate.getDate()) {

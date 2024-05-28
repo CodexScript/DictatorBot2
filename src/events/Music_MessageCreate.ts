@@ -1,17 +1,16 @@
 import { Events, Message } from 'discord.js';
 import axios from 'axios';
 
-function extractMusicURL(msg: string) {
-    try {
-        const url = new URL(msg);
-        if (url.hostname === 'music.apple.com' || url.hostname === 'open.spotify.com') {
-            return url.href;
-        }
-    } catch (e) {
-        return null;
-    }
+function extractSpotifyURL(text: string) {
+    const spotifyPattern = /https:\/\/open\.spotify\.com\/(album|track)\/[a-zA-Z0-9]{22}(?:\?si=[a-zA-Z0-9]{22})?/g;
+    const match = text.match(spotifyPattern);
+    return match ? match[0] : null;
+}
 
-    return null;
+function extractAppleMusicURL(text: string) {
+    const appleMusicPattern = /https:\/\/music\.apple\.com\/[a-z]{2}\/album\/[^\/]+\/\d+\??(?:i=\d+)?/g;
+    const match = text.match(appleMusicPattern);
+    return match ? match[0] : null;
 }
 
 function classifyURL(url: string) {
@@ -49,10 +48,13 @@ export const execute = async (msg: Message) => {
 
     if (!msg.client.config.APImusicURL || msg.client.config.APImusicURL === '') return;
 
-    const url = extractMusicURL(msg.content);
+    let url = extractSpotifyURL(msg.content);
     if (!url) {
-        console.log('URL does not match');
-        return;
+        url = extractAppleMusicURL(msg.content);
+        if (!url) {
+            console.log('No match');
+            return;
+        }
     }
 
     const [service, type] = classifyURL(url);
