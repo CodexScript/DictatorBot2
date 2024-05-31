@@ -1015,10 +1015,10 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-effect@2.0.0-next.56:
-  version "2.0.0-next.56"
-  resolved "https://registry.yarnpkg.com/effect/-/effect-2.0.0-next.56.tgz#2795c83d48b186d530a9c020e4a78879cc152066"
-  integrity sha512-Z6L9rf78OveZorl4pC82hUM/kNhQ8epChuCBVNIjVsookbb6iqTuP9goi3qi6CR7xUZE+HnOKF2bzMIdOOP+Vw==
+effect@2.4.9:
+  version "2.4.9"
+  resolved "https://registry.yarnpkg.com/effect/-/effect-2.4.9.tgz#58c99e495e05ea3310683c54600560fe66adf833"
+  integrity sha512-hRTy37jVylIYOC4k/VKfgmGkIMEOjR8MOurLzr1J0AD7ufagbcoO7voygZkT2B1STXfBXEsKNWj8yDAzUcPpAA==
 
 emoji-regex@^8.0.0:
   version "8.0.0"

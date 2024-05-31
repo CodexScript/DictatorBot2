@@ -3,6 +3,8 @@ import { ActivityType, CommandInteraction, GuildMember } from 'discord.js';
 
 type TriggerFunction = () => Promise<boolean>;
 
+let counter = 0;
+
 const responses: Array<string> = [
     'I disagree',
     "OK, here's the schpiel... *incoherent rambling*",
@@ -43,7 +45,18 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
             return false;
         }
 
+        if (
+            interaction.member.presence?.activities?.length === undefined ||
+            interaction.member.presence.activities.length === 0
+        ) {
+            return false;
+        }
+
         const current = activities[0];
+
+        if (current.type !== ActivityType.Playing) {
+            return false;
+        }
 
         await interaction.reply(`*unprompted* ${current.name} is probably the worst game in terms of art and design`);
         return true;
@@ -54,31 +67,24 @@ export async function execute(interaction: CommandInteraction): Promise<void> {
         return true;
     };
 
-    const triggers: Array<TriggerFunction> = [];
-
-    if (interaction.member instanceof GuildMember) {
-        if (
-            interaction.member.presence?.activities?.length !== undefined &&
-            interaction.member.presence.activities.length > 0
-        ) {
-            console.log(interaction.member.presence);
-            if (interaction.member.presence.activities[0].type === ActivityType.Playing) {
-                triggers.push(gameTrigger);
-            }
-        }
-    }
-
-    triggers.push(wrTrigger);
+    const triggers: Array<TriggerFunction> = [gameTrigger, wrTrigger];
 
     const allResponses = [...responses, ...triggers];
 
-    const response = allResponses[Math.floor(Math.random() * allResponses.length)];
-    if (response instanceof Function) {
-        const success = await response();
-        if (!success) {
-            await interaction.reply(responses[Math.floor(Math.random() * responses.length)]);
+    const response = allResponses[counter];
+
+    let success = false;
+
+    while (!success) {
+        if (response instanceof Function) {
+            success = await response();
+        } else {
+            await interaction.reply(response);
+            success = true;
         }
-    } else {
-        await interaction.reply(response);
+        counter++;
+        if (counter >= allResponses.length) {
+            counter = 0;
+        }
     }
 }

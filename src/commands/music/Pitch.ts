@@ -28,11 +28,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         return;
     }
 
-    if (!scheduler.filters.timescale) {
-        scheduler.filters.setTimescale({ pitch: newPitch / 100, rate: 1, speed: 1 });
-    } else {
-        scheduler.filters.setTimescale({ pitch: newPitch / 100 });
-    }
+    scheduler.filters.setTimescale({ pitch: newPitch / 100 });
 
     await interaction.reply({ content: `Set pitch to **${newPitch}%**` });
 }

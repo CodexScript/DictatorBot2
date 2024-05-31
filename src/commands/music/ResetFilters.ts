@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { getSchedulerAfterChecks, isInteractionGood } from '../../util/music.js';
+import { ChatInputCommandInteraction } from 'discord.js';
+import { getSchedulerAfterChecks } from '../../util/music.js';
 
 export const data = new SlashCommandBuilder().setName('resetfilters').setDescription('Resets all player filters.');
 

@@ -19,7 +19,7 @@
         "bufferutil": "^4.0.8",
         "discord-api-types": "^0.37.85",
         "discord.js": "^14.15.2",
-        "effect": "2.0.0-next.56",
+        "effect": "2.4.9",
         "express": "^4.19.2",
         "fast-check": "3.13.2",
         "js-yaml": "^4.1.0",

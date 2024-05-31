@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { addSocialCredit } from '../../util/SocialCreditManager.js';
-import { getSchedulerAfterChecks, isInteractionGood } from '../../util/music.js';
+import { ChatInputCommandInteraction } from 'discord.js';
+import { getSchedulerAfterChecks } from '../../util/music.js';
 
 export const data = new SlashCommandBuilder()
     .setName('speed')
@@ -29,11 +28,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         return;
     }
 
-    if (!scheduler.filters.timescale) {
-        scheduler.filters.setTimescale({ pitch: 1, rate: 1, speed: newSpeed / 100 });
-    } else {
-        scheduler.filters.setTimescale({ speed: newSpeed / 100 });
-    }
+    scheduler.filters.setTimescale({ speed: newSpeed / 100 });
 
     await interaction.reply({ content: `Set speed to **${newSpeed}%**` });
 }

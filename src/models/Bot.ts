@@ -1,12 +1,4 @@
-import {
-    ActivityType,
-    Client,
-    Collection,
-    GatewayDispatchEvents,
-    GatewayIdentifyProperties,
-    GatewayIntentBits,
-    Snowflake,
-} from 'discord.js';
+import { ActivityType, Client, Collection, GatewayIdentifyProperties, GatewayIntentBits, Snowflake } from 'discord.js';
 import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Manager, Payload } from 'magmastream';

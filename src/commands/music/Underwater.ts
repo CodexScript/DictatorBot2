@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
-import { addSocialCredit } from '../../util/SocialCreditManager.js';
-import { getSchedulerAfterChecks, isInteractionGood } from '../../util/music.js';
+import { ChatInputCommandInteraction } from 'discord.js';
+import { getSchedulerAfterChecks } from '../../util/music.js';
 
 let state = false;
 
