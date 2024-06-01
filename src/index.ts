@@ -51,7 +51,7 @@ import { createServer } from './server/APIServer.js';
         const command = client.commands.get(interaction.commandName);
 
         if (!command) {
-            console.log(`Command not found: ${interaction.commandName}`);
+            console.warn(`Command not found: ${interaction.commandName}`);
             return;
         }
 
@@ -72,5 +72,6 @@ import { createServer } from './server/APIServer.js';
         // }
     });
 
-    await Promise.all([client.login(client.config.botToken), createServer(client)]);
+    //await Promise.all([client.login(client.config.botToken), createServer(client)]);
+    await client.login(client.config.botToken);
 })();

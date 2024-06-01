@@ -53,7 +53,6 @@ export const execute = async (msg: Message) => {
     if (!url) {
         url = extractAppleMusicURL(msg.content);
         if (!url) {
-            console.log('No match');
             return;
         }
     }
