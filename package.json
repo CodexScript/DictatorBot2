@@ -13,6 +13,7 @@
     "dependencies": {
         "@discordjs/builders": "^1.8.1",
         "@discordjs/rest": "^2.3.0",
+        "@discordjs/ws": "^1.1.0",
         "@napi-rs/canvas": "^0.1.52",
         "axios": "^1.7.2",
         "better-sqlite3": "^10.0.0",

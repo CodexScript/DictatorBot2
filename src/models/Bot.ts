@@ -1,4 +1,4 @@
-import { ActivityType, Client, Collection, GatewayIdentifyProperties, GatewayIntentBits, Snowflake } from 'discord.js';
+import { ActivityType, Client, Collection, GatewayIntentBits, Snowflake } from 'discord.js';
 import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Manager, Payload } from 'magmastream';
@@ -7,6 +7,7 @@ import { Config } from './config/Config.js';
 import { SlashCommand } from './SlashCommand.js';
 import { OpenAI } from 'openai';
 import { getCurrentPfp, setPfp } from '../util/settings/GlobalSettingsManager.js';
+import { DefaultWebSocketManagerOptions } from 'discord.js';
 
 function isDaylightSavingsReady(): boolean {
     // Get current date
@@ -159,6 +160,7 @@ export default class Bot extends Client {
     readonly Bot: Bot = this;
 
     constructor() {
+        (DefaultWebSocketManagerOptions.identifyProperties as any).browser = 'Discord iOS';
         super({
             intents: [
                 GatewayIntentBits.Guilds,
@@ -169,13 +171,6 @@ export default class Bot extends Client {
                 GatewayIntentBits.GuildMessageReactions,
                 GatewayIntentBits.MessageContent,
             ],
-            ws: {
-                identifyProperties: {
-                    browser: 'Discord iOS',
-                    device: 'iPhone',
-                    os: 'iOS',
-                },
-            },
         });
 
         this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
@@ -247,9 +242,5 @@ declare module 'discord.js' {
         readonly imgur: ImgurClient;
         readonly openai: OpenAI | null;
         readonly Bot: Bot;
-    }
-
-    interface WebSocketOptions {
-        identifyProperties: GatewayIdentifyProperties;
     }
 }
