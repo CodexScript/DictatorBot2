@@ -12,6 +12,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     }
 
     await scheduler.filters.clearFilters();
+    scheduler.filters.setTimescale({ pitch: 1, speed: 1 });
 
     await interaction.reply({ content: 'Filters reset.' });
 }
