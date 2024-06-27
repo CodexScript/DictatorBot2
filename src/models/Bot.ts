@@ -242,5 +242,6 @@ declare module 'discord.js' {
         readonly imgur: ImgurClient;
         readonly openai: OpenAI | null;
         readonly Bot: Bot;
+        readonly commands: Collection<Snowflake, [string, SlashCommand]>
     }
 }

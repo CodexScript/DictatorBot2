@@ -99,6 +99,8 @@ export async function registerEvents(client: Bot, dir: string): Promise<void> {
     const files = await getFilesRecursively(dir);
     const events = files.filter((file) => file.endsWith('.js'));
 
+    client.setMaxListeners(Infinity);
+
     for (const file of events) {
         const event = await import(`file:///${file}`);
         console.log(`Registering event: ${event.name}`);
