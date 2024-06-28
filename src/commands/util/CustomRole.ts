@@ -76,7 +76,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
     const guildId = interaction.guildId;
 
-    if (guildId === null) {
+    if (!interaction.guild || guildId === null) {
         await interaction.reply({content: "You can't use that command here.", ephemeral: true});
         return;
     }
@@ -118,6 +118,10 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         let replyString = 'Custom roles for this server:\n```\n';
         for (let role of Object.keys(data[guildId])) {
             replyString += `${role}\n`;
+            for (let user of data[guildId][role]) {
+                const guildMember = await interaction.guild.members.fetch(user.id);
+                replyString += `\t${guildMember.displayName}\n`;
+            }
         }
         replyString += '```';
         await interaction.reply({content: replyString, ephemeral: true});
