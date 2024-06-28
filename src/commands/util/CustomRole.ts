@@ -115,7 +115,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             return;
         }
 
-        await interaction.deferReply();
+        await interaction.deferReply({ephemeral: true});
 
         let replyString = 'Custom roles for this server:\n```\n';
         for (let role of Object.keys(data[guildId])) {
