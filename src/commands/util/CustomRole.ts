@@ -110,21 +110,23 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     } else if (interaction.options.getSubcommand() === 'list') {
         const data = await readJSON(true);
 
-        if (!Object.hasOwn(data, guildId) || data[guildId].length === 0) {
+        if (!Object.hasOwn(data, guildId) || Object.keys(data[guildId]).length === 0) {
             await interaction.reply({content: 'There are no roles currently defined for this server.', ephemeral: true});
             return;
         }
+
+        await interaction.deferReply();
 
         let replyString = 'Custom roles for this server:\n```\n';
         for (let role of Object.keys(data[guildId])) {
             replyString += `${role}\n`;
             for (let user of data[guildId][role]) {
-                const guildMember = await interaction.guild.members.fetch(user.id);
+                const guildMember = await interaction.guild.members.fetch(user);
                 replyString += `\t${guildMember.displayName}\n`;
             }
         }
         replyString += '```';
-        await interaction.reply({content: replyString, ephemeral: true});
+        await interaction.followUp({content: replyString, ephemeral: true});
     } else if (interaction.options.getSubcommand() === 'add') {
         const user = interaction.options.getUser('user');
         if (user === null) {
@@ -181,7 +183,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             return;
         }
 
-        if (data[guildId][role].length === 0) {
+        if (Object.keys(data[guildId][role]).length === 0) {
             await interaction.reply({content: 'There are no users in that role.', ephemeral: true});
             return;
         }
