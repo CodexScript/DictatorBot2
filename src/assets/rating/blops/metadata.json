@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Kino Der Toten",
+    "files": [
+      "kino/1.jpg",
+      "kino/2.jpg",
+      "kino/3.jpg"
+    ],
+    "baseRating": 8.8
+  },
+  {
+    "name": "Mob of the Dead",
+    "files": [
+      "mob/1.jpg",
+      "mob/2.jpg",
+      "mob/3.jpg`"
+    ],
+    "baseRating": 7.0
+  },
+  {
+    "name": "Call of the Dead",
+    "files": [
+      "cotd/1.jpg",
+      "cotd/2.jpg",
+      "cotd/3.jpg"
+    ],
+    "baseRating": 8.2
+  },
+  {
+    "name": "Origins",
+    "files": [
+      "origins/1.jpg",
+      "origins/2.jpg",
+      "origins/3.jpg"
+    ],
+    "baseRating": 6.1
+  },
+  {
+    "name": "Five",
+    "files": [
+      "five/1.jpg",
+      "five/2.jpg",
+      "five/3.jpg"
+    ],
+    "baseRating": 6.8
+  },
+  {
+    "name": "Der Eisendrache",
+    "files": [
+      "de/1.jpg",
+      "de/2.jpg",
+      "de/3.jpg"
+    ],
+    "baseRating": 9.0
+  },
+  {
+    "name": "Moon",
+    "files": [
+      "moon/1.jpg",
+      "moon/2.jpg",
+      "moon/3.jpg"
+    ],
+    "baseRating": 7.4
+  },
+  {
+    "name": "Der Riese / The Giant",
+    "files": [
+      "derriese/1.jpg",
+      "derriese/2.jpg",
+      "derriese/3.jpg"
+    ],
+    "baseRating": 8.0
+  }
+]

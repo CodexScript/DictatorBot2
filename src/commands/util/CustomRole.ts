@@ -188,7 +188,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             return;
         }
 
-        let mentionString = '';
+        let mentionString = role + ': ';
         for (let userId of Object.values(data[guildId][role])) {
             mentionString += `<@${userId}> `;
         }

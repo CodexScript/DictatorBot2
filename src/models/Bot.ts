@@ -1,4 +1,4 @@
-import { ActivityType, Client, Collection, GatewayIntentBits, Snowflake } from 'discord.js';
+import { ActivityType, Client, Collection, GatewayIntentBits, Snowflake, TextBasedChannel } from 'discord.js';
 import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Manager, Payload } from 'magmastream';
@@ -218,10 +218,18 @@ export default class Bot extends Client {
 
         this.music.on('trackError', async (eventPlayer, track, payload) => {
             console.warn('TRACK ERROR!: ' + JSON.stringify(payload));
+            if (!eventPlayer.textChannel) return;
+
+            const trackChannel = await this.channels.fetch(eventPlayer.textChannel);
+            if (!trackChannel) return;
+
+            if (!trackChannel.isTextBased) return;
+
+            await (trackChannel as TextBasedChannel).send({content: "Error playing the track! The cause of this is unknown, but can usually be fixed by finding a different video."});
         });
 
         this.music.on('trackStuck', async (eventPlayer, track, payload) => {
-            console.warn('TRACK STUCK!: ' + payload);
+            console.warn('TRACK STUCK!: ' + JSON.stringify(payload));
         });
 
         if (process.env.OPENAI_API_KEY == undefined) {

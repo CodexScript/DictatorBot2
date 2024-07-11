@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ChatInputCommandInteraction, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember, VoiceChannel } from 'discord.js';
 import { isInteractionGood } from '../../util/music.js';
 import { SearchResult } from 'magmastream';
 
@@ -87,7 +87,6 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     player.queue.add(res.tracks[0]);
 
     if (!player.playing && !player.paused && !player.queue.length) {
-        console.log('Now we play');
         await player.play();
     }
 
