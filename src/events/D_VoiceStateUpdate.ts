@@ -19,9 +19,6 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
     }
 
     if (joinDate && (newState.selfDeaf || !newState.channel || newState.guild.id !== oldState.guild.id)) {
-        let diff = Date.now() - joinDate;
-        joinDate = null;
-        
         const owner = await newState.client.users.fetch(newState.client.config.ownerID);
 
         if (!owner) return;
@@ -30,7 +27,8 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
 
         if (!dm) return;
 
-        await dm.send({ content: `Dylan just left, he joined **${timeAgo.format(diff)}** `});        
+        await dm.send({ content: `Dylan just left, he joined **${timeAgo.format(joinDate)}**`});
+        joinDate = null;
     }
     
 };
