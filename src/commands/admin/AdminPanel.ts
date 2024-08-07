@@ -272,8 +272,8 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .setColor(0xF5BB12)
                 .setTitle('Dylan Deafen Time')
                 .addFields(
-                    { name: 'Time spent deafened', value: msToReadable(data.totalDeafenTime), inline: true },
-                    { name: 'Total time', value: msToReadable(data.totalTime), inline: true },
+                    { name: 'Time spent deafened', value: data.totalDeafenTime > 0 ? msToReadable(data.totalDeafenTime) : '0', inline: true },
+                    { name: 'Total time', value: data.totalTime > 0 ? msToReadable(data.totalTime) : '0', inline: true },
                 )
                 .setTimestamp()
 
