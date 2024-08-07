@@ -25,19 +25,7 @@ async function writeJSON(client: Bot) {
         }
 
         console.warn("Error writing deafen times to file: " + err);
-        const owner = await client.users.fetch(client.config.ownerID);
-
-        if (!owner) {
-            return;
-        }
-
-        const dm = await owner.createDM();
-
-        if (!dm) {
-            return;
-        }
-
-        await dm.send({ content: 'Error writing deafen times to file:\n```\n' + err + '\n```'});
+        await messageOwner(client, { content: 'Error writing deafen times to file:\n```\n' + err + '\n```'});
     });
 }
 
