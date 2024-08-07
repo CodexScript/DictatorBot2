@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Bot, { setProfilePicture, setStatus } from './models/Bot.js';
 import { registerCommands, registerEvents } from './util/CommandUtils.js';
-import { createServer } from './server/APIServer.js';
 
 (async () => {
     const client = new Bot();
