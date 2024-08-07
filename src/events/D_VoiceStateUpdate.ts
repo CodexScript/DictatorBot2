@@ -4,6 +4,8 @@ import en from 'javascript-time-ago/locale/en';
 import fs from 'node:fs';
 import DeafenTimes from '../models/DeafenTimes.js';
 import Bot from '../models/Bot.js';
+import { messageOwner } from '../util/AdminUtils.js';
+import { readJSONSync } from '../util/DeafenUtil.js';
 
 let joinDate: number | null = null;
 let deafTime: number | null = null;
@@ -11,19 +13,7 @@ TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo('en-US');
 const DYLAN = "236982767080964097";
 
-let json: DeafenTimes | null = null;
-
-if (fs.existsSync('./assets/dylan.json')) {
-    const data = fs.readFileSync('./assets/dylan.json', 'utf8');
-    json = JSON.parse(data) as DeafenTimes;
-} else {
-    json = {
-        "totalDeafenTime": 0,
-        "totalTime": 0
-    };
-
-    fs.writeFileSync('./assets/dylan.json', JSON.stringify(json, null, 2), 'utf8');
-}
+let json = readJSONSync();
 
 async function writeJSON(client: Bot) {
     if (!json) {
@@ -74,28 +64,19 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
         deafTime = Date.now();
     }
 
-    if (joinDate && (newState.selfDeaf || !newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id))) {
-        const diff = Date.now() - joinDate;
+    if (newState.selfDeaf || !newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id)) {
+        if (!joinDate) {
+            console.warn("Left with no join date");
+            await messageOwner(newState.client, {content: "Left with no join date"});
+            return;
+        }
+        const diff = Date.now() - joinDate!;
         json.totalTime += diff;
+        
         await writeJSON(newState.client);
+        await messageOwner(newState.client, { content: `Dylan just left, he joined **${timeAgo.format(joinDate)}**`});
         
-        const owner = await newState.client.users.fetch(newState.client.config.ownerID);
-
-
-        if (!owner) {
-            joinDate = null;
-            return;
-        }
-
-        const dm = await owner.createDM();
-
-        if (!dm) {
-            joinDate = null;
-            return;
-        }
-
-        await dm.send({ content: `Dylan just left, he joined **${timeAgo.format(joinDate)}**`});
-        
+        joinDate = null;
     }
     
 };

@@ -9,10 +9,12 @@ import {
     ButtonStyle,
     ChatInputCommandInteraction,
     ComponentType,
+    EmbedBuilder,
     GuildMember,
     TextChannel,
     TextInputStyle,
 } from 'discord.js';
+import { readJSON, msToReadable } from '../../util/DeafenUtil.js';
 
 export const data = new SlashCommandBuilder().setName('admin').setDescription('For admin functionality.');
 
@@ -67,8 +69,12 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         .setCustomId('unban_guild_from_music')
         .setLabel('✅ Pardon Guild from 🎵Music')
         .setStyle(ButtonStyle.Success);
+    const dylan_time = new ButtonBuilder()
+        .setCustomId('dylan_time')
+        .setLabel('☕ Dylan Time')
+        .setStyle(ButtonStyle.Primary)
 
-    const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(kick_voice, delete_message, change_nick);
+    const mainMenu = new ActionRowBuilder<ButtonBuilder>().addComponents(kick_voice, delete_message, change_nick, dylan_time);
 
     const mainMenu2 = new ActionRowBuilder<ButtonBuilder>().addComponents(ban_gpt, pardon_gpt);
 
@@ -260,6 +266,20 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addComponents(row);
 
             await buttonInteraction.showModal(modal);
+        } else if (buttonInteraction.customId === 'dylan_time') {
+            const data = await readJSON();
+            const embed = new EmbedBuilder()
+                .setColor(0xF5BB12)
+                .setTitle('Dylan Deafen Time')
+                .addFields(
+                    { name: 'Time spent deafened', value: msToReadable(data.totalDeafenTime), inline: true },
+                    { name: 'Total time', value: msToReadable(data.totalTime), inline: true },
+                    { name: 'Percentage of time deafened', value: Math.floor((data.totalDeafenTime / data.totalTime) * 100) + '%', inline: true }
+                )
+                .setTimestamp()
+
+            await buttonInteraction.update({ embeds: [embed], content: null });
+            await message.edit({ content: null, components: [] });
         }
     });
 }
