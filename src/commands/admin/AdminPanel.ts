@@ -274,9 +274,18 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addFields(
                     { name: 'Time spent deafened', value: msToReadable(data.totalDeafenTime), inline: true },
                     { name: 'Total time', value: msToReadable(data.totalTime), inline: true },
-                    { name: 'Percentage of time deafened', value: Math.floor((data.totalDeafenTime / data.totalTime) * 100) + '%', inline: true }
                 )
                 .setTimestamp()
+
+            if (data.totalTime > 0) {
+                embed.addFields(
+                    { name: 'Percentage of time deafened', value: Math.floor((data.totalDeafenTime / data.totalTime) * 100) + '%', inline: true }
+                )
+            } else {
+                embed.addFields(
+                    { name: 'Percentage of time deafened', value: 'N/A', inline: true }
+                )
+            }
 
             await buttonInteraction.update({ embeds: [embed], content: null });
             await message.edit({ content: null, components: [] });
