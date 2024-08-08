@@ -2,7 +2,6 @@ import { Events, VoiceState } from 'discord.js';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import fs from 'node:fs';
-import DeafenTimes from '../models/DeafenTimes.js';
 import Bot from '../models/Bot.js';
 import { messageOwner } from '../util/AdminUtils.js';
 import { readJSONSync } from '../util/DeafenUtil.js';
@@ -48,11 +47,14 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
         joinDate = Date.now();
     }
 
-    if (newState.channel && newState.guild.id === oldState.guild.id && oldState.selfDeaf === false && newState.selfDeaf) {
+    if (newState.channel && newState.guild.id === oldState.guild.id && oldState.selfDeaf === false && newState.selfDeaf && newState.channel) {
         deafTime = Date.now();
+        if (joinDate) {
+            await messageOwner(newState.client, { content: `Dylan just deafened, he joined **${timeAgo.format(joinDate)}**`});
+        }
     }
 
-    if (newState.selfDeaf || !newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id)) {
+    if (!newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id) || newState.member.presence?.status === 'idle') {
         if (!joinDate) {
             console.warn("Left with no join date");
             await messageOwner(newState.client, {content: "Left with no join date"});
