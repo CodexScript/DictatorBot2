@@ -16,15 +16,17 @@ let json = readJSONSync();
 
 async function writeJSON(client: Bot) {
     if (!json) {
+        await messageOwner(client, { content: 'Error writing deafen times to file: JSON object does not exist.' });
         return;
     }
-    await fs.writeFile('./assets/dylan.json', JSON.stringify(json, null, 2), 'utf8', async (err) => {
+
+    fs.writeFile('./assets/dylan.json', JSON.stringify(json, null, 2), 'utf8', async (err) => {
         if (!err) {
             return;
         }
 
         console.warn("Error writing deafen times to file: " + err);
-        await messageOwner(client, { content: 'Error writing deafen times to file:\n```\n' + err + '\n```'});
+        await messageOwner(client, { content: 'Error writing deafen times to file:\n```\n' + err + '\n```' });
     });
 }
 
@@ -47,13 +49,16 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
         joinDate = Date.now();
     }
 
-    if (newState.channel && newState.guild.id === oldState.guild.id && oldState.selfDeaf === false && newState.selfDeaf && newState.channel) {
+    // Deafened or muted
+    // Must be in a channel and in the same guild as old state
+    if (newState.channel && newState.guild.id === oldState.guild.id && (oldState.selfDeaf === false && oldState.selfMute === false) && (newState.selfDeaf || newState.selfMute)) {
         if (!joinDate) return;
         deafTime = Date.now();
         await messageOwner(newState.client, { content: `Dylan just deafened, he joined **${timeAgo.format(joinDate)}**`});
         
     }
 
+    // No longer exists in any channel, or left to a different server, or went idle
     if (!newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id) || newState.member.presence?.status === 'idle') {
         if (!joinDate) {
             console.warn("Left with no join date");
