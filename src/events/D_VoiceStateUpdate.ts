@@ -48,10 +48,10 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
     }
 
     if (newState.channel && newState.guild.id === oldState.guild.id && oldState.selfDeaf === false && newState.selfDeaf && newState.channel) {
+        if (!joinDate) return;
         deafTime = Date.now();
-        if (joinDate) {
-            await messageOwner(newState.client, { content: `Dylan just deafened, he joined **${timeAgo.format(joinDate)}**`});
-        }
+        await messageOwner(newState.client, { content: `Dylan just deafened, he joined **${timeAgo.format(joinDate)}**`});
+        
     }
 
     if (!newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id) || newState.member.presence?.status === 'idle') {
@@ -62,6 +62,12 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
         }
         const diff = Date.now() - joinDate!;
         json.totalTime += diff;
+        
+        if (deafTime) {
+            const deafDiff = Date.now() - deafTime;
+            deafTime = null;
+            json.totalDeafenTime += deafDiff;
+        }
         
         await writeJSON(newState.client);
         await messageOwner(newState.client, { content: `Dylan just left, he joined **${timeAgo.format(joinDate)}**`});
