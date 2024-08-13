@@ -37,7 +37,7 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
         return;
     }
 
-    if (deafTime && newState.selfDeaf === false) {
+    if (deafTime && newState.selfDeaf === false && newState.selfMute === false) {
         const diff = Date.now() - deafTime;
         deafTime = null;
         json.totalDeafenTime += diff;
