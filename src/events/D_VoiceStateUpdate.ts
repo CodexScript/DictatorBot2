@@ -12,7 +12,7 @@ TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo('en-US');
 const DYLAN = "236982767080964097";
 
-let json = readJSONSync();
+export let json = readJSONSync();
 
 async function writeJSON(client: Bot) {
     if (!json) {

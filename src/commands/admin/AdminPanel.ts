@@ -14,7 +14,8 @@ import {
     TextChannel,
     TextInputStyle,
 } from 'discord.js';
-import { readJSON, msToReadable } from '../../util/DeafenUtil.js';
+import { msToReadable } from '../../util/DeafenUtil.js';
+import { json as deafenData } from '../../events/D_VoiceStateUpdate.js';
 
 export const data = new SlashCommandBuilder().setName('admin').setDescription('For admin functionality.');
 
@@ -267,19 +268,18 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
             await buttonInteraction.showModal(modal);
         } else if (buttonInteraction.customId === 'dylan_time') {
-            const data = await readJSON();
             const embed = new EmbedBuilder()
                 .setColor(0xF5BB12)
                 .setTitle('Dylan Deafen Time')
                 .addFields(
-                    { name: 'Time spent deafened', value: data.totalDeafenTime > 0 ? msToReadable(data.totalDeafenTime) : '0', inline: true },
-                    { name: 'Total time', value: data.totalTime > 0 ? msToReadable(data.totalTime) : '0', inline: true },
+                    { name: 'Time spent deafened', value: deafenData.totalDeafenTime > 0 ? msToReadable(deafenData.totalDeafenTime) : '0', inline: true },
+                    { name: 'Total time', value: deafenData.totalTime > 0 ? msToReadable(deafenData.totalTime) : '0', inline: true },
                 )
                 .setTimestamp()
 
-            if (data.totalTime > 0) {
+            if (deafenData.totalTime > 0) {
                 embed.addFields(
-                    { name: 'Percentage of time deafened', value: Math.floor((data.totalDeafenTime / data.totalTime) * 100) + '%', inline: true }
+                    { name: 'Percentage of time deafened', value: Math.floor((deafenData.totalDeafenTime / deafenData.totalTime) * 100) + '%', inline: true }
                 )
             } else {
                 embed.addFields(
