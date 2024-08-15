@@ -120,7 +120,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
         let stattrak = false;
 
-        if (!Object.hasOwn('stattrak')) {
+        if (!Object.hasOwn(skin, 'stattrak')) {
             await messageOwner(interaction.client, { content: "No StatTrak for skin\n```" +  skin + "\n``` "});
         } else {
             if (skin['stattrak']) {
