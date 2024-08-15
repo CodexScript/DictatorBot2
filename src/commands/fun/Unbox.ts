@@ -168,7 +168,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const color = getRarityHex(skin['rarity']);
             let finalName = skin['name'];
             if (stattrak) {
-                finalName = "StatTrak\u000AE " + finalName;
+                finalName = "StatTrak\u00AE " + finalName;
             }
 
             let profitString;
