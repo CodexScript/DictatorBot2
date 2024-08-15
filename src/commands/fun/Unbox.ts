@@ -1,6 +1,7 @@
 import { EmbedBuilder, SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
 import fs from 'node:fs';
+import { messageOwner } from '../../util/AdminUtils.js';
 
 const casesFile = fs.readFileSync('./assets/skins.json', 'utf-8');
 const cases = JSON.parse(casesFile);
@@ -111,6 +112,11 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         }
 
         const skin = possibleSkins[Math.floor(Math.random() * possibleSkins.length)];
+
+        if (!skin) {
+            await messageOwner(interaction.client, { content: "Skin is undefined for case " + csCase });
+            continue;
+        }
 
         let stattrak = false;
 
