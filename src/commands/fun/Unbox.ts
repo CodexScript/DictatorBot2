@@ -5,7 +5,11 @@ import fs from 'node:fs';
 const casesFile = fs.readFileSync('./assets/skins.json', 'utf-8');
 const cases = JSON.parse(casesFile);
 
-function getWear(floatValue: number) {
+function getWear(floatValue: number | null) {
+    if (!floatValue) {
+        return "Vanilla";
+    }
+
     if (floatValue >= 0 && floatValue <= 1) {
         if (floatValue >= 0.00 && floatValue <= 0.07) {
             return "Factory New";
@@ -116,8 +120,15 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 stattrak = true;
             }
         }
+
+        let skinFloat;
+
+        if (skin['maxWear'] === null || skin['minWear'] === null) {
+            skinFloat = "N/A";
+        } else {
+            skinFloat = (Math.random() * (skin['maxWear'] - skin['minWear']) + skin['minWear']).toFixed(6);
+        }
         
-        const skinFloat = Math.random() * (skin['maxWear'] - skin['minWear']) + skin['minWear'];
         const wearStr = getWear(skinFloat);
 
         if (!wearStr) {
@@ -132,7 +143,13 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             skinPrice = skin['pricing'][wearStr];
         }
 
-        gained += skinPrice;
+        if (skinPrice === null) {
+            skinPrice = "No recent price data";
+        } else {
+            gained += skinPrice;
+        }
+
+        
 
         if (gold) {
             const spentCases = rolls * cases[csCase]['price'];
@@ -158,7 +175,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addFields(
                     { name: "Exterior", value: wearStr },
                     { name: "Price", value: '$' + skinPrice },
-                    { name: "Float", value: skinFloat.toFixed(6) },
+                    { name: "Float", value: skinFloat },
                     { name: "Total rolls", value: rolls.toString() },
                     { name: "Blues", value: blues.toString(), inline: true },
                     { name: "Purples", value: purples.toString(), inline: true },

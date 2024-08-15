@@ -225,7 +225,7 @@ export default class Bot extends Client {
 
             if (!trackChannel.isTextBased) return;
 
-            await (trackChannel as TextBasedChannel).send({content: "Error playing the track! The cause of this is unknown, but can usually be fixed by finding a different video."});
+            await (trackChannel as TextBasedChannel).send({content: `Error playing the track! <@${this.config.ownerID}>`});
         });
 
         this.music.on('trackStuck', async (eventPlayer, track, payload) => {
