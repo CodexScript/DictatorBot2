@@ -6,8 +6,8 @@ import { messageOwner } from '../../util/AdminUtils.js';
 const casesFile = fs.readFileSync('./assets/skins.json', 'utf-8');
 const cases = JSON.parse(casesFile);
 
-function getWear(floatValue: number | null) {
-    if (!floatValue) {
+function getWear(floatValue: any) {
+    if (!floatValue || floatValue === "N/A") {
         return "Vanilla";
     }
 
@@ -107,7 +107,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             purples++;
         } else {
             // Blue
-            possibleSkins = cases[csCase]['blue'];
+            possibleSkins = cases[csCase]['blue'].concat(cases[csCase]['light blue']);
             blues++;
         }
 
@@ -142,6 +142,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         const wearStr = getWear(skinFloat);
 
         if (!wearStr) {
+            await messageOwner(interaction.client, { content: "Skin " +  skin['name'] + " has no wear string for float " + skinFloat});
             return;
         }
 
@@ -167,7 +168,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const color = getRarityHex(skin['rarity']);
             let finalName = skin['name'];
             if (stattrak) {
-                finalName = "StatTrak " + finalName;
+                finalName = "StatTrak\u000AE " + finalName;
             }
 
             let profitString;
