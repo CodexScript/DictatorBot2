@@ -120,10 +120,14 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
         let stattrak = false;
 
-        if (skin['stattrak']) {
-            const statRng = Math.random();
-            if (statRng <= 0.1) {
-                stattrak = true;
+        if (!Object.hasOwn('stattrak')) {
+            await messageOwner(interaction.client, { content: "No StatTrak for skin\n```" +  skin + "\n``` "});
+        } else {
+            if (skin['stattrak']) {
+                const statRng = Math.random();
+                if (statRng <= 0.1) {
+                    stattrak = true;
+                }
             }
         }
 
