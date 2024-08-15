@@ -45,6 +45,9 @@ const possibleCases = Object.keys(cases);
 
 for (const csCase of possibleCases) {
     choices.push({ name: csCase, value: csCase });
+    if (choices.length == 25) {
+        break;
+    }
 }
 
 export const data = new SlashCommandBuilder()
@@ -143,9 +146,9 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             let profitString;
 
             if (gained - spentCases - spentKeys > 0) {
-                profitString = '$' + (gained - spentCases - spentKeys);
+                profitString = '$' + (gained - spentCases - spentKeys).toFixed(2);
             } else {
-                profitString = '-$' + ((gained - spentCases - spentKeys) * -1);
+                profitString = '-$' + ((gained - spentCases - spentKeys) * -1).toFixed(2);
             }
 
             const embed = new EmbedBuilder()
@@ -155,15 +158,15 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addFields(
                     { name: "Exterior", value: wearStr },
                     { name: "Price", value: '$' + skinPrice },
-                    { name: "Float", value: skinFloat },
+                    { name: "Float", value: skinFloat.toFixed(6) },
                     { name: "Total rolls", value: rolls.toString() },
                     { name: "Blues", value: blues.toString(), inline: true },
                     { name: "Purples", value: purples.toString(), inline: true },
                     { name: "Pinks", value: pinks.toString(), inline: true },
                     { name: "Reds", value: reds.toString(), inline: true },
-                    { name: "Total spent on keys", value: '$' + spentKeys, inline: true },
-                    { name: "Total spent on cases", value: '$' + spentCases, inline: true },
-                    { name: "Total spent", value: '$' + (spentCases + spentKeys), inline: true },
+                    { name: "Total spent on keys", value: '$' + spentKeys.toFixed(2), inline: true },
+                    { name: "Total spent on cases", value: '$' + spentCases.toFixed(2), inline: true },
+                    { name: "Total spent", value: '$' + (spentCases + spentKeys).toFixed(2), inline: true },
                     { name: "Profit", value: profitString, inline: true }
                 )
 
