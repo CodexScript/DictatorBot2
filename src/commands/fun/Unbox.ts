@@ -185,16 +185,16 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
         const rng = Math.random();
 
-        if (rng >= 0.9974){
+        if (rng >= 0.9974) {
             // Gold
             rolledRarity = 'gold';
         } else if (rng >= 0.9936) {
             // Red
             rolledRarity = 'red';
-        } else if (rng >= 0.968) {
+        } else if (rng >= 0.9616) {
             // Pink
             rolledRarity = 'pink';
-        } else if (rng >= 0.8402) {
+        } else if (rng >= 0.8018) {
             // Purple
             rolledRarity = 'purple';
         } else {
