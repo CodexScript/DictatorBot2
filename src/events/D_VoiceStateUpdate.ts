@@ -48,7 +48,7 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
 
     // No longer exists in any channel, or left to a different server, or went idle
     if (!newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id) || newState.member.presence?.status === 'idle') {
-        if (!Object.hasOwn(deafenMap, newState.member.id) || !Object.hasOwn(deafenMap[newState.member.id], 'joinDate') || deafenMap[newState.member.id]['joinDate'] === null) {
+        if (!Object.hasOwn(deafenMap, oldState.member.id) || !Object.hasOwn(deafenMap[oldState.member.id], 'joinDate') || deafenMap[oldState.member.id]['joinDate'] === null) {
             console.warn("Left with no join date");
             await messageOwner(newState.client, {content: "Left with no join date " + newState.member.id});
             return;
@@ -62,8 +62,7 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
             await addDeafenTime(oldState.client.sql, oldState.member.id, deafDiff);
         }
         
-        
-        deafenMap[oldState.member.id]['joinDate'] = null;
+        delete deafenMap[oldState.member.id];
     }
     
 };
