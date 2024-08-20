@@ -3,7 +3,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Bot, { setProfilePicture, setStatus } from './models/Bot.js';
 import { registerCommands, registerEvents } from './util/CommandUtils.js';
-import { createBalancesTable } from './util/DatabaseUtil.js';
+import { createBalancesTable } from './util/BalanceUtil.js';
+import { createDeafenTable } from './util/DeafenUtil.js';
 
 (async () => {
     const client = new Bot();
@@ -18,6 +19,7 @@ import { createBalancesTable } from './util/DatabaseUtil.js';
 
     client.once('ready', async () => {
         await createBalancesTable(client.sql);
+        await createDeafenTable(client.sql);
         const filename = fileURLToPath(import.meta.url);
         await registerCommands(
             client,

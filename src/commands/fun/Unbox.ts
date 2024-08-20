@@ -3,7 +3,7 @@ import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder } from 'disc
 import fs from 'node:fs';
 import { messageOwner } from '../../util/AdminUtils.js';
 import { ScrapedSkin, CounterStrikeSkin } from '../../models/CounterStrikeSkin.js';
-import { addBalance, formatCurrency } from '../../util/DatabaseUtil.js';
+import { addBalance, formatCurrency } from '../../util/BalanceUtil.js';
 
 const casesFile = fs.readFileSync('./assets/skins.json', 'utf-8');
 const cases = JSON.parse(casesFile);

@@ -1,52 +1,54 @@
-import fs from 'node:fs';
-import fspromises from 'node:fs/promises';
-
-import DeafenTimes from '../models/DeafenTimes.js';
-
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
+import postgres from 'postgres';
 dayjs.extend(duration);
 
-export function readJSONSync() {
-    let json;
-    if (fs.existsSync('./assets/dylan.json')) {
-        const data = fs.readFileSync('./assets/dylan.json', 'utf8');
-        json = JSON.parse(data) as DeafenTimes;
-    } else {
-        json = {
-            "totalDeafenTime": 0,
-            "totalTime": 0
-        };
-    
-        fs.writeFileSync('./assets/dylan.json', JSON.stringify(json, null, 2), 'utf8');
-    }
-
-    return json;
+interface TimeData {
+    time_total: number,
+    time_deafen: number
 }
 
-export async function readJSON() {
-    try {
-        const fd = await fspromises.open('./assets/dylan.json', 'r');
-        const content = await fd.readFile('utf8');
-        await fd.close();
-        return JSON.parse(content) as DeafenTimes;
-    } catch (err: any) {
-        if (err.code === 'ENOENT') {
-            const json = {
-                "totalDeafenTime": 0,
-                "totalTime": 0
-            };
+export async function createDeafenTable(sql: postgres.Sql<{}>) {
+    await sql`
+        CREATE TABLE IF NOT EXISTS deafen_table (
+            id BIGINT PRIMARY KEY,
+            time_total INTEGER NOT NULL DEFAULT 0,
+            time_deafen INTEGER NOT NULL DEFAULT 0
+        );
+    `
+}
 
-            const fd = await fspromises.open('./assets/dylan.json', 'w');
-        
-            await fd.writeFile(JSON.stringify(json, null, 2), 'utf8');
-            await fd.close();
+export async function addTotalTime(sql: postgres.Sql<{}>, id: string, time: number) {
+    const result = await sql`
+        INSERT INTO deafen_table (id, time_total, time_deafen)
+        VALUES (${id}, ${time}, 0)
+        ON CONFLICT (id) DO UPDATE
+        SET time_total = deafen_table.time_total + EXCLUDED.time_total
+        RETURNING time_total;
+    `
+}
 
-            return json as DeafenTimes;
-        } else {
-            throw err;
-        }
+export async function addDeafenTime(sql: postgres.Sql<{}>, id: string, time: number) {
+    const result = await sql`
+        INSERT INTO deafen_table (id, time_total, time_deafen)
+        VALUES (${id}, 0, ${time})
+        ON CONFLICT (id) DO UPDATE
+        SET time_deafen = deafen_table.time_deafen + EXCLUDED.time_deafen
+        RETURNING time_deafen;
+    `
+}
+
+export async function getTimeData(sql: postgres.Sql<{}>) {
+    const result = await sql`
+        SELECT *
+        FROM deafen_table;
+    `
+
+    if (result.length === 0) {
+        return null;
     }
+
+    return result
 }
 
 export function msToReadable(ms: number) {

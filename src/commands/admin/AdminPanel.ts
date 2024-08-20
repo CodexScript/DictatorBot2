@@ -14,8 +14,9 @@ import {
     TextChannel,
     TextInputStyle,
 } from 'discord.js';
-import { msToReadable } from '../../util/DeafenUtil.js';
-import { json as deafenData } from '../../events/D_VoiceStateUpdate.js';
+import { getTimeData, msToReadable } from '../../util/DeafenUtil.js';
+
+const DYLAN = "236982767080964097";
 
 export const data = new SlashCommandBuilder().setName('admin').setDescription('For admin functionality.');
 
@@ -268,18 +269,51 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
 
             await buttonInteraction.showModal(modal);
         } else if (buttonInteraction.customId === 'dylan_time') {
+            const timeData = await getTimeData(interaction.client.sql);
+
+            if (timeData === null) {
+                await buttonInteraction.update({ embeds: [], components: [], content: 'No data recorded yet.' });
+                return;
+            }
+
+            let dylanTimeDeafen;
+            let dylanTimeTotal;
+
+            let avgTimeDeafen = 0;
+            let avgTimeTotal = 0;
+
+            let dylanExists = false;
+
+            for (let user of timeData) {
+                if(user.id === DYLAN) {
+                    dylanTimeDeafen = user.time_deafen;
+                    dylanTimeTotal = user.time_total;
+                    dylanExists = true;
+                } else {
+                    avgTimeDeafen += user.time_deafen;
+                    avgTimeTotal += user.time_total;
+                }
+            }
+
+
+            // Subtract 1 from length to account for Dylan
+            avgTimeDeafen /= timeData.length - (dylanExists ? 1 : 0);
+            avgTimeTotal /= timeData.length - (dylanExists ? 1 : 0);
+
             const embed = new EmbedBuilder()
                 .setColor(0xF5BB12)
                 .setTitle('Dylan Deafen Time')
                 .addFields(
-                    { name: 'Time spent deafened', value: deafenData.totalDeafenTime > 0 ? msToReadable(deafenData.totalDeafenTime) : '0', inline: true },
-                    { name: 'Total time', value: deafenData.totalTime > 0 ? msToReadable(deafenData.totalTime) : '0', inline: true },
+                    { name: 'Time spent deafened', value: dylanTimeDeafen > 0 ? msToReadable(dylanTimeDeafen) : '0', inline: true },
+                    { name: 'Total time', value: dylanTimeTotal > 0 ? msToReadable(dylanTimeTotal) : '0', inline: true },
+                    { name: 'Average total time', value: avgTimeTotal !== Infinity ? msToReadable(avgTimeTotal) : 'N/A', inline: true },
+                    { name: 'Average time deafened', value: avgTimeDeafen !== Infinity ? msToReadable(avgTimeDeafen) : 'N/A', inline: true },
                 )
                 .setTimestamp()
 
-            if (deafenData.totalTime > 0) {
+            if (dylanTimeTotal > 0) {
                 embed.addFields(
-                    { name: 'Percentage of time deafened', value: Math.floor((deafenData.totalDeafenTime / deafenData.totalTime) * 100) + '%', inline: true }
+                    { name: 'Percentage of time deafened', value: Math.floor((dylanTimeDeafen / dylanTimeTotal) * 100) + '%', inline: true }
                 )
             } else {
                 embed.addFields(
@@ -287,8 +321,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 )
             }
 
-            await buttonInteraction.update({ embeds: [embed], content: null });
-            await message.edit({ content: null, components: [] });
+            await buttonInteraction.update({ embeds: [embed], content: null, components: [] });
         }
     });
 }

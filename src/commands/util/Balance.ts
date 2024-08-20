@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { formatCurrency, getBalance, setBalance } from '../../util/DatabaseUtil.js';
+import { formatCurrency, getBalance, setBalance } from '../../util/BalanceUtil.js';
 
 
 export const data = new SlashCommandBuilder().setName('bal').setDescription('Shows your current balance.');
