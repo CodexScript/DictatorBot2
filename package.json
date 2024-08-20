@@ -6,9 +6,9 @@
     "license": "MIT",
     "packageManager": "yarn@3.2.0",
     "scripts": {
-        "build": "yarn tsc --build",
-        "lint": "yarn eslint --ext .js,.ts .",
-        "format": "yarn prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
+        "build": "tsc --build",
+        "lint": "eslint --ext .js,.ts .",
+        "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
     },
     "dependencies": {
         "@discordjs/builders": "^1.8.1",
@@ -16,7 +16,6 @@
         "@discordjs/ws": "^1.1.0",
         "@napi-rs/canvas": "^0.1.52",
         "axios": "^1.7.2",
-        "better-sqlite3": "^10.0.0",
         "bufferutil": "^4.0.8",
         "dayjs": "^1.11.12",
         "discord-api-types": "^0.37.85",
@@ -31,6 +30,7 @@
         "openai": "^4.47.1",
         "pg": "^8.11.5",
         "pino": "^9.1.0",
+        "postgres": "^3.4.4",
         "puppeteer": "^22.10.0",
         "puppeteer-extra": "^3.3.6",
         "puppeteer-extra-plugin-stealth": "^2.11.2",

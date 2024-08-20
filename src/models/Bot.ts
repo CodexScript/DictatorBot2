@@ -9,6 +9,8 @@ import { OpenAI } from 'openai';
 import { getCurrentPfp, setPfp } from '../util/settings/GlobalSettingsManager.js';
 import { DefaultWebSocketManagerOptions } from 'discord.js';
 
+import postgres from 'postgres';
+
 function isDaylightSavingsReady(): boolean {
     // Get current date
     const currentDate = new Date();
@@ -149,6 +151,8 @@ export async function setProfilePicture(client: Bot, force: boolean = false): Pr
 export default class Bot extends Client {
     config: Config;
 
+    readonly sql: postgres.Sql<{}>;
+
     readonly music: Manager;
 
     readonly commands: Collection<Snowflake, [string, SlashCommand]> = new Collection();
@@ -174,6 +178,8 @@ export default class Bot extends Client {
         });
 
         this.config = yaml.load(fs.readFileSync('./config.yml', 'utf8')) as Config;
+
+        this.sql = postgres(this.config.dbConnectionString, { onnotice: () => {} });
 
         const nodes = [
             {
@@ -245,6 +251,7 @@ export default class Bot extends Client {
 declare module 'discord.js' {
     // eslint-disable-next-line no-shadow
     interface Client {
+        readonly sql: postgres.Sql<{}>;
         readonly music: Manager;
         readonly config: Config;
         readonly imgur: ImgurClient;

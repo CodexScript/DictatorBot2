@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Bot, { setProfilePicture, setStatus } from './models/Bot.js';
 import { registerCommands, registerEvents } from './util/CommandUtils.js';
+import { createBalancesTable } from './util/DatabaseUtil.js';
 
 (async () => {
     const client = new Bot();
@@ -16,6 +17,7 @@ import { registerCommands, registerEvents } from './util/CommandUtils.js';
     });
 
     client.once('ready', async () => {
+        await createBalancesTable(client.sql);
         const filename = fileURLToPath(import.meta.url);
         await registerCommands(
             client,

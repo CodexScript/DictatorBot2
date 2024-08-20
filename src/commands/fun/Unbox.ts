@@ -3,9 +3,26 @@ import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder } from 'disc
 import fs from 'node:fs';
 import { messageOwner } from '../../util/AdminUtils.js';
 import { ScrapedSkin, CounterStrikeSkin } from '../../models/CounterStrikeSkin.js';
+import { addBalance, formatCurrency } from '../../util/DatabaseUtil.js';
 
 const casesFile = fs.readFileSync('./assets/skins.json', 'utf-8');
 const cases = JSON.parse(casesFile);
+
+function roundHalfToEven(num: number, decimalPlaces: number) {
+    const multiplier = Math.pow(10, decimalPlaces);
+    const adjustedNum = num * multiplier;
+    const roundedNum = Math.round(adjustedNum);
+    
+    // Check if we're exactly halfway
+    if (Math.abs(adjustedNum - roundedNum) === 0.5) {
+        // If the rounded number is odd, we need to round down
+        if (roundedNum % 2 !== 0) {
+            return (roundedNum - 1) / multiplier;
+        }
+    }
+    
+    return roundedNum / multiplier;
+}
 
 function getWear(floatValue: any) {
     if (!floatValue || floatValue === "N/A") {
@@ -30,7 +47,6 @@ function getWear(floatValue: any) {
 }
 
 function downgradeByOne(floatValue: number) {
-    console.log("Downgrading, received float " + floatValue);
     let returnValue;
     if (floatValue >= 0.00 && floatValue <= 0.07) {
         // Minimal Wear range: 0.07 < x <= 0.15
@@ -51,7 +67,6 @@ function downgradeByOne(floatValue: number) {
 
     returnValue = returnValue;
 
-    console.log("Returning " + returnValue);
     return returnValue;
 }
 
@@ -235,14 +250,9 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const spentCases = rolls * cases[csCase]['price'];
             const spentKeys = rolls * 2.5;
             const color = getRarityHex(csSkin.rarity);
+            const profit = roundHalfToEven((gained - spentCases - spentKeys), 2);
 
-            let profitString;
-
-            if (gained - spentCases - spentKeys > 0) {
-                profitString = '$' + (gained - spentCases - spentKeys).toFixed(2);
-            } else {
-                profitString = '-$' + ((gained - spentCases - spentKeys) * -1).toFixed(2);
-            }
+            const profitString = formatCurrency(profit);
 
             let floatString;
 
@@ -281,7 +291,14 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const row = new ActionRowBuilder<ButtonBuilder>()
                 .addComponents(viewAll);
 
-            const response = await interaction.editReply({ embeds: [embed], components: [row] });
+
+            const profitCents = Math.floor(profit * 100);
+            const result = await addBalance(interaction.client.sql, interaction.user.id, profitCents);
+
+            const response = await interaction.editReply({ embeds: [embed], components: [row], content: `Your new balance: **${formatCurrency(result / 100)}**` });
+
+            
+            
 
             try {
                 const confirmation = await response.awaitMessageComponent({ time: 60_000 });
