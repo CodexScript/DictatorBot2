@@ -48,9 +48,10 @@ export async function setBalance(sql: postgres.Sql<{}>, id: string, balanceCents
 
 export async function addBalance(sql: postgres.Sql<{}>, id: string, balanceCents: number) {
     const result = await sql`
-        UPDATE balance_table
-        SET balance_cents = balance_cents + ${balanceCents}
-        WHERE id = ${id}
+        INSERT INTO balance_table (id, balance_cents)
+        VALUES (${id}, ${balanceCents})
+        ON CONFLICT (id) DO UPDATE
+        SET balance_cents = balance_table.balance_cents + EXCLUDED.balance_cents
         RETURNING balance_cents;
     `
 

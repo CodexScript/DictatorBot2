@@ -270,16 +270,16 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .setThumbnail(skin.img)
                 .addFields(
                     { name: "Exterior", value: csSkin.wear },
-                    { name: "Price", value: '$' + csSkin.price },
+                    { name: "Price", value: formatCurrency(csSkin.price) },
                     { name: "Float", value: floatString },
                     { name: "Total rolls", value: rolls.toString() },
                     { name: "Blues", value: Object.values(rolledSkins['Blue']).reduce((sum, value) => sum + value, 0).toString(), inline: true },
                     { name: "Purples", value: Object.values(rolledSkins['Purple']).reduce((sum, value) => sum + value, 0).toString(), inline: true },
                     { name: "Pinks", value: Object.values(rolledSkins['Pink']).reduce((sum, value) => sum + value, 0).toString(), inline: true },
                     { name: "Reds", value: Object.values(rolledSkins['Red']).reduce((sum, value) => sum + value, 0).toString(), inline: true },
-                    { name: "Total spent on keys", value: '$' + spentKeys.toFixed(2), inline: true },
-                    { name: "Total spent on cases", value: '$' + spentCases.toFixed(2), inline: true },
-                    { name: "Total spent", value: '$' + (spentCases + spentKeys).toFixed(2), inline: true },
+                    { name: "Total spent on keys", value: formatCurrency(spentKeys), inline: true },
+                    { name: "Total spent on cases", value: formatCurrency(spentCases), inline: true },
+                    { name: "Total spent", value: formatCurrency(spentCases + spentKeys), inline: true },
                     { name: "Profit", value: profitString, inline: true }
                 )
 
