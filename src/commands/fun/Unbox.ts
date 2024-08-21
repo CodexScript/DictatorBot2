@@ -267,6 +267,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const embed = new EmbedBuilder()
                 .setColor(color)
                 .setTitle(finalName)
+                .setDescription(`Unboxing ${csCase}`)
                 .setThumbnail(skin.img)
                 .addFields(
                     { name: "Exterior", value: csSkin.wear },
