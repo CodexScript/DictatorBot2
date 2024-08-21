@@ -251,11 +251,12 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const spentKeys = rolls * 2.5;
             const color = getRarityHex(csSkin.rarity);
             const profit = roundHalfToEven((gained - spentCases - spentKeys), 2);
+            const profitCents = Math.floor(profit * 100);
 
             if (profit > 0) {
-                await setMostGained(interaction.client.sql, interaction.user.id, profit);
+                await setMostGained(interaction.client.sql, interaction.user.id, profitCents);
             } else {
-                await setMostLost(interaction.client.sql, interaction.user.id, profit * -1);
+                await setMostLost(interaction.client.sql, interaction.user.id, profitCents * -1);
             }
 
             const profitString = formatCurrency(profit);
@@ -297,7 +298,6 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
                 .addComponents(viewAll);
 
 
-            const profitCents = Math.floor(profit * 100);
             const result = await addBalance(interaction.client.sql, interaction.user.id, profitCents);
 
             const response = await interaction.editReply({ embeds: [embed], components: [row], content: `Your new balance: **${formatCurrency(result.balance_cents / 100)}**\nMost gained in one run: **${formatCurrency(result.most_gained / 100)}**\nMost lost in one run: **${formatCurrency(result.most_lost / 100)}**` });
