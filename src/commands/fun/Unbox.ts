@@ -3,7 +3,7 @@ import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder } from 'disc
 import fs from 'node:fs';
 import { messageOwner } from '../../util/AdminUtils.js';
 import { ScrapedSkin, CounterStrikeSkin } from '../../models/CounterStrikeSkin.js';
-import { addBalance, formatCurrency } from '../../util/BalanceUtil.js';
+import { addBalance, formatCurrency, setMostGained, setMostLost } from '../../util/BalanceUtil.js';
 
 const casesFile = fs.readFileSync('./assets/skins.json', 'utf-8');
 const cases = JSON.parse(casesFile);
@@ -252,6 +252,12 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const color = getRarityHex(csSkin.rarity);
             const profit = roundHalfToEven((gained - spentCases - spentKeys), 2);
 
+            if (profit > 0) {
+                await setMostGained(interaction.client.sql, interaction.user.id, profit);
+            } else {
+                await setMostLost(interaction.client.sql, interaction.user.id, profit * -1);
+            }
+
             const profitString = formatCurrency(profit);
 
             let floatString;
@@ -261,8 +267,6 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             } else {
                 floatString = csSkin.floatValue.toFixed(6);
             }
-
-
 
             const embed = new EmbedBuilder()
                 .setColor(color)
@@ -296,11 +300,8 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
             const profitCents = Math.floor(profit * 100);
             const result = await addBalance(interaction.client.sql, interaction.user.id, profitCents);
 
-            const response = await interaction.editReply({ embeds: [embed], components: [row], content: `Your new balance: **${formatCurrency(result / 100)}**` });
-
+            const response = await interaction.editReply({ embeds: [embed], components: [row], content: `Your new balance: **${formatCurrency(result.balance_cents / 100)}**\nMost gained in one run: **${formatCurrency(result.most_gained / 100)}**\nMost lost in one run: **${formatCurrency(result.most_lost / 100)}**` });
             
-            
-
             try {
                 const confirmation = await response.awaitMessageComponent({ time: 60_000 });
             

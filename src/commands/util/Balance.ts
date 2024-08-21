@@ -6,9 +6,7 @@ import { formatCurrency, getBalance, setBalance } from '../../util/BalanceUtil.j
 export const data = new SlashCommandBuilder().setName('bal').setDescription('Shows your current balance.');
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const bal = await getBalance(interaction.client.sql, interaction.user.id);
+    const result = await getBalance(interaction.client.sql, interaction.user.id);
 
-    const balString = formatCurrency(bal / 100);
-
-    await interaction.reply({ content: `Your balance is: **${balString}**`, ephemeral: true });
+    await interaction.reply({ content: `Your balance: **${formatCurrency(result.balance_cents / 100)}**\nMost gained in one run: **${formatCurrency(result.most_gained / 100)}**\nMost lost in one run: **${formatCurrency(result.most_lost / 100)}**`, ephemeral: true });
 }

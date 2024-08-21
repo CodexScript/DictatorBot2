@@ -14,27 +14,33 @@ export async function createBalancesTable(sql: postgres.Sql<{}>) {
     await sql`
         CREATE TABLE IF NOT EXISTS balance_table (
             id BIGINT PRIMARY KEY,
-            balance_cents INTEGER NOT NULL DEFAULT 0
+            balance_cents INTEGER NOT NULL DEFAULT 0,
+            most_lost INTEGER NOT NULL DEFAULT 0,
+            most_gained INTEGER NOT NULL DEFAULT 0
         );
     `
 }
 
 export async function getBalance(sql: postgres.Sql<{}>, id: string) {
     const result = await sql`
-        SELECT balance_cents
+        SELECT balance_cents, most_lost, most_gained
         FROM balance_table
         WHERE id = ${id};
     `
 
     if (result.length === 0) {
         await sql`
-            INSERT INTO balance_table (id, balance_cents) VALUES (${id}, 0);
+            INSERT INTO balance_table (id) VALUES (${id});
         `
 
-        return 0;
+        return {
+            'balance_cents': 0,
+            'most_lost': 0,
+            'most_gained': 0
+        };
     }
 
-    return result[0].balance_cents;
+    return result[0];
 
 }
 
@@ -46,14 +52,30 @@ export async function setBalance(sql: postgres.Sql<{}>, id: string, balanceCents
     `
 }
 
+export async function setMostLost(sql: postgres.Sql<{}>, id: string, cents: number) {
+    return await sql`
+        UPDATE balance_table
+        SET most_lost = ${cents}
+        WHERE id = ${id} AND ${cents} > most_lost;
+    `
+}
+
+export async function setMostGained(sql: postgres.Sql<{}>, id: string, cents: number) {
+    return await sql`
+        UPDATE balance_table
+        SET most_gained = ${cents}
+        WHERE id = ${id} AND ${cents} > most_gained;
+    `
+}
+
 export async function addBalance(sql: postgres.Sql<{}>, id: string, balanceCents: number) {
     const result = await sql`
         INSERT INTO balance_table (id, balance_cents)
         VALUES (${id}, ${balanceCents})
         ON CONFLICT (id) DO UPDATE
         SET balance_cents = balance_table.balance_cents + EXCLUDED.balance_cents
-        RETURNING balance_cents;
+        RETURNING balance_cents, most_gained, most_lost;
     `
 
-    return result[0].balance_cents;
+    return result[0];
 }
