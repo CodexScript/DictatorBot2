@@ -13,15 +13,17 @@ export const data = new SlashCommandBuilder().setName('bal')
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
     let target = interaction.options.getUser('user');
 
+    let userString;
+
     if (!target) {
         target = interaction.user;
+        userString = "Your";
+    } else {
+        userString = target.displayName;
     }
 
     const result = await getBalance(interaction.client.sql, target.id);
 
-    if (target) {
-        await interaction.reply({ content: `${target.displayName} balance: **${formatCurrency(result.balance_cents / 100)}**\nMost gained in one run: **${formatCurrency(result.most_gained / 100)}**\nMost lost in one run: **${formatCurrency(result.most_lost / 100)}**`, ephemeral: true });
-    } else {
-        await interaction.reply({ content: `Your balance: **${formatCurrency(result.balance_cents / 100)}**\nMost gained in one run: **${formatCurrency(result.most_gained / 100)}**\nMost lost in one run: **${formatCurrency(result.most_lost / 100)}**`, ephemeral: true });
-    }
+
+    await interaction.reply({ content: `${userString} balance: **${formatCurrency(result.balance_cents / 100)}**\nMost gained in one run: **${formatCurrency(result.most_gained / 100)}**\nMost lost in one run: **${formatCurrency(result.most_lost / 100)}**`, ephemeral: true });
 }
