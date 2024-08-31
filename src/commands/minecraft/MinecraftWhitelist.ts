@@ -8,7 +8,7 @@ import {
     TextChannel,
 } from 'discord.js';
 import { Rcon } from 'rcon-client';
-import { isAdmin } from '../../util/AdminUtils';
+import { isAdmin } from '../../util/AdminUtils.js';
 
 const filter = (reaction: MessageReaction) => {
     return reaction.emoji.name === '✅' || reaction.emoji.name === '❌';
