@@ -3,13 +3,11 @@ import { messageOwner } from '../util/AdminUtils.js';
 import { addDeafenTime, addTotalTime } from '../util/DeafenUtil.js';
 
 type UserAudioState = {
-    [key: string]: {
-        joinDate: number | null;
-        deafenTime: number | null;
-    }
+    joinDate: number | null;
+    deafenTime: number | null;
 };
 
-const deafenMap: UserAudioState = {};
+const deafenMap: Map<string, UserAudioState> = new Map();
 
 export const name = Events.VoiceStateUpdate;
 export const once = false;
@@ -18,51 +16,54 @@ export const execute = async (oldState: VoiceState, newState: VoiceState) => {
         return;
     }
 
-    if (Object.hasOwn(deafenMap, newState.member.id) && Object.hasOwn(deafenMap[newState.member.id], 'deafenTime') && deafenMap[newState.member.id]['deafenTime'] !== null && newState.selfDeaf === false && newState.selfMute === false) {
-        const diff = Date.now() - deafenMap[newState.member.id]['deafenTime']!;
-        deafenMap[newState.member.id]['deafenTime'] = null;
-        await addDeafenTime(oldState.client.sql, oldState.member.id, diff);
+    const userId = newState.member.id;
+    const userState = deafenMap.get(userId);
+
+    if (userState && userState.deafenTime !== null && newState.selfDeaf === false && newState.selfMute === false) {
+        const diff = Date.now() - userState.deafenTime;
+        userState.deafenTime = null;
+        deafenMap.set(userId, userState);
+        await addDeafenTime(oldState.client.sql, userId, diff);
     }
 
     // Joined channel, previously was not in the server
     if ((!oldState.channel && newState.channel) || (newState.channel && oldState.guild.id !== newState.guild.id)) {
-        if (newState.selfDeaf || newState.selfMute) {
-            deafenMap[newState.member.id] = {
-                'deafenTime': Date.now(),
-                'joinDate': Date.now()
-            };
-        } else {
-            deafenMap[newState.member.id] = {
-                'deafenTime': null,
-                'joinDate': Date.now()
-            };
-        }
+        const newUserState: UserAudioState = {
+            deafenTime: newState.selfDeaf || newState.selfMute ? Date.now() : null,
+            joinDate: Date.now()
+        };
+        deafenMap.set(userId, newUserState);
     }
 
     // Deafened or muted
     // Must be in a channel and in the same guild as old state
-    if (newState.channel && newState.guild.id === oldState.guild.id && (oldState.selfDeaf === false && oldState.selfMute === false) && (newState.selfDeaf || newState.selfMute)) {
-        if (!Object.hasOwn(deafenMap, newState.member.id) || !Object.hasOwn(deafenMap[newState.member.id], 'joinDate')) return;
-        deafenMap[newState.member.id]['deafenTime'] = Date.now();        
+    if (newState.channel && newState.guild.id === oldState.guild.id && 
+        (oldState.selfDeaf === false && oldState.selfMute === false) && 
+        (newState.selfDeaf || newState.selfMute)) {
+        const existingState = deafenMap.get(userId);
+        if (existingState) {
+            existingState.deafenTime = Date.now();
+            deafenMap.set(userId, existingState);
+        }
     }
 
     // No longer exists in any channel, or left to a different server, or went idle
     if (!newState.channel || (newState.channel && newState.guild.id !== oldState.guild.id) || newState.member.presence?.status === 'idle') {
-        if (!Object.hasOwn(deafenMap, oldState.member.id) || !Object.hasOwn(deafenMap[oldState.member.id], 'joinDate') || deafenMap[oldState.member.id]['joinDate'] === null) {
+        const existingState = deafenMap.get(userId);
+        if (!existingState || existingState.joinDate === null) {
             console.warn("Left with no join date");
-            await messageOwner(newState.client, {content: "Left with no join date " + newState.member.id});
+            await messageOwner(newState.client, {content: "Left with no join date " + userId});
             return;
         }
-        const diff = Date.now() - deafenMap[newState.member.id]['joinDate']!;
-        await addTotalTime(oldState.client.sql, oldState.member.id, diff);
+        const diff = Date.now() - existingState.joinDate;
+        await addTotalTime(oldState.client.sql, userId, diff);
         
-        if (Object.hasOwn(deafenMap, newState.member.id) && Object.hasOwn(deafenMap[newState.member.id], 'deafenTime') && deafenMap[newState.member.id]['deafenTime'] !== null) {
-            const deafDiff = Date.now() - deafenMap[newState.member.id]['deafenTime']!;
-            deafenMap[newState.member.id]['deafenTime'] = null;
-            await addDeafenTime(oldState.client.sql, oldState.member.id, deafDiff);
+        if (existingState.deafenTime !== null) {
+            const deafDiff = Date.now() - existingState.deafenTime;
+            await addDeafenTime(oldState.client.sql, userId, deafDiff);
         }
         
-        delete deafenMap[oldState.member.id];
+        deafenMap.delete(userId);
     }
     
 };
