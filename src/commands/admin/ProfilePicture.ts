@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { setPfp } from '../../util/settings/GlobalSettingsManager.js';
 import { setProfilePicture } from '../../models/Bot.js';
+import { isAdmin } from '../../util/AdminUtils.js';
 
 export const data = new SlashCommandBuilder()
     .setName('pfp')
@@ -28,7 +29,7 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    if (interaction.user.id != interaction.client.config.ownerID) {
+    if (!isAdmin(interaction.client, interaction.user.id)) {
         await interaction.reply({ content: "You can't use that command.", ephemeral: true });
         return;
     }

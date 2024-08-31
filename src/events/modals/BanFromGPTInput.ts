@@ -1,5 +1,6 @@
 import { BaseInteraction, Events } from 'discord.js';
 import { writeConfig } from '../../util/settings/GlobalSettingsManager.js';
+import { isAdmin } from '../../util/AdminUtils.js';
 
 export const name = Events.InteractionCreate;
 export const once = false;
@@ -8,7 +9,7 @@ export const execute = async (interaction: BaseInteraction) => {
 
     if (interaction.customId !== 'ban_from_gpt_modal') return;
 
-    if (interaction.user.id !== interaction.client.config.ownerID) return;
+    if (!isAdmin(interaction.client, interaction.user.id)) return;
 
     const userId = interaction.fields.getTextInputValue('ban_from_gpt_id_input');
 

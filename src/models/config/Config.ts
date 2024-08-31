@@ -3,6 +3,7 @@ import { TiktokConfig } from './TiktokConfig.js';
 export interface Config {
     botToken: string;
     ownerID: string;
+    admins: string[];
     dbConnectionString: string;
     pfp: {
         current: string;

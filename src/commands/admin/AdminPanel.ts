@@ -15,6 +15,7 @@ import {
     TextInputStyle,
 } from 'discord.js';
 import { getTimeData, msToReadable } from '../../util/DeafenUtil.js';
+import { isAdmin } from '../../util/AdminUtils.js';
 
 const DYLAN = "236982767080964097";
 
@@ -30,7 +31,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         return;
     }
 
-    if (interaction.member.id !== interaction.client.config.ownerID) {
+    if (!isAdmin(interaction.client, interaction.member.id)) {
         await interaction.reply({ content: "You don't have permission to use that command.", ephemeral: true });
         return;
     }

@@ -12,6 +12,7 @@ import {
 } from 'discord.js';
 import { BasedometerCategory } from '../../models/basedometer/Basedometer.js';
 import BasedometerManager from './BasedometerManager.js';
+import { isAdmin } from '../AdminUtils.js';
 
 export default class BasedometerInstance {
     lastInteraction: Date;
@@ -236,7 +237,7 @@ export default class BasedometerInstance {
                 if (keepInteraction.customId === 'basedometerKeepThread') {
                     if (
                         keepInteraction.user.id === this.member.user.id ||
-                        keepInteraction.user.id === keepInteraction.client.config.ownerID ||
+                        isAdmin(keepInteraction.client, keepInteraction.user.id) ||
                         (keepInteraction.member instanceof GuildMember &&
                             keepInteraction.member.permissions.has(PermissionFlagsBits.ManageThreads))
                     ) {

@@ -1,4 +1,5 @@
 import { BaseInteraction, Events } from 'discord.js';
+import { isAdmin } from '../../util/AdminUtils.js';
 
 export const name = Events.InteractionCreate;
 export const once = false;
@@ -7,7 +8,10 @@ export const execute = async (interaction: BaseInteraction) => {
 
     if (interaction.customId !== 'delete_message_modal') return;
 
-    if (interaction.user.id !== interaction.client.config.ownerID) return;
+    if (!isAdmin(interaction.client, interaction.user.id)) {
+        await interaction.reply({ content: 'You don\'t have permission to use that command.', ephemeral: true });
+        return;
+    };
 
     const messageId = interaction.fields.getTextInputValue('delete_message_id_input');
 

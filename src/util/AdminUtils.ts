@@ -18,3 +18,7 @@ export async function messageOwner(client: Bot, options: MessageCreateOptions): 
     await dm.send(options);
     return true;
 }
+
+export function isAdmin(client: Bot, userId: string): boolean {
+    return client.config.ownerID === userId || client.config.admins.includes(userId);
+}

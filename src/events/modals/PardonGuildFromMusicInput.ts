@@ -1,5 +1,6 @@
 import { BaseInteraction, Events } from 'discord.js';
 import { writeConfig } from '../../util/settings/GlobalSettingsManager.js';
+import { isAdmin } from '../../util/AdminUtils.js';
 
 export const name = Events.InteractionCreate;
 export const once = false;
@@ -8,7 +9,10 @@ export const execute = async (interaction: BaseInteraction) => {
 
     if (interaction.customId !== 'unban_guild_from_music_modal') return;
 
-    if (interaction.user.id !== interaction.client.config.ownerID) return;
+    if (!isAdmin(interaction.client, interaction.user.id)) {
+        await interaction.reply({ content: 'You don\'t have permission to use that command.', ephemeral: true });
+        return;
+    };
 
     const guildId = interaction.fields.getTextInputValue('unban_guild_from_music_id_input');
 

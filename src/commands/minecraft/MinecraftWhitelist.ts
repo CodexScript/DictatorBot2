@@ -8,6 +8,7 @@ import {
     TextChannel,
 } from 'discord.js';
 import { Rcon } from 'rcon-client';
+import { isAdmin } from '../../util/AdminUtils';
 
 const filter = (reaction: MessageReaction) => {
     return reaction.emoji.name === '✅' || reaction.emoji.name === '❌';
@@ -65,7 +66,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
         return;
     }
 
-    if (interaction.user.id === interaction.client.config.ownerID) {
+    if (isAdmin(interaction.client, interaction.user.id)) {
         await interaction.deferReply();
         await whitelist(username, interaction);
         return;

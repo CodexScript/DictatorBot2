@@ -1,4 +1,5 @@
 import { BaseInteraction, Events } from 'discord.js';
+import { isAdmin } from '../../util/AdminUtils.js';
 
 export const name = Events.InteractionCreate;
 export const once = false;
@@ -7,7 +8,10 @@ export const execute = async (interaction: BaseInteraction) => {
 
     if (interaction.customId !== 'change_nick_modal') return;
 
-    if (interaction.user.id !== interaction.client.config.ownerID) return;
+    if (!isAdmin(interaction.client, interaction.user.id)) {
+        await interaction.reply({ content: 'You don\'t have permission to use that command.', ephemeral: true });
+        return;
+    };
 
     let userId = interaction.fields.getTextInputValue('change_nick_id_input');
     const newNick = interaction.fields.getTextInputValue('change_nick_new_nick_input');
