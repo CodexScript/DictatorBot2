@@ -84,7 +84,7 @@ async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
 
     const show = await axios.get(`${discordBot.config.overseerrEndpoint}/api/v1/tv/${seriesId}`, {
         headers: {
-            Authorization: `Bearer ${discordBot.config.overseerrToken}`,
+            'X-Api-Key': discordBot.config.overseerrToken,
         },
     });
 
