@@ -5,6 +5,8 @@ export interface Config {
     ownerID: string;
     admins: string[];
     dbConnectionString: string;
+    overseerrEndpoint: string | null;
+    overseerrToken: string | null;
     pfp: {
         current: string;
         forced: boolean;

@@ -1,5 +1,6 @@
 import Bot from '../models/Bot.js';
 import express from 'express';
+import axios from 'axios';
 
 export async function createServer(discordBot: Bot) {
     const app = express();
@@ -8,6 +9,10 @@ export async function createServer(discordBot: Bot) {
         console.log('Got request with id ' + req.params.id);
         res.send('Kick Endpoint');
         await kickContinous(20000, discordBot, req.params.id);
+    });
+
+    app.post('/overseerr', async (req, res) => {
+        await alertBadRequest(req.body, discordBot);
     });
 
     app.listen(3000, () => {
@@ -50,4 +55,68 @@ function kickContinous(durationMillis: number, discordBot: Bot, id: string): Pro
 
         checkTime();
     });
+}
+
+async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
+    if (!discordBot.config.overseerrEndpoint || !discordBot.config.overseerrToken) {
+        return;
+    }
+
+    if (
+        overseerrPayload['notification_type'] !== 'MEDIA_PENDING' ||
+        !overseerrPayload['media'] ||
+        overseerrPayload['media']['media_type'] !== 'tv'
+    ) {
+        return;
+    }
+
+    if (!overseerrPayload['request'] || !overseerrPayload['request']['request_id']) {
+        return;
+    }
+
+    const seriesId = overseerrPayload['media']['tmdbId'];
+
+    const show = await axios.get(`${discordBot.config.overseerrEndpoint}/api/v1/tv/${seriesId}`, {
+        headers: {
+            Authorization: `Bearer ${discordBot.config.overseerrToken}`,
+        },
+    });
+
+    if (!show.data['keywords']) {
+        return;
+    }
+
+    let isAnime = false;
+
+    for (let keyword of show.data['keywords']) {
+        if (keyword['name'] && keyword['name'] === 'anime') {
+            isAnime = true;
+            break;
+        }
+    }
+
+    if (!isAnime) {
+        return;
+    }
+
+    await axios.post(
+        `${discordBot.config.overseerrEndpoint}/api/v1/request/${overseerrPayload['request']['request_id']}/decline`,
+        {
+            headers: {
+                Authorization: `Bearer ${discordBot.config.overseerrToken}`,
+            },
+        },
+    );
+
+    if (!overseerrPayload['request']['requestedBy_discord']) {
+        return;
+    }
+
+    const userId = overseerrPayload['request']['requestedBy_discord'];
+
+    const user = await discordBot.users.fetch(userId);
+    await user.send(`Hello,
+        It seems that you've requested the anime ${show.data['name']}. This is your reminder that anime is not supposed to be requested.
+        Requests for anime should be directly communicated to <@${discordBot.config.ownerID}>.
+        Your request has been automatically declined.`);
 }
