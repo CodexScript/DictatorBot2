@@ -109,7 +109,7 @@ async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
         `${discordBot.config.overseerrEndpoint}/api/v1/request/${overseerrPayload['request']['request_id']}/decline`,
         {
             headers: {
-                Authorization: `Bearer ${discordBot.config.overseerrToken}`,
+                'X-Api-Key': discordBot.config.overseerrToken,
             },
         },
     );
