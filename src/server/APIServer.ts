@@ -68,7 +68,8 @@ async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
     }
 
     if (
-        overseerrPayload['notification_type'] !== 'MEDIA_PENDING' ||
+        (overseerrPayload['notification_type'] !== 'MEDIA_PENDING' &&
+            overseerrPayload['notification_type'] !== 'MEDIA_AUTO_APPROVED') ||
         !overseerrPayload['media'] ||
         overseerrPayload['media']['media_type'] !== 'tv'
     ) {
