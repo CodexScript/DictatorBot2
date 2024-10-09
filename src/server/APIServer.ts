@@ -1,7 +1,6 @@
 import Bot from '../models/Bot.js';
 import express from 'express';
 import axios from 'axios';
-import * as fs from 'fs/promises';
 
 export async function createServer(discordBot: Bot) {
     const app = express();
@@ -61,12 +60,12 @@ function kickContinous(durationMillis: number, discordBot: Bot, id: string): Pro
 }
 
 async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
-    const data = JSON.stringify(overseerrPayload, null, 2);
-    await fs.writeFile('overseerr.json', data, 'utf-8');
+    // If overseerr is not configured then skip
     if (!discordBot.config.overseerrEndpoint || !discordBot.config.overseerrToken) {
         return;
     }
 
+    // Needs to be a TV show that was just requested
     if (
         (overseerrPayload['notification_type'] !== 'MEDIA_PENDING' &&
             overseerrPayload['notification_type'] !== 'MEDIA_AUTO_APPROVED') ||
@@ -121,7 +120,7 @@ async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
 
     const user = await discordBot.users.fetch(userId);
     await user.send(`Hello,
-        It seems that you've requested the anime ${show.data['name']}. This is your reminder that anime is not supposed to be requested.
-        Requests for anime should be directly communicated to <@${discordBot.config.ownerID}>.
-        Your request has been automatically declined.`);
+It seems that you've requested the anime ${show.data['name']}. This is your reminder that anime is not supposed to be requested.
+Requests for anime should be directly communicated to <@${discordBot.config.ownerID}>.
+Your request has been automatically declined.`);
 }
