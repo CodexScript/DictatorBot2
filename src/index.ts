@@ -75,6 +75,6 @@ import { createDeafenTable } from './util/DeafenUtil.js';
         // }
     });
 
-    //await Promise.all([client.login(client.config.botToken), createServer(client)]);
-    await client.login(client.config.botToken);
+    await Promise.all([client.login(client.config.botToken), createServer(client)]);
+    // await client.login(client.config.botToken);
 })();
