@@ -107,10 +107,9 @@ async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
 
     await axios.post(
         `${discordBot.config.overseerrEndpoint}/api/v1/request/${overseerrPayload['request']['request_id']}/decline`,
+        {},
         {
-            headers: {
-                'X-Api-Key': discordBot.config.overseerrToken,
-            },
+            headers: { 'X-Api-Key': discordBot.config.overseerrToken },
         },
     );
 
