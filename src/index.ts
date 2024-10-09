@@ -5,6 +5,7 @@ import Bot, { setProfilePicture, setStatus } from './models/Bot.js';
 import { registerCommands, registerEvents } from './util/CommandUtils.js';
 import { createBalancesTable } from './util/BalanceUtil.js';
 import { createDeafenTable } from './util/DeafenUtil.js';
+import { createServer } from './server/APIServer.js';
 
 (async () => {
     const client = new Bot();

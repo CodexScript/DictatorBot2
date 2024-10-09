@@ -1,6 +1,7 @@
 import Bot from '../models/Bot.js';
 import express from 'express';
 import axios from 'axios';
+import * as fs from 'fs/promises';
 
 export async function createServer(discordBot: Bot) {
     const app = express();
@@ -13,6 +14,7 @@ export async function createServer(discordBot: Bot) {
 
     app.post('/overseerr', async (req, res) => {
         await alertBadRequest(req.body, discordBot);
+        res.sendStatus(200);
     });
 
     app.listen(3000, () => {
@@ -58,6 +60,8 @@ function kickContinous(durationMillis: number, discordBot: Bot, id: string): Pro
 }
 
 async function alertBadRequest(overseerrPayload: any, discordBot: Bot) {
+    const data = JSON.stringify(overseerrPayload, null, 2);
+    await fs.writeFile('overseerr.json', data, 'utf-8');
     if (!discordBot.config.overseerrEndpoint || !discordBot.config.overseerrToken) {
         return;
     }
