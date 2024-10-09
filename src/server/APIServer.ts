@@ -5,6 +5,7 @@ import * as fs from 'fs/promises';
 
 export async function createServer(discordBot: Bot) {
     const app = express();
+    app.use(express.json());
 
     app.get('/kick/:id', async (req, res) => {
         console.log('Got request with id ' + req.params.id);
