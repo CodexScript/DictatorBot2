@@ -1,4 +1,12 @@
-import { ActivityType, Client, Collection, GatewayIntentBits, Snowflake, TextBasedChannel } from 'discord.js';
+import {
+    ActivityType,
+    Client,
+    Collection,
+    GatewayIntentBits,
+    Snowflake,
+    TextBasedChannel,
+    TextChannel,
+} from 'discord.js';
 import * as fs from 'fs';
 import yaml from 'js-yaml';
 import { Manager, Payload } from 'magmastream';
@@ -231,7 +239,7 @@ export default class Bot extends Client {
 
             if (!trackChannel.isTextBased) return;
 
-            await (trackChannel as TextBasedChannel).send({content: `Error playing the track! <@${this.config.ownerID}>`});
+            await (trackChannel as TextChannel).send({ content: `Error playing the track! <@${this.config.ownerID}>` });
         });
 
         this.music.on('trackStuck', async (eventPlayer, track, payload) => {
@@ -257,6 +265,6 @@ declare module 'discord.js' {
         readonly imgur: ImgurClient;
         readonly openai: OpenAI | null;
         readonly Bot: Bot;
-        readonly commands: Collection<Snowflake, [string, SlashCommand]>
+        readonly commands: Collection<Snowflake, [string, SlashCommand]>;
     }
 }

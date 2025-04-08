@@ -2,13 +2,16 @@
 import { ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder } from '@discordjs/builders';
 import {
     APISelectMenuOption,
+    ButtonInteraction,
     ButtonStyle,
     ComponentType,
     GuildMember,
+    GuildTextBasedChannel,
     Message,
     MessageComponentInteraction,
     PermissionFlagsBits,
     TextBasedChannel,
+    TextChannel,
 } from 'discord.js';
 import { BasedometerCategory } from '../../models/basedometer/Basedometer.js';
 import BasedometerManager from './BasedometerManager.js';
@@ -17,7 +20,7 @@ import { isAdmin } from '../AdminUtils.js';
 export default class BasedometerInstance {
     lastInteraction: Date;
 
-    channel: TextBasedChannel;
+    channel: GuildTextBasedChannel;
 
     visible: boolean;
 
@@ -35,7 +38,7 @@ export default class BasedometerInstance {
 
     finished = false;
 
-    constructor(manager: BasedometerManager, member: GuildMember, channel: TextBasedChannel, visible: boolean) {
+    constructor(manager: BasedometerManager, member: GuildMember, channel: GuildTextBasedChannel, visible: boolean) {
         this.lastInteraction = new Date();
         this.channel = channel;
         this.visible = visible;
@@ -142,7 +145,7 @@ export default class BasedometerInstance {
             componentType: ComponentType.Button,
             time: 15000 * 60,
         });
-        slideshowCollector.on('collect', async (i) => {
+        slideshowCollector.on('collect', async (i: ButtonInteraction) => {
             this.lastInteraction = new Date();
             if (i.user.id === this.member.user.id) {
                 if (i.customId === 'basedometerPrevImage') {
