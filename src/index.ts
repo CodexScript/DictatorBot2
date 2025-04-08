@@ -6,6 +6,7 @@ import { registerCommands, registerEvents } from './util/CommandUtils.js';
 import { createBalancesTable } from './util/BalanceUtil.js';
 import { createDeafenTable } from './util/DeafenUtil.js';
 import { createServer } from './server/APIServer.js';
+import { ghostMention } from './util/GhostMention.js';
 
 (async () => {
     const client = new Bot();
@@ -41,6 +42,10 @@ import { createServer } from './server/APIServer.js';
         setInterval(async () => {
             await setProfilePicture(client);
         }, 900000);
+
+        setInterval(async () => {
+            await ghostMention(client);
+        }, 300000);
 
         // await (await client.guilds.fetch('575404293935595531')).members.fetch();
 
